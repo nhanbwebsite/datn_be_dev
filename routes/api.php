@@ -20,18 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::controller(AuthController::class)->prefix('auth')->group(function (){
-    Route::post('/login', 'login');
-    Route::post('/register', 'register');
-});
+require __DIR__.'/Auth/auth.php';
 
-Route::controller(AuthController::class)->middleware(['auth:sanctum'])->group(function (){
-    Route::post('/me', 'me');
-    Route::post('/logout', 'logout');
-});
-
-Route::controller(UserController::class)->middleware(['auth:sanctum', 'checkAction:all,view-user,create-user,update-user,delete-user'])->prefix('users')->group(function (){
-    Route::get('/', 'index');
-    Route::get('/{id}', 'show');
-    Route::delete('/{id}', 'destroy');
-});
+require __DIR__.'/User/user.php';
