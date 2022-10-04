@@ -23,3 +23,8 @@ require __DIR__.'/Auth/auth.php';
 
 require __DIR__.'/User/user.php';
 
+
+Route::get('/v1/categories',[Categories::class,'index']);
+
+Route::get('/v1/categories/{category}',[Categories::class,'show']);
+
