@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 class Categories extends Controller
 {
     /**
@@ -13,7 +14,7 @@ class Categories extends Controller
      */
     public function index()
     {
-        $dataCategories = Category::all()->paginate(5);
+        $dataCategories = DB::table('categories')->paginate(9);
         return response()->json([
             'data' => $dataCategories
         ],200);
@@ -72,7 +73,7 @@ class Categories extends Controller
             'name' =>'required|max:255',
             'slug' =>'required|max:255',
         ]);
-        $category =  Category::find($id)->first();
+        $category =  Category::firstWhere('id',$id);
         $category->name = $fiedls['name'];
         $category->slug = $fiedls['slug'];
         $category->url_img = $fiedls['url_img'];
@@ -87,6 +88,10 @@ class Categories extends Controller
      */
     public function destroy($id)
     {
-        //
+        $category = Category::destroy($id);
+        return response()->json([
+           'message' => 'category deleted',
+           'data' => $category
+        ],200);
     }
 }

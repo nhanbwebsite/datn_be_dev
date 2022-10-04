@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +22,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 require __DIR__.'/Auth/auth.php';
 
 require __DIR__.'/User/user.php';
+

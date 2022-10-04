@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SubCategory;
 use Illuminate\Http\Request;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 class Subcategories extends Controller
 {
     /**
@@ -13,7 +15,7 @@ class Subcategories extends Controller
      */
     public function index()
     {
-        //
+        $data = DB::table('subcategories')->all()->paginate(9);
     }
 
     /**
@@ -24,7 +26,19 @@ class Subcategories extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $fiedls = $request->validate([
+            'category_id' =>'required',
+            'name' =>'required|max:255',
+            'slug' =>'required|max:255',
+            'url_img' =>'required|max:300'
+        ]);
+        if($fiedls) {
+            return SubCategory::create($request->all());
+        }
+
+        return response()->json([
+            'message' => 'created subcategory error',
+        ]);
     }
 
     /**
@@ -35,7 +49,17 @@ class Subcategories extends Controller
      */
     public function show($id)
     {
-        //
+        $dataSubcategory = SubCategory::find($id);
+        if($dataSubcategory){
+            return response()->json([
+                'message' => 'created subcategory successfully',
+                'data' => $dataSubcategory
+            ]);
+        }
+        return response()->json([
+            'message' => 'created subcategory error',
+        ]); //
+
     }
 
     /**
@@ -47,7 +71,22 @@ class Subcategories extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $fiedls = $request->validate([
+            'category_id' =>'required',
+            'name' =>'required',
+            'slug' =>'required|max:255',
+            'url_img' =>'required|max:300',
+            'is_active' =>'required',
+        ]);
+
+        if($fiedls) {
+            $dataUpdate = SubCategory::find($id);
+            $dataUpdate->category_id = $fiedls['category_id'];
+            $dataUpdate->name = $fiedls['name'];
+            $dataUpdate->slug = $fiedls['slug'];
+            $dataUpdate->url_img = $fiedls['url_img'];
+
+        }
     }
 
     /**
