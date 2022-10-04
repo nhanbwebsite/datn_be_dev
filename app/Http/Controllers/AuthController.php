@@ -226,6 +226,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try{
+            DB::beginTransaction();
             $user = $request->user();
             if(empty($user)){
                 return response()->json([
@@ -243,8 +244,10 @@ class AuthController extends Controller
                 ]);
                 $sessionDel->delete();
             }
+            DB::commit();
         }
         catch(Exception $e){
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
