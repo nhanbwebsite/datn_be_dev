@@ -38,4 +38,6 @@ Route::get('/v1/subcategories/{id}',[Subcategories::class,'show']);
 
 Route::patch('/v1/subcategories/{id}',[Subcategories::class,'update']);
 
-Route::patch('/v1/subcategories/{id}',[Subcategories::class,'destroy']);
+// Route::patch('/v1/subcategories/{id}',[Subcategories::class,'destroy']);
+;
+
