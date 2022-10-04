@@ -3,7 +3,7 @@
 use App\Http\Controllers\Categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Subcategories;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -26,5 +26,16 @@ require __DIR__.'/User/user.php';
 
 Route::get('/v1/categories',[Categories::class,'index']);
 
-Route::get('/v1/categories/{category}',[Categories::class,'show']);
+Route::get('/v1/categories/{id}',[Categories::class,'show']);
 
+Route::patch('/v1/categories/{id}',[Categories::class,'update']);
+
+Route::delete('/v1/categories/{id}',[Categories::class,'destroy']);
+
+Route::get('/v1/subcategories',[Subcategories::class,'index']);
+
+Route::get('/v1/subcategories/{id}',[Subcategories::class,'show']);
+
+Route::patch('/v1/subcategories/{id}',[Subcategories::class,'update']);
+
+Route::patch('/v1/subcategories/{id}',[Subcategories::class,'destroy']);

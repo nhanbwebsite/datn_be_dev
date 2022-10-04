@@ -15,7 +15,11 @@ class Subcategories extends Controller
      */
     public function index()
     {
-        $data = DB::table('subcategories')->all()->paginate(9);
+        $data = DB::table('sub_categories')->paginate(9);
+        return response()->json([
+            'message' => 'Subcategories list',
+            'data' => $data
+        ],200);
     }
 
     /**
@@ -33,7 +37,16 @@ class Subcategories extends Controller
             'url_img' =>'required|max:300'
         ]);
         if($fiedls) {
-            return SubCategory::create($request->all());
+           $dataCreate = SubCategory::create([
+                'category_id' =>$fiedls['category_id'],
+                'name' =>$fiedls['name'],
+                'slug' =>$fiedls['slug'],
+                'url_img' =>$fiedls['url_img']
+            ]);
+            return response()-> json([
+                'message' => 'Successfully created category',
+                'data' => $dataCreate
+            ],200);
         }
 
         return response()->json([
@@ -52,9 +65,9 @@ class Subcategories extends Controller
         $dataSubcategory = SubCategory::find($id);
         if($dataSubcategory){
             return response()->json([
-                'message' => 'created subcategory successfully',
+                'message' => 'List subcategories',
                 'data' => $dataSubcategory
-            ]);
+            ],200);
         }
         return response()->json([
             'message' => 'created subcategory error',
@@ -76,7 +89,6 @@ class Subcategories extends Controller
             'name' =>'required',
             'slug' =>'required|max:255',
             'url_img' =>'required|max:300',
-            'is_active' =>'required',
         ]);
 
         if($fiedls) {
@@ -85,7 +97,11 @@ class Subcategories extends Controller
             $dataUpdate->name = $fiedls['name'];
             $dataUpdate->slug = $fiedls['slug'];
             $dataUpdate->url_img = $fiedls['url_img'];
-
+            $dataUpdate->update();
+            return response()->json([
+               'message' => 'Successfully updated subcategory',
+               'data' => $dataUpdate
+            ],200);
         }
     }
 
@@ -97,6 +113,14 @@ class Subcategories extends Controller
      */
     public function destroy($id)
     {
-        //
+        $dataDelete = SubCategory::find($id);
+        if($dataDelete){
+            $dataDelete->delete();
+            return response()->json([
+               'message' => 'deleted subcategory successfully',
+               'data' => $dataDelete
+            ],200);
+        }
+
     }
 }
