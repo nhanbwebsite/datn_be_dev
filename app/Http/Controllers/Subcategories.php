@@ -93,16 +93,21 @@ class Subcategories extends Controller
 
         if($fiedls) {
             $dataUpdate = SubCategory::find($id);
-            $dataUpdate->category_id = $fiedls['category_id'];
-            $dataUpdate->name = $fiedls['name'];
-            $dataUpdate->slug = $fiedls['slug'];
-            $dataUpdate->url_img = $fiedls['url_img'];
-            $dataUpdate->update();
-            return response()->json([
-               'message' => 'Successfully updated subcategory',
-               'data' => $dataUpdate
-            ],200);
+                if($dataUpdate){
+                    $dataUpdate->category_id = $fiedls['category_id'];
+                    $dataUpdate->name = $fiedls['name'];
+                    $dataUpdate->slug = $fiedls['slug'];
+                    $dataUpdate->url_img = $fiedls['url_img'];
+                    $dataUpdate->update();
+                    return response()->json([
+                       'message' => 'Successfully updated subcategory',
+                       'data' => $dataUpdate
+                    ],200);
+                }
         }
+        return response()->json([
+           'message' => 'updated subcategory error',
+        ]);
     }
 
     /**
