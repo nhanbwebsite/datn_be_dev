@@ -31,6 +31,8 @@ class AuthController extends Controller
             'phone.required' => ':attribute không được để trống !',
             'phone.string' => ':attribute phải là chuỗi !',
             'phone.regex' => ':attribute chưa đúng định dạng ! VD: 0946636842',
+            'password.required' => ':attribute không được để trống !',
+            'password.string' => ':attribute phải là chuỗi !',
         ];
 
         $attributes = [
