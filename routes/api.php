@@ -26,6 +26,8 @@ require __DIR__.'/User/user.php';
 
 Route::get('/v1/categories',[Categories::class,'index']);
 
+Route::post('/v1/categories',[Categories::class,'store']);
+
 Route::get('/v1/categories/{id}',[Categories::class,'show']);
 
 Route::patch('/v1/categories/{id}',[Categories::class,'update']);
