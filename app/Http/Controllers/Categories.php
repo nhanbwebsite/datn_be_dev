@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\DB;
 class Categories extends Controller
 {
@@ -14,10 +15,17 @@ class Categories extends Controller
      */
     public function index()
     {
-        $dataCategories = DB::table('categories')->paginate(9);
-        return response()->json([
-            'data' => $dataCategories
-        ],200);
+        try{
+            $dataCategories = Category::orderBy('id', 'DESC')->paginate(9);
+            return response()->json([
+                'data' => $dataCategories
+            ],200);
+        } catch(Exception $e){
+            return response()->json([
+               'status' => 'Error',
+               'message' => $e->getMessage()
+            ],400);
+        }
     }
 
     /**
@@ -28,22 +36,50 @@ class Categories extends Controller
      */
     public function store(Request $request)
     {
-      $fiedls =  $request->validate([
-            'name' =>'required|max:255',
-            'slug' =>'required|max:255',
-            'url_img' =>'required|max:300'
-        ]);
+        $rules = [
+            'name' => 'required|max:255',
+        ];
+        $messages = [
+            'name.required' => ':atribuite không được để trống !',
+            'name.max' => ':attribute tối đa 255 ký tự !',
+        ];
 
-      $category =  Category::create([
-            'name' => $fiedls['name'],
-            'slug' => $fiedls['slug'],
-            'url_img'=>$fiedls['url_img']
-        ]);
+        $attributes = [
+            'name' => 'Tên danh mục không được để trống'
+        ];
+
+        try {
+
+            DB::beginTransaction();
+            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+            if($validator->fails()){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $validator->errors(),
+                ], 422);
+            }
+
+            $categoryCreate = Category::create([
+                'name' => $request->name,
+                'slug' => Str::slug($request->name)
+            ]);
+            DB::commit();
+
+
+        } catch(Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 400);
+
+        }
 
         return response()->json([
-           'success' => 'Category created successfully',
-           'data' => $category
-        ],200);
+            'status' => 'success',
+            'message' => $categoryCreate->name . ' đã được tạo thành công !',
+        ]);
+
     }
 
     /**
@@ -54,10 +90,25 @@ class Categories extends Controller
      */
     public function show($id)
     {
-        $category = Category::find($id)->first();
-        return response()->json([
-            'data' => $category
-        ],200);
+        try{
+            $category = Category::find($id)->first();
+            if(!empty($category)){
+                return response()->json([
+                    'data' => $category
+                ],200);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
+            ],400);
+
+        } catch(Exception $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 400);
+        }
     }
 
     /**
@@ -69,15 +120,53 @@ class Categories extends Controller
      */
     public function update(Request $request, $id)
     {
-        $fiedls = $request->validate([
-            'name' =>'required|max:255',
-            'slug' =>'required|max:255',
+        $rules = [
+            'name' => 'required|max:255',
+        ];
+        $messages = [
+            'name.required' => ':atribuite không được để trống !',
+            'name.max' => ':attribute tối đa 255 ký tự !',
+        ];
+
+        $attributes = [
+            'name' => 'Tên danh mục không được để trống'
+        ];
+
+        try {
+
+            DB::beginTransaction();
+            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+            if($validator->fails()){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $validator->errors(),
+                ], 422);
+            }
+            $category = Category::find($id);
+            if(!empty($category)){
+                $categoryCreate = $category->update([
+                    'name' => $request->name,
+                    'slug' => Str::slug($request->name),
+                    'url_img' => $request->url_img,
+                    // 'updated_by' => auth('sanctum')->user()->id,
+                ]);
+            }
+            DB::commit();
+
+
+        } catch(Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 400);
+
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $categoryCreate->name . ' đã được cập nhật !',
         ]);
-        $category =  Category::firstWhere('id',$id);
-        $category->name = $fiedls['name'];
-        $category->slug = $fiedls['slug'];
-        $category->url_img = $fiedls['url_img'];
-        $category->save();
     }
 
     /**
@@ -88,10 +177,33 @@ class Categories extends Controller
      */
     public function destroy($id)
     {
-        $category = Category::destroy($id);
-        return response()->json([
-           'message' => 'category deleted',
-           'data' => $category
-        ],200);
+        try {
+            DB::beginTransaction();
+            $data = Category::find($id);
+            if(!empty($category)){
+                $data->update([
+                    'is_delete' => 1,
+                    'deleted_by' => auth('sanctum')->user()->id
+                ]);
+
+                $category = $data->delete();
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Đã xóa thành công danh mục ' . $data->name
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Danh mục không tồn tại !',
+            ], 404);
+            DB::commit();
+        } catch(Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 400);
+        }
     }
 }
