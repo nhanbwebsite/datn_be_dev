@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
-use Illuminate\Contracts\Validation\Validator;
+// use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 class Categories extends Controller
 {
     /**
@@ -91,7 +93,7 @@ class Categories extends Controller
     public function show($id)
     {
         try{
-            $category = Category::find($id)->first();
+            $category = Category::find($id);
             if(!empty($category)){
                 return response()->json([
                     'data' => $category
@@ -165,7 +167,7 @@ class Categories extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => $categoryCreate->name . ' đã được cập nhật !',
+            'message' =>'Danh mục '. $request->name . ' đã được cập nhật !',
         ]);
     }
 
