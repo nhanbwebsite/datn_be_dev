@@ -34,12 +34,15 @@ Route::patch('/v1/categories/{id}',[Categories::class,'update']);
 
 Route::delete('/v1/categories/{id}',[Categories::class,'destroy']);
 
+// subcategories routes
+
 Route::get('/v1/subcategories',[Subcategories::class,'index']);
+
+Route::post('/v1/subcategories',[Subcategories::class,'store']);
 
 Route::get('/v1/subcategories/{id}',[Subcategories::class,'show']);
 
 Route::patch('/v1/subcategories/{id}',[Subcategories::class,'update']);
 
-// Route::patch('/v1/subcategories/{id}',[Subcategories::class,'destroy']);
-;
+Route::delete('/v1/subcategories/{id}',[Subcategories::class,'destroy']);
 
