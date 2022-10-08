@@ -25,8 +25,6 @@ class Category extends Model
         'deleted_at',
     ];
 
-    public function test(){
-        return $this->hasOne(SubCategory::class, 'category_id', 'id');
-    }
+
 
 }
