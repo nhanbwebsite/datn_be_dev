@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Categories;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Subcategories;
+use App\Http\Controllers\SubcategoryController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -24,25 +24,28 @@ require __DIR__.'/Auth/auth.php';
 require __DIR__.'/User/user.php';
 
 
-Route::get('/v1/categories',[Categories::class,'index']);
+Route::get('/v1/categories',[CategoryController::class,'index']);
 
-Route::post('/v1/categories',[Categories::class,'store']);
+Route::post('/v1/categories',[CategoryController::class,'store']);
 
-Route::get('/v1/categories/{id}',[Categories::class,'show']);
+Route::get('/v1/categories/{id}',[CategoryController::class,'show']);
 
-Route::patch('/v1/categories/{id}',[Categories::class,'update']);
+Route::patch('/v1/categories/{id}',[CategoryController::class,'update']);
 
-Route::delete('/v1/categories/{id}',[Categories::class,'destroy']);
+Route::delete('/v1/categories/{id}',[CategoryController::class,'destroy']);
+
+
+
 
 // subcategories routes
 
-Route::get('/v1/subcategories',[Subcategories::class,'index']);
+Route::get('/v1/subcategories',[SubcategoryController::class,'index']);
 
-Route::post('/v1/subcategories',[Subcategories::class,'store']);
+Route::post('/v1/subcategories',[SubcategoryController::class,'store']);
 
-Route::get('/v1/subcategories/{id}',[Subcategories::class,'show']);
+Route::get('/v1/subcategories/{id}',[SubcategoryController::class,'show']);
 
-Route::patch('/v1/subcategories/{id}',[Subcategories::class,'update']);
+Route::patch('/v1/subcategories/{id}',[SubcategoryController::class,'update']);
 
-Route::delete('/v1/subcategories/{id}',[Subcategories::class,'destroy']);
+Route::delete('/v1/subcategories/{id}',[SubcategoryController::class,'destroy']);
 

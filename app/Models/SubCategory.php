@@ -24,4 +24,5 @@ class SubCategory extends Model
         'updated_at',
         'deleted_at',
     ];
+
 }

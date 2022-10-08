@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\SubCategory;
 class Category extends Model
 {
     use HasFactory, SoftDeletes;
@@ -24,5 +25,8 @@ class Category extends Model
         'deleted_at',
     ];
 
+    public function test(){
+        return $this->hasOne(SubCategory::class, 'category_id', 'id');
+    }
 
 }
