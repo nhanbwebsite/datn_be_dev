@@ -8,7 +8,7 @@ use App\Models\Category;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-class Categories extends Controller
+class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -208,4 +208,7 @@ class Categories extends Controller
             ], 400);
         }
     }
+
+
+
 }

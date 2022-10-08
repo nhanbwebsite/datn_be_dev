@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 // use Illuminate\Support\Facades\DB;
-class Subcategories extends Controller
+class SubcategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -228,5 +228,11 @@ class Subcategories extends Controller
         ]);
         }
 
+    }
+    public function test($id){
+        $name = Category::find($id)->phone;
+        return response()->json([
+            'data' =>   $name
+        ]);
     }
 }
