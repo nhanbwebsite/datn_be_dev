@@ -31,6 +31,8 @@ class AuthController extends Controller
             'phone.required' => ':attribute không được để trống !',
             'phone.string' => ':attribute phải là chuỗi !',
             'phone.regex' => ':attribute chưa đúng định dạng ! VD: 0946636842',
+            'password.required' => ':attribute không được để trống !',
+            'password.string' => ':attribute phải là chuỗi !',
         ];
 
         $attributes = [
@@ -66,7 +68,10 @@ class AuthController extends Controller
                     'message' => 'Người dùng đã bị khóa hoặc chưa kích hoạt !',
                 ], 401);
             }
-            $data = RolePermission::where('role_id', $userData->role_id)->get();
+            $data = RolePermission::where([
+                ['role_id', $userData->role_id],
+                ['is_active', 1],
+            ])->get();
             $permission_code = [];
             foreach($data as $item){
                 $permission_code[] = strtolower($item->permission->code);
@@ -223,6 +228,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try{
+            DB::beginTransaction();
             $user = $request->user();
             if(empty($user)){
                 return response()->json([
@@ -240,8 +246,10 @@ class AuthController extends Controller
                 ]);
                 $sessionDel->delete();
             }
+            DB::commit();
         }
         catch(Exception $e){
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
