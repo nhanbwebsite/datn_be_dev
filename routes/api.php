@@ -2,13 +2,13 @@
 
 use App\Http\Controllers\CategoryController;
 
-use App\Http\Controllers\PostCategoryController;
-
 use App\Http\Controllers\ProductController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SubcategoryController;
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
