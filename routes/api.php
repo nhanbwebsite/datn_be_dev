@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\CategoryController;
 
+use App\Http\Controllers\PostCategoryController;
+
 use App\Http\Controllers\ProductController;
 
 use Illuminate\Http\Request;
@@ -59,3 +61,9 @@ Route::get('/v1/product/{id}',[ProductController::class,'show']);
 Route::post('/v1/products',[ProductController::class,'store']);
 Route::patch('/v1/product/{id}',[ProductController::class,'update']);
 Route::delete('/v1/product/{id}',[ProductController::class,'destroy']);
+
+Route::get('/v1/postcategories',[PostCategoryController::class,'index']);
+Route::post('/v1/postcategories',[PostCategoryController::class,'store']);
+Route::patch('/v1/postcategories/{id}',[PostCategoryController::class,'update']);
+Route::delete('/v1/postcategories/{id}',[PostCategoryController::class,'destroy']);
+Route::get('/v1/postcategories/{id}',[PostCategoryController::class,'show']);
