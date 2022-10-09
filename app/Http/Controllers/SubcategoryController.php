@@ -195,15 +195,13 @@ class SubcategoryController extends Controller
      */
     public function destroy($id)
     {
-
         try {
-            DB::beginTransaction();
+
             $dataDelete = SubCategory::find($id);
             if(!empty($dataDelete)){
-
                 $dataDelete->update([
                     'is_delete' => 1,
-                    'updated_by' => auth('sanctum')->user()->id,
+                    // 'updated_by' => auth('sanctum')->user()->id,
                 ]);
 
                 $dataDelete->delete();
@@ -219,7 +217,7 @@ class SubcategoryController extends Controller
                 'message' => 'Danh mục '. "[$dataDelete->name]" . ' không tồn tại !'
             ]);
 
-            DB::commit();
+
         } catch(Exception $e) {
             DB::rollBack();
             return response()->json([
