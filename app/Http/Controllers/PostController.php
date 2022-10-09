@@ -14,7 +14,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        Post::factory()->count(5)->create();
+       
     }
 
     /**
