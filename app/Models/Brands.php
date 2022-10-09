@@ -10,7 +10,7 @@ class Brands extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'brands';
     protected $fillable = [
-        'name',
+        'brand_name',
         'slug',
         'is_active',
         'is_delete',
