@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PostCategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SubcategoryController;
@@ -46,3 +47,4 @@ Route::patch('/v1/subcategories/{id}',[SubcategoryController::class,'update']);
 
 Route::delete('/v1/subcategories/{id}',[SubcategoryController::class,'destroy']);
 
+// post category routes
