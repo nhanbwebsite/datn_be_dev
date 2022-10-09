@@ -65,6 +65,7 @@ class CategoryController extends Controller
                 'name' => $request->name,
                 'slug' => Str::slug($request->name)
             ]);
+
             DB::commit();
 
 
@@ -94,16 +95,17 @@ class CategoryController extends Controller
     {
         try{
             $category = Category::find($id);
-            if(!empty($category)){
+
+            if(empty($category)){
                 return response()->json([
-                    'data' => $category
-                ],200);
+                    'status' => 'error',
+                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
+                ],400);
             }
 
             return response()->json([
-                'status' => 'error',
-                'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
-            ],400);
+                'data' => $category
+            ],200);
 
         } catch(Exception $e){
             return response()->json([
@@ -182,23 +184,25 @@ class CategoryController extends Controller
         try {
             DB::beginTransaction();
             $data = Category::find($id);
-            if(!empty($category)){
-                $data->update([
-                    'is_delete' => 1,
-                    'deleted_by' => auth('sanctum')->user()->id
-                ]);
-
-                $category = $data->delete();
+            // dd($data);
+            if(empty($data)){
                 return response()->json([
-                    'status' => 'success',
-                    'message' => 'Đã xóa thành công danh mục ' . $data->name
-                ]);
+                    'status' => 'error',
+                    'message' => 'Danh mục không tồn tại !',
+                ], 404);
+
             }
 
+            $data->update([
+                'is_delete' => 1,
+                // 'deleted_by' => auth('sanctum')->user()->id
+            ]);
+
+           $data->delete();
             return response()->json([
-                'status' => 'error',
-                'message' => 'Danh mục không tồn tại !',
-            ], 404);
+                'status' => 'success',
+                'message' => 'Đã xóa thành công danh mục ' . $data->name
+            ]);
             DB::commit();
         } catch(Exception $e) {
             DB::rollBack();
