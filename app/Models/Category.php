@@ -11,18 +11,18 @@ class Category extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'categories';
     protected $fillable = [
-        'name',
-        'description',
-        'slug',
-        'url_img',
-        'is_active',
-        'is_delete',
-        'created_by',
-        'updated_by',
-        'deleted_by',
-        'created_at',
-        'updated_at',
-        'deleted_at',
+        "id",
+        "name",
+        "slug" ,
+        "url_img",
+        "is_active" ,
+        "is_delete" ,
+        "created_by" ,
+        "updated_by",
+        "deleted_by",
+        "created_at" ,
+        "updated_at",
+        "deleted_at" ,
     ];
 
 

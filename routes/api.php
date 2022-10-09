@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SubcategoryController;
@@ -49,3 +50,11 @@ Route::patch('/v1/subcategories/{id}',[SubcategoryController::class,'update']);
 
 Route::delete('/v1/subcategories/{id}',[SubcategoryController::class,'destroy']);
 
+
+//  products routes
+
+Route::get('/v1/products',[ProductController::class,'index']);
+Route::get('/v1/product/{id}',[ProductController::class,'show']);
+Route::post('/v1/products',[ProductController::class,'store']);
+Route::patch('/v1/product/{id}',[ProductController::class,'update']);
+Route::delete('/v1/product/{id}',[ProductController::class,'destroy']);
