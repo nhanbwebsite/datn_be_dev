@@ -65,7 +65,6 @@ class CategoryController extends Controller
                 'name' => $request->name,
                 'slug' => Str::slug($request->name)
             ]);
-
             DB::commit();
 
 
@@ -95,17 +94,16 @@ class CategoryController extends Controller
     {
         try{
             $category = Category::find($id);
-
-            if(empty($category)){
+            if(!empty($category)){
                 return response()->json([
-                    'status' => 'error',
-                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
-                ],400);
+                    'data' => $category
+                ],200);
             }
 
             return response()->json([
-                'data' => $category
-            ],200);
+                'status' => 'error',
+                'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
+            ],400);
 
         } catch(Exception $e){
             return response()->json([
@@ -137,7 +135,6 @@ class CategoryController extends Controller
         ];
 
         try {
-
             DB::beginTransaction();
             $validator = Validator::make($request->all(), $rules, $messages, $attributes);
             if($validator->fails()){
@@ -179,31 +176,35 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+
     public function destroy($id)
     {
+
         try {
-            DB::beginTransaction();
+
             $data = Category::find($id);
-            // dd($data);
-            if(empty($data)){
+
+            if(!empty($data)){
+
+                $data->update([
+                    'is_delete' => '1',
+                    // 'deleted_by' => auth('sanctum')->user()->id
+                ]);
+
+               $data->delete();
                 return response()->json([
-                    'status' => 'error',
-                    'message' => 'Danh mục không tồn tại !',
-                ], 404);
+                    'status' => 'success',
+                    'message' => 'Đã xóa thành công danh mục ' . $data->name
+                ]);
+
 
             }
 
-            $data->update([
-                'is_delete' => 1,
-                // 'deleted_by' => auth('sanctum')->user()->id
-            ]);
-
-           $data->delete();
             return response()->json([
-                'status' => 'success',
-                'message' => 'Đã xóa thành công danh mục ' . $data->name
-            ]);
-            DB::commit();
+                'status' => 'error',
+                'message' => 'Danh mục không tồn tại !',
+            ], 404);
         } catch(Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -212,7 +213,6 @@ class CategoryController extends Controller
             ], 400);
         }
     }
-
 
 
 }

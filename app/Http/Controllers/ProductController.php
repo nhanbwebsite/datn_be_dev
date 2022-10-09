@@ -103,7 +103,7 @@ class ProductController extends Controller
     {
         try{
             DB::beginTransaction();
-            $data = Product::where('id',$id);
+            $data = Product::find($id);
 
             if(empty($data)){
                 return response()->json([
@@ -151,7 +151,7 @@ class ProductController extends Controller
             'branch_id' => 'Tên chi nhánh'
         ];
         try {
-            DB::beginTransaction();
+
             $validator = Validator::make($request->only(['name','brand_id']), $rules, $messages, $attributes);
                 if($validator->fails()){
                     return response()->json([
@@ -161,36 +161,35 @@ class ProductController extends Controller
                 }
 
                $product = Product::find($id);
+
                if($product){
-                $product->update([
-                    'meta_title' => $request -> meta_title,
-                    'meta_keywords' =>  $request -> teme_keywords,
-                    'meta_description' => $request -> meta_description,
-                    'name' =>  $request -> name,
-                    'slug' =>  Str::slug($request -> name),
-                    'description' => $request -> description,
-                    'url_image' =>  $request -> url_image,
-                    'price'=>  $request -> price,
-                    'promotion' =>  $request -> promotion,
-                    'color_ids' =>  $request -> color_ids,
-                    'product_weight' =>  $request -> product_weight,
-                    'product_height'  => $request -> product_height,
-                    'product_width'  => $request -> product_width,
-                    'amount'  => $request -> amount,
-                    'deleted_by' =>  $request -> deleted_by,
-                    'brand_id' =>  $request -> brand_id,
-                    'branch_id'  => $request -> branch_id,
-                    'subcategories_id'  => $request -> subcategories_id,
-                    'is_active' =>  $request -> is_active
-                   ]);
+                    $product->update([
+                        'meta_title' => $request->meta_title,
+                        'meta_keywords' =>  $request->meta_keywords,
+                        'meta_description' => $request-> meta_description,
+                        'name' =>  $request -> name,
+                        'slug' =>  Str::slug($request->name),
+                        'description' => $request->description,
+                        'url_image' =>  $request->url_image,
+                        'price'=>  $request->price,
+                        'promotion' =>  $request->promotion,
+                        'color_ids' =>  $request->color_ids,
+                        'product_weight' =>  $request->product_weight,
+                        'product_height'  => $request->product_height,
+                        'product_width'  => $request->product_width,
+                        'amount'  => $request->amount,
+                        'deleted_by' =>  $request->deleted_by,
+                        'brand_id' =>  $request->brand_id,
+                        'branch_id'  => $request->branch_id,
+                        'subcategories_id'  => $request->subcategories_id,
+                        'is_active' =>  $request->is_active
+                    ]);
 
-                   return response()->json([
-                    'status' => 'success',
-                    'message' => $product['name'] . ' đã được cập nhật'
-                ]);
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => $product['name'] . ' đã được cập nhật'
+                    ]);
                }
-
-            DB::commit();
 
         } catch (\Exception $e) {
             DB::rollBack();
