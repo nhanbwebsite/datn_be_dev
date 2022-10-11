@@ -108,8 +108,9 @@ class UserController extends Controller
                 'province_id' => $request->province_id,
                 'phone' => $request->phone,
                 'password' => Hash::make($request->password),
-                'is_active' => $request->is_active,
+                'is_active' => $request->is_active ?? 0,
                 'created_by' => auth('sanctum')->user()->id,
+                'updated_by' => auth('sanctum')->user()->id,
             ]);
             DB::commit();
         }

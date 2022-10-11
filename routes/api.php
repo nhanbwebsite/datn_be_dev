@@ -26,7 +26,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
+require __DIR__ . '/Auth/auth.php';
+require __DIR__ . '/User/user.php';
+require __DIR__ . '/Role/role.php';
 
 Route::get('/v1/categories',[CategoryController::class,'index']);
 
