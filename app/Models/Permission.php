@@ -24,8 +24,15 @@ class Permission extends Model
         'deleted_by',
     ];
 
-    public function group()
-    {
+    public function group(){
         return $this->hasOne(GroupPermission::class, 'id', 'group_id');
+    }
+
+    public function createdBy(){
+        return $this->hasOne(User::class, 'id', 'created_by');
+    }
+
+    public function updatedBy(){
+        return $this->hasOne(User::class, 'id', 'updated_by');
     }
 }

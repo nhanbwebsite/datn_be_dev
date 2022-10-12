@@ -78,4 +78,12 @@ class User extends Authenticatable
     public function session(){
         return $this->belongsTo(UserSession::class, 'id', 'user_id');
     }
+
+    public function createdBy($id){
+        return $this->find($id);
+    }
+
+    public function updatedBy($id){
+        return $this->find($id);
+    }
 }
