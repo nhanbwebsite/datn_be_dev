@@ -31,8 +31,8 @@ class UserCollection extends ResourceCollection
                     'deleted' => $value->deleted,
                     'created_at' => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $value->updated_at->format('Y-m-d H:i:s'),
-                    'created_by' => $value->created_by,
-                    'updated_by' => $value->updated_by,
+                    'created_by' => $value->createdBy($value->created_by)->name ?? null,
+                    'updated_by' => $value->updatedBy($value->updated_by)->name ?? null,
                 ];
             }
             $result['paginator'] = [
