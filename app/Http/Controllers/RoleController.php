@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\RoleCollection;
 use App\Http\Resources\RoleResource;
 use App\Models\Role;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -172,11 +173,10 @@ class RoleController extends Controller
                     'message' => 'Vai trò không tồn tại !',
                 ], 404);
             }
-            $roleUpdate->update([
-                'name' => $request->name ?? $roleUpdate->name,
-                'level' => $request->level ?? $roleUpdate->level,
-                'updated_by' => auth('sanctum')->user()->id,
-            ]);
+            $roleUpdate->name = $request->name ?? $roleUpdate->name;
+            $roleUpdate->level = $request->level ?? $roleUpdate->level;
+            $roleUpdate->updated_by = auth('sanctum')->user()->id;
+            $roleUpdate->save();
             DB::commit();
         }
         catch (Exception $e){

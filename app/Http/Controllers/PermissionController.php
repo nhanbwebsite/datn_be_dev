@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\GroupPermissionCollection;
-use App\Http\Resources\GroupPermissionResource;
-use App\Models\GroupPermission;
+use App\Http\Resources\PermissionCollection;
+use App\Http\Resources\PermissionResource;
+use App\Models\Permission;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class GroupPermissionController extends Controller
+class PermissionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,8 +20,8 @@ class GroupPermissionController extends Controller
     public function index()
     {
         try{
-            $data = GroupPermission::orderBy('created_at', 'desc')->paginate();
-            $resource = new GroupPermissionCollection($data);
+            $data = Permission::orderBy('created_at', 'desc')->paginate();
+            $resource = new PermissionCollection($data);
             $result = $resource->toArray($data);
         }
         catch(Exception $e){
@@ -46,9 +46,9 @@ class GroupPermissionController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'code' => 'required|string|max:50|unique:group_permissions,code',
+            'code' => 'required|string|max:50|unique:permissions,code',
             'name' => 'required|string|max:50',
-            'table_name' => 'string',
+            'group_id' => 'required|numeric|exists:group_permissions,id',
         ];
 
         $messages = [
@@ -59,13 +59,15 @@ class GroupPermissionController extends Controller
             'name.required' => ':attribute không được để trống !',
             'name.string' => ':attribute phải là chuỗi !',
             'name.max' => ':attribute tối đa 50 ký tự !',
-            'table_name.string' => ':attribute phải là chuỗi !',
+            'group_id.required' => ':attribute không được để trống !',
+            'group_id.numeric' => ':attribute phải là số !',
+            'group_id.exists' => ':attribute không tồn tại !',
         ];
 
         $attributes = [
-            'code' => 'Mã nhóm quyền',
-            'name' => 'Tên nhóm quyền',
-            'table_name' => 'Tên bảng',
+            'code' => 'Mã quyền',
+            'name' => 'Tên quyền',
+            'group_id' => 'Mã nhóm quyền',
         ];
 
         try{
@@ -77,10 +79,10 @@ class GroupPermissionController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $groupPermissionCreate = GroupPermission::create([
+            $permissionCreate = Permission::create([
                 'code' => strtoupper($request->code),
                 'name' => $request->name,
-                'table_name' => $request->table_name ?? null,
+                'group_id' => $request->group_id,
                 'is_active' => $request->is_active ?? 1,
                 'created_by' => auth('sanctum')->user()->id,
                 'updated_by' => auth('sanctum')->user()->id,
@@ -96,7 +98,7 @@ class GroupPermissionController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Nhóm quyền ['.$groupPermissionCreate->name.'] đã được tạo thành công !',
+            'message' => 'Quyền ['.$permissionCreate->name.'] đã được tạo thành công !',
         ]);
     }
 
@@ -109,11 +111,11 @@ class GroupPermissionController extends Controller
     public function show($id)
     {
         try{
-            $data = GroupPermission::find($id);
+            $data = Permission::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Không tìm thấy vai trò !',
+                    'message' => 'Không tìm thấy quyền !',
                 ], 404);
             }
         }
@@ -125,7 +127,7 @@ class GroupPermissionController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data' => new GroupPermissionResource($data),
+            'data' => new PermissionResource($data),
         ]);
     }
 
@@ -140,19 +142,21 @@ class GroupPermissionController extends Controller
     {
         $rules = [
             'name' => 'required|string|max:50',
-            'table_name' => 'string',
+            'group_id' => 'required|numeric|exists:group_permissions,id',
         ];
 
         $messages = [
             'name.required' => ':attribute không được để trống !',
             'name.string' => ':attribute phải là chuỗi !',
             'name.max' => ':attribute tối đa 50 ký tự !',
-            'table_name.string' => ':attribute phải là chuỗi !',
+            'group_id.required' => ':attribute không được để trống !',
+            'group_id.numeric' => ':attribute phải là số !',
+            'group_id.exists' => ':attribute không tồn tại !',
         ];
 
         $attributes = [
-            'name' => 'Tên nhóm quyền',
-            'table_name' => 'Tên bảng',
+            'name' => 'Tên quyền',
+            'group_id' => 'Mã nhóm quyền',
         ];
 
         try{
@@ -164,17 +168,17 @@ class GroupPermissionController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $groupPermissionUpdate = GroupPermission::find($id);
-            if(empty($groupPermissionUpdate)){
+            $permissionUpdate = Permission::find($id);
+            if(empty($permissionUpdate)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Nhóm quyền không tồn tại !',
                 ], 404);
             }
-            $groupPermissionUpdate->name = $request->name ?? $groupPermissionUpdate->name;
-            $groupPermissionUpdate->table_name = $request->table_name ?? $groupPermissionUpdate->table_name;
-            $groupPermissionUpdate->name = auth('sanctum')->user()->id;
-            $groupPermissionUpdate->save();
+            $permissionUpdate->name = $request->name ?? $permissionUpdate->name;
+            $permissionUpdate->group_id = $request->group_id ?? $permissionUpdate->group_id;
+            $permissionUpdate->updated_by = auth('sanctum')->user()->id;
+            $permissionUpdate->save();
             DB::commit();
         }
         catch(Exception $e){
@@ -186,7 +190,7 @@ class GroupPermissionController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Nhóm quyền ['.$groupPermissionUpdate->name.'] đã được cập nhật !',
+            'message' => 'Quyền ['.$permissionUpdate->name.'] đã được cập nhật !',
         ]);
     }
 
@@ -200,11 +204,11 @@ class GroupPermissionController extends Controller
     {
         try{
             DB::beginTransaction();
-            $data = GroupPermission::find($id);
+            $data = Permission::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Vai trò không tồn tại !',
+                    'message' => 'Quyền không tồn tại !',
                 ], 404);
             }
             $data->update([
