@@ -224,18 +224,19 @@ class UserController extends Controller
                     'message' => 'Người dùng không tồn tại !',
                 ], 404);
 ;           }
-            $user->update([
-                'name' => $request->name,
-                'address' => $request->address,
-                'email' => $request->email,
-                'role_id' => $request->role_id,
-                'ward_id' => $request->ward_id,
-                'district_id' => $request->district_id,
-                'province_id' => $request->province_id,
-                'password' => Hash::make($request->password),
-                'is_active' => $request->is_active,
-                'updated_by' => auth('sanctum')->user()->id,
-            ]);
+
+            $user->name = $request->name ?? $user->name;
+            $user->address = $request->address ?? $user->address;
+            $user->email = $request->email ?? $user->email;
+            $user->role_id = $request->role_id ?? $user->role_id;
+            $user->ward_id = $request->ward_id ?? $user->ward_id;
+            $user->district_id = $request->district_id ?? $user->district_id;
+            $user->province_id = $request->province_id ?? $user->province_id;
+            $user->password = Hash::make($request->password ?? $user->password);
+            $user->is_active = $request->is_active ?? $user->is_active;
+            $user->updated_by = auth('sanctum')->user()->id;
+            $user->save();
+
             DB::commit();
         }
         catch (Exception $e){
