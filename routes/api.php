@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 
 use App\Http\Controllers\PostCategoryController;
@@ -71,3 +72,11 @@ Route::post('/v1/postcategories',[PostCategoryController::class,'store']);
 Route::patch('/v1/postcategories/{id}',[PostCategoryController::class,'update']);
 Route::delete('/v1/postcategories/{id}',[PostCategoryController::class,'destroy']);
 Route::get('/v1/postcategories/{id}',[PostCategoryController::class,'show']);
+
+//  Brands routes
+
+
+Route::get('/v1/brands/',[BrandController::class,'index']);
+Route::get('/v1/brands/{id}',[BrandController::class,'show']);
+Route::patch('/v1/brands/{id}',[BrandController::class,'show']);
+Route::delete('/v1/brands/{id}',[BrandController::class,'destroy']);

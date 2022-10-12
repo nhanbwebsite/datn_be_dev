@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brands;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 class BrandController extends Controller
 {
     /**
@@ -178,6 +179,42 @@ class BrandController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            // DB::beginTransaction();
+            $data = Brands::find($id);
+
+            if(!empty($data)){
+                $data->update([
+                    'is_delete' => 1
+                ]);
+
+             $delete = $data->delete();
+
+                if($delete) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Đã xóa nhà cung cấp'. ' ' . $data['brand_name']
+                    ],200);
+                }
+
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Lỗi, vui lòng thử lại !'
+                ],400);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Không tìm thấy nhà cung cấp !'
+            ],400);
+
+            // DB::commit();
+        } catch(Exception $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }
