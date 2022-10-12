@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\RoleCollection;
-use App\Http\Resources\RoleResource;
-use App\Models\Role;
+use App\Http\Resources\GroupPermissionCollection;
+use App\Http\Resources\GroupPermissionResource;
+use App\Models\GroupPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class RoleController extends Controller
+class GroupPermissionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,8 +19,8 @@ class RoleController extends Controller
     public function index()
     {
         try{
-            $data = Role::orderBy('created_at', 'desc')->paginate();
-            $resource = new RoleCollection($data);
+            $data = GroupPermission::orderBy('created_at', 'desc')->paginate();
+            $resource = new GroupPermissionCollection($data);
             $result = $resource->toArray($data);
         }
         catch(Exception $e){
@@ -45,9 +45,9 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'code' => 'required|string|max:50|unique:roles,code',
+            'code' => 'required|string|max:50|unique:group_permissions,code',
             'name' => 'required|string|max:50',
-            'level' => 'required|numeric',
+            'table_name' => 'string',
         ];
 
         $messages = [
@@ -58,14 +58,13 @@ class RoleController extends Controller
             'name.required' => ':attribute không được để trống !',
             'name.string' => ':attribute phải là chuỗi !',
             'name.max' => ':attribute tối đa 50 ký tự !',
-            'level.required' => ':attribute không được để trống !',
-            'level.numeric' => ':attribute phải là số !',
+            'table_name.string' => ':attribute phải là chuỗi !',
         ];
 
         $attributes = [
-            'code' => 'Mã vai trò',
-            'name' => 'Tên vai trò',
-            'level' => 'Cấp',
+            'code' => 'Mã quyền',
+            'name' => 'Tên quyền',
+            'table_name' => 'Tên bảng',
         ];
 
         try{
@@ -77,10 +76,10 @@ class RoleController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $roleCreate = Role::create([
+            $groupPermissionCreate = GroupPermission::create([
                 'code' => strtoupper($request->code),
                 'name' => $request->name,
-                'level' => $request->level,
+                'table_name' => $request->table_name ?? null,
                 'is_active' => $request->is_active ?? 1,
                 'created_by' => auth('sanctum')->user()->id,
                 'updated_by' => auth('sanctum')->user()->id,
@@ -96,7 +95,7 @@ class RoleController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Vai trò ['.$roleCreate->name.'] đã được tạo thành công !',
+            'message' => 'Nhóm quyền ['.$groupPermissionCreate->name.'] đã được tạo thành công !',
         ]);
     }
 
@@ -109,7 +108,7 @@ class RoleController extends Controller
     public function show($id)
     {
         try{
-            $data = Role::find($id);
+            $data = GroupPermission::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
@@ -125,7 +124,7 @@ class RoleController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data' => new RoleResource($data),
+            'data' => new GroupPermissionResource($data),
         ]);
     }
 
@@ -140,55 +139,54 @@ class RoleController extends Controller
     {
         $rules = [
             'name' => 'required|string|max:50',
-            'level' => 'required|numeric',
+            'table_name' => 'string',
         ];
 
         $messages = [
             'name.required' => ':attribute không được để trống !',
             'name.string' => ':attribute phải là chuỗi !',
             'name.max' => ':attribute tối đa 50 ký tự !',
-            'level.required' => ':attribute không được để trống !',
-            'level.numeric' => ':attribute phải là số !',
+            'table_name.string' => ':attribute phải là chuỗi !',
         ];
 
         $attributes = [
-            'name' => 'Tên vai trò',
-            'level' => 'Cấp',
+            'name' => 'Tên quyền',
+            'table_name' => 'Tên bảng',
         ];
 
-        try {
+        try{
             DB::beginTransaction();
             $validator = Validator::make($request->all(), $rules, $messages, $attributes);
-            if($validator->fails()) {
+            if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $roleUpdate = Role::find($id);
-            if(empty($roleUpdate)) {
+            $groupPermissionUpdate = GroupPermission::find($id);
+            if(empty($groupPermissionUpdate)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Vai trò không tồn tại !',
+                    'message' => 'Nhóm quyền không tồn tại !',
                 ], 404);
             }
-            $roleUpdate->update([
-                'name' => $request->name ?? $roleUpdate->name,
-                'level' => $request->level ?? $roleUpdate->level,
+            $groupPermissionUpdate->update([
+                'name' => $request->name ?? $groupPermissionUpdate->name,
+                'table_name' => $request->table_name ?? $groupPermissionUpdate->table_name,
                 'updated_by' => auth('sanctum')->user()->id,
             ]);
             DB::commit();
         }
-        catch (Exception $e){
+        catch(Exception $e){
             DB::rollback();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
             ], 400);
-        };
+        }
         return response()->json([
             'status' => 'success',
-            'message' => 'Vai trò ['.$roleUpdate->name.'] đã được cập nhật !',
+            'message' => 'Nhóm quyền ['.$groupPermissionUpdate->name.'] đã được cập nhật !',
         ]);
     }
 
@@ -202,7 +200,7 @@ class RoleController extends Controller
     {
         try{
             DB::beginTransaction();
-            $data = Role::find($id);
+            $data = GroupPermission::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',

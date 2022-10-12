@@ -48,13 +48,13 @@ class UserController extends Controller
         $rules = [
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:255',
-            'role_id'   => 'nullable|numeric',
-            'ward_id' => 'required',
-            'district_id' => 'required',
-            'province_id' => 'required',
+            'role_id'   => 'nullable|numeric|exists:roles,id',
+            'ward_id' => 'required|exists:wards,id',
+            'district_id' => 'required|exists:districts,id',
+            'province_id' => 'required|exists:provinces,id',
             'phone' => 'required|string|min:10|unique:users,phone|regex:/^0[2-9]{1}[0-9]{8}$/',
             'password' => 'required|string|min:8',
-            'is_active' => 'required|numeric',
+            'is_active' => 'numeric',
         ];
 
         $messages = [
@@ -75,7 +75,6 @@ class UserController extends Controller
             'password.required' => ':attribute không được để trống !',
             'password.string' => ':attribute phải là chuỗi !',
             'password.min' => ':attribute tối thiểu 8 ký tự !',
-            'is_active.required' => ':attribute không để trống !',
             'is_active.numeric' => ':attribute chưa đúng !',
         ];
 
@@ -219,6 +218,12 @@ class UserController extends Controller
                 ], 422);
             }
             $user = User::find($id);
+            if(empty($user)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Người dùng không tồn tại !',
+                ], 404);
+;           }
             $user->update([
                 'name' => $request->name,
                 'address' => $request->address,
@@ -242,7 +247,7 @@ class UserController extends Controller
         };
         return response()->json([
             'status' => 'success',
-            'message' => '['.$user->name.'] đã được cập nhật !',
+            'message' => 'Người dùng ['.$user->name.'] đã được cập nhật !',
         ]);
     }
 
