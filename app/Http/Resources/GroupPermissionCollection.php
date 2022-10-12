@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class RoleCollection extends ResourceCollection
+class GroupPermissionCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -21,7 +21,7 @@ class RoleCollection extends ResourceCollection
                 $result['data'][] = [
                     'name' => $value->name,
                     'code' => $value->code,
-                    'level' => $value->level,
+                    'table_name' => $value->table_name,
                     'is_active' => $value->is_active,
                     'deleted' => $value->deleted,
                     'created_at' => $value->created_at->format('Y-m-d H:i:s'),

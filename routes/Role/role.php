@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\RoleController;
 
-Route::controller(RoleController::class)->middleware(['auth:sanctum', 'checkAction:all,view-user,create-user,update-user,delete-user'])->prefix('roles')->group(function(){
+Route::controller(RoleController::class)->middleware(['auth:sanctum', 'checkAction:all,view-role,create-role,update-role,delete-role'])->prefix('roles')->group(function(){
     Route::get('/', 'index');
     Route::post('/', 'store');
     Route::get('/{id}', 'show');
