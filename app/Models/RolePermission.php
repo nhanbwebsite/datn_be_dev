@@ -22,13 +22,19 @@ class RolePermission extends Model
         'deleted_by',
     ];
 
-    public function role()
-    {
+    public function role(){
         return $this->hasOne(Role::class, 'id', 'role_id');
     }
 
-    public function permission()
-    {
+    public function permission(){
         return $this->hasOne(Permission::class, 'id', 'permission_id');
+    }
+
+    public function createdBy(){
+        return $this->hasOne(User::class, 'id', 'created_by');
+    }
+
+    public function updatedBy(){
+        return $this->hasOne(User::class, 'id', 'updated_by');
     }
 }

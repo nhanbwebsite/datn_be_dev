@@ -3,8 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
-class UserResource extends JsonResource
+
+class GroupPermissionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,20 +16,15 @@ class UserResource extends JsonResource
     {
         // return parent::toArray($request);
         return [
+            'code' => $this->code,
             'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'address' => $this->address,
-            'ward' => $this->ward->name,
-            'district' => $this->district->name,
-            'province' => $this->province->name,
-            'role' => $this->role->name,
+            'table_name' => $this->table_name,
             'is_active' => $this->is_active,
             'deleted' => $this->deleted,
             'created_at' => $this->created_at->format('d-m-Y H:i:s'),
             'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
-            'created_by' => $this->createdBy($this->created_by)->name ?? null,
-            'updated_by' => $this->updatedBy($this->updated_by)->name ?? null,
+            'created_by' => $this->createdBy->name ?? null,
+            'updated_by' => $this->updatedBy->name ?? null,
         ];
     }
 }

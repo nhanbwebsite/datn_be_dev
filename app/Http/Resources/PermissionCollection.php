@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class UserCollection extends ResourceCollection
+class PermissionCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -20,19 +20,14 @@ class UserCollection extends ResourceCollection
             foreach($this->collection as $value){
                 $result['data'][] = [
                     'name' => $value->name,
-                    'email' => $value->email,
-                    'phone' => $value->phone,
-                    'address' => !empty($value->address) ? $value->address : null,
-                    'ward' => $value->ward->name,
-                    'district' => $value->district->name,
-                    'province' => $value->province->name,
-                    'role' => !empty($value->role->name) ? $value->role->name : null,
+                    'code' => $value->code,
+                    'group' => $value->group->name,
                     'is_active' => $value->is_active,
                     'deleted' => $value->deleted,
                     'created_at' => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $value->updated_at->format('Y-m-d H:i:s'),
-                    'created_by' => $value->createdBy($value->created_by)->name ?? null,
-                    'updated_by' => $value->updatedBy($value->updated_by)->name ?? null,
+                    'created_by' => $value->createdBy->name ?? null,
+                    'updated_by' => $value->updatedBy->name ?? null,
                 ];
             }
             $result['paginator'] = [
