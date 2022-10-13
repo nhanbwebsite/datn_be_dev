@@ -28,13 +28,13 @@ class UserController extends Controller
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
                 if(!empty($input['email'])){
-                    $query->orWhere('email', 'like', '%'.$input['email'].'%');
+                    $query->where('email', 'like', '%'.$input['email'].'%');
                 }
                 if(!empty($input['phone'])){
-                    $query->orWhere('phone', 'like', '%'.$input['phone'].'%');
+                    $query->where('phone', $input['phone']);
                 }
                 if(!empty($input['address'])){
-                    $query->orWhere('address', 'like', '%'.$input['address'].'%');
+                    $query->where('address', 'like', '%'.$input['address'].'%');
                 }
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new UserCollection($data);
