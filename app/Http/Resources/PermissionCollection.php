@@ -15,7 +15,7 @@ class PermissionCollection extends ResourceCollection
     public function toArray($request)
     {
         // return parent::toArray($request);
-        if(!empty($request)){
+        if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $value){
                 $result['data'][] = [
@@ -23,7 +23,6 @@ class PermissionCollection extends ResourceCollection
                     'code' => $value->code,
                     'group' => $value->group->name,
                     'is_active' => $value->is_active,
-                    'deleted' => $value->deleted,
                     'created_at' => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $value->updated_at->format('Y-m-d H:i:s'),
                     'created_by' => $value->createdBy->name ?? null,
@@ -43,6 +42,8 @@ class PermissionCollection extends ResourceCollection
         }
 
         // $request is empty
-        return [];
+        $result['data'] = [];
+        $result['paginator'] = [];
+        return $result;
     }
 }

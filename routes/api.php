@@ -32,6 +32,9 @@ require __DIR__ . '/Role/role.php';
 // GroupPermission
 require __DIR__ . '/GroupPermission/group_permission.php';
 
+// RolePermission
+require __DIR__ . '/RolePermission/role_permission.php';
+
 // Permission
 require __DIR__ . '/Permission/permission.php';
 

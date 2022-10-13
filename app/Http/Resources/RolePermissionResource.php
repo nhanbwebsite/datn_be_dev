@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class GroupPermissionResource extends JsonResource
+class RolePermissionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,12 +14,10 @@ class GroupPermissionResource extends JsonResource
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
         if(!empty($request)){
             return [
-                'code' => $this->code,
-                'name' => $this->name,
-                'table_name' => $this->table_name,
+                'role' => $this->role->name,
+                'permission' => $this->permission->name,
                 'is_active' => $this->is_active,
                 'created_at' => $this->created_at->format('d-m-Y H:i:s'),
                 'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
@@ -27,6 +25,7 @@ class GroupPermissionResource extends JsonResource
                 'updated_by' => $this->updatedBy->name ?? null,
             ];
         }
+
         return [];
     }
 }

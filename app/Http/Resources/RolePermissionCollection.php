@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class GroupPermissionCollection extends ResourceCollection
+class RolePermissionCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -14,14 +14,11 @@ class GroupPermissionCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
         if(!$this->collection->isEmpty()){
-            // $request not empty
             foreach($this->collection as $value){
                 $result['data'][] = [
-                    'name' => $value->name,
-                    'code' => $value->code,
-                    'table_name' => $value->table_name,
+                    'role' => $value->role->name,
+                    'permission' => $value->permission->name,
                     'is_active' => $value->is_active,
                     'created_at' => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $value->updated_at->format('Y-m-d H:i:s'),
@@ -41,7 +38,6 @@ class GroupPermissionCollection extends ResourceCollection
             return $result;
         }
 
-        // $request is empty
         $result['data'] = [];
         $result['paginator'] = [];
         return $result;
