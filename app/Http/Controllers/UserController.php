@@ -18,24 +18,38 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $input = $request->all();
+        $input['limit'] = $request->limit;
         try{
-            $data = User::orderBy('created_at', 'desc')->paginate();
+            $data = User::where('is_active', 1)->where(function($query) use($input) {
+                if(!empty($input['name'])){
+                    $query->where('name', 'like', '%'.$input['name'].'%');
+                }
+                if(!empty($input['email'])){
+                    $query->orWhere('email', 'like', '%'.$input['email'].'%');
+                }
+                if(!empty($input['phone'])){
+                    $query->orWhere('phone', 'like', '%'.$input['phone'].'%');
+                }
+                if(!empty($input['address'])){
+                    $query->orWhere('address', 'like', '%'.$input['address'].'%');
+                }
+            })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new UserCollection($data);
-            $result = $resource->toArray($data);
         }
         catch(Exception $e){
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], 400);
         }
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data'],
-            'paginator' => $result['paginator'],
-        ]);
+        return response()->json($resource);
     }
     /**
      * Store a newly created resource in storage.
@@ -114,10 +128,14 @@ class UserController extends Controller
             DB::commit();
         }
         catch(Exception $e){
-            DB::rollback();
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], 400);
         }
         return response()->json([
@@ -146,7 +164,11 @@ class UserController extends Controller
         catch(Exception $e){
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], 400);
         }
         return response()->json([
@@ -239,13 +261,17 @@ class UserController extends Controller
 
             DB::commit();
         }
-        catch (Exception $e){
-            DB::rollback();
+        catch(Exception $e){
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], 400);
-        };
+        }
         return response()->json([
             'status' => 'success',
             'message' => 'Người dùng ['.$user->name.'] đã được cập nhật !',
@@ -280,7 +306,11 @@ class UserController extends Controller
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], 400);
         }
         return response()->json([
