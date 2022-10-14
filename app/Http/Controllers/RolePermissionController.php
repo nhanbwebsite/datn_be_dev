@@ -23,7 +23,17 @@ class RolePermissionController extends Controller
     {
         $input['limit'] = $request->limit;
         try{
-            $data = RolePermission::orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
+            $data = RolePermission::where('is_active', 1)->where(function($query) use($input){
+                if(!empty($input['role_id'])){
+                    $query->where('role_id', $input['role_id']);
+                }
+                if(!empty($input['permission_id'])){
+                    $query->where('permission_id', $input['permission_id']);
+                }
+                if(!empty($input['is_active'])){
+                    $query->where('is_active', $input['is_active']);
+                }
+            })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new RolePermissionCollection($data);
         }
         catch(Exception $e){

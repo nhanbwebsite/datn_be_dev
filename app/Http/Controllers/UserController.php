@@ -36,6 +36,21 @@ class UserController extends Controller
                 if(!empty($input['address'])){
                     $query->where('address', 'like', '%'.$input['address'].'%');
                 }
+                if(!empty($input['is_active'])){
+                    $query->where('is_active', $input['is_active']);
+                }
+                if(!empty($input['province_id'])){
+                    $query->where('province_id', $input['province_id']);
+                }
+                if(!empty($input['district_id'])){
+                    $query->where('district_id', $input['district_id']);
+                }
+                if(!empty($input['ward_id'])){
+                    $query->where('ward_id', $input['ward_id']);
+                }
+                if(!empty($input['role_id'])){
+                    $query->where('role_id', $input['role_id']);
+                }
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new UserCollection($data);
         }
