@@ -27,7 +27,10 @@ class GroupPermissionController extends Controller
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
                 if(!empty($input['code'])){
-                    $query->orWhere('code', 'like', '%'.$input['code'].'%');
+                    $query->where('code', $input['code']);
+                }
+                if(!empty($input['is_active'])){
+                    $query->where('is_active', $input['is_active']);
                 }
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new GroupPermissionCollection($data);
