@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UserController extends Controller
 {
@@ -18,24 +18,53 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $input = $request->all();
+        $input['limit'] = $request->limit;
         try{
-            $data = User::orderBy('created_at', 'desc')->paginate();
+            $data = User::where('is_active', 1)->where(function($query) use($input) {
+                if(!empty($input['name'])){
+                    $query->where('name', 'like', '%'.$input['name'].'%');
+                }
+                if(!empty($input['email'])){
+                    $query->where('email', 'like', '%'.$input['email'].'%');
+                }
+                if(!empty($input['phone'])){
+                    $query->where('phone', $input['phone']);
+                }
+                if(!empty($input['address'])){
+                    $query->where('address', 'like', '%'.$input['address'].'%');
+                }
+                if(!empty($input['is_active'])){
+                    $query->where('is_active', $input['is_active']);
+                }
+                if(!empty($input['province_id'])){
+                    $query->where('province_id', $input['province_id']);
+                }
+                if(!empty($input['district_id'])){
+                    $query->where('district_id', $input['district_id']);
+                }
+                if(!empty($input['ward_id'])){
+                    $query->where('ward_id', $input['ward_id']);
+                }
+                if(!empty($input['role_id'])){
+                    $query->where('role_id', $input['role_id']);
+                }
+            })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new UserCollection($data);
-            $result = $resource->toArray($data);
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data'],
-            'paginator' => $result['paginator'],
-        ]);
+        return response()->json($resource);
     }
     /**
      * Store a newly created resource in storage.
@@ -113,12 +142,16 @@ class UserController extends Controller
             ]);
             DB::commit();
         }
-        catch(Exception $e){
-            DB::rollback();
+        catch(HttpException $e){
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -143,11 +176,15 @@ class UserController extends Controller
                 ], 404);
             }
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -239,13 +276,17 @@ class UserController extends Controller
 
             DB::commit();
         }
-        catch (Exception $e){
-            DB::rollback();
+        catch(HttpException $e){
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
-        };
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
         return response()->json([
             'status' => 'success',
             'message' => 'Người dùng ['.$user->name.'] đã được cập nhật !',
@@ -276,12 +317,16 @@ class UserController extends Controller
             $data->delete();
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',

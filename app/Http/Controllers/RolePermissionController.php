@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\RoleCollection;
-use App\Http\Resources\RoleResource;
+use App\Http\Resources\RolePermissionCollection;
+use App\Http\Resources\RolePermissionResource;
+use App\Models\Permission;
 use App\Models\Role;
+use App\Models\RolePermission;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class RoleController extends Controller
+class RolePermissionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,33 +21,25 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
-        $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = Role::where('is_active', 1)->where(function($query) use($input) {
-                if(!empty($input['name'])){
-                    $query->where('name', 'like', '%'.$input['name'].'%');
+            $data = RolePermission::where('is_active', 1)->where(function($query) use($input){
+                if(!empty($input['role_id'])){
+                    $query->where('role_id', $input['role_id']);
                 }
-                if(!empty($input['code'])){
-                    $query->where('code', $input['code']);
-                }
-                if(!empty($input['level'])){
-                    $query->where('level', $input['level']);
+                if(!empty($input['permission_id'])){
+                    $query->where('permission_id', $input['permission_id']);
                 }
                 if(!empty($input['is_active'])){
                     $query->where('is_active', $input['is_active']);
                 }
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
-            $resource = new RoleCollection($data);
+            $resource = new RolePermissionCollection($data);
         }
         catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
+                'message' => $e->getMessage(),
             ], $e->getStatusCode());
         }
         return response()->json($resource);
@@ -60,32 +54,26 @@ class RoleController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'code' => 'required|string|max:50|unique:roles,code',
-            'name' => 'required|string|max:50',
-            'level' => 'required|numeric',
+            'role_id' => 'required|numeric|exists:roles,id',
+            'permission_id' => 'required|numeric|exists:permissions,id',
             'is_active' => 'numeric',
         ];
 
         $messages = [
-            'code.required' => ':attribute không được để trống !',
-            'code.string' => ':attribute phải là chuỗi !',
-            'code.max' => ':attribute tối đa 50 ký tự !',
-            'code.unique' => ':attribute đã tồn tại !',
-            'name.required' => ':attribute không được để trống !',
-            'name.string' => ':attribute phải là chuỗi !',
-            'name.max' => ':attribute tối đa 50 ký tự !',
-            'level.required' => ':attribute không được để trống !',
-            'level.numeric' => ':attribute phải là số !',
+            'role_id.required' => ':attribute không được để trống !',
+            'role_id.numeric' => ':attribute phải là số !',
+            'role_id.exists' => ':attribute không tồn tại !',
+            'permission_id.required' => ':attribute không được để trống !',
+            'permission_id.numeric' => ':attribute phải là số !',
+            'permission_id.exists' => ':attribute không tồn tại !',
             'is_active.numeric' => ':attribute chưa đúng !',
         ];
 
         $attributes = [
-            'code' => 'Mã vai trò',
-            'name' => 'Tên vai trò',
-            'level' => 'Cấp',
+            'role_id' => 'Mã vai trò',
+            'permission_id' => 'Mã quyền',
             'is_active' => 'Kích hoạt'
         ];
-
         try{
             DB::beginTransaction();
             $validator = Validator::make($request->all(), $rules, $messages, $attributes);
@@ -95,10 +83,11 @@ class RoleController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $roleCreate = Role::create([
-                'code' => strtoupper($request->code),
-                'name' => $request->name,
-                'level' => $request->level,
+            $roleData = Role::find($request->role_id);
+            $permissionData = Permission::find($request->permission_id);
+            RolePermission::create([
+                'role_id' => $request->role_id,
+                'permission_id' => $request->permission_id,
                 'is_active' => $request->is_active ?? 1,
                 'created_by' => auth('sanctum')->user()->id,
                 'updated_by' => auth('sanctum')->user()->id,
@@ -118,7 +107,7 @@ class RoleController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Vai trò ['.$roleCreate->name.'] đã được tạo thành công !',
+            'message' => 'Quyền ['.$permissionData->name.'] đã được gán thành công cho ['.$roleData->name.'] !',
         ]);
     }
 
@@ -131,11 +120,11 @@ class RoleController extends Controller
     public function show($id)
     {
         try{
-            $data = Role::find($id);
+            $data = RolePermission::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Không tìm thấy vai trò !',
+                    'message' => 'Không tìm thấy quyền !',
                 ], 404);
             }
         }
@@ -151,7 +140,7 @@ class RoleController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data' => new RoleResource($data),
+            'data' => new RolePermissionResource($data),
         ]);
     }
 
@@ -165,43 +154,42 @@ class RoleController extends Controller
     public function update(Request $request, $id)
     {
         $rules = [
-            'name' => 'required|string|max:50',
-            'level' => 'required|numeric',
+            'role_id' => 'required|numeric|exists:roles,id',
+            'permission_id' => 'required|numeric|exists:permissions,id',
+            'is_active' => 'required|numeric',
         ];
 
         $messages = [
-            'name.required' => ':attribute không được để trống !',
-            'name.string' => ':attribute phải là chuỗi !',
-            'name.max' => ':attribute tối đa 50 ký tự !',
-            'level.required' => ':attribute không được để trống !',
-            'level.numeric' => ':attribute phải là số !',
+            'role_id.required' => ':attribute không được để trống !',
+            'role_id.numeric' => ':attribute phải là số !',
+            'role_id.exists' => ':attribute không tồn tại !',
+            'permission_id.required' => ':attribute không được để trống !',
+            'permission_id.numeric' => ':attribute phải là số !',
+            'permission_id.exists' => ':attribute không tồn tại !',
+            'is_active.required' => ':attribute không được để trống !',
+            'is_active.numeric' => ':attribute chưa đúng !',
         ];
 
         $attributes = [
-            'name' => 'Tên vai trò',
-            'level' => 'Cấp',
+            'role_id' => 'Mã vai trò',
+            'permission_id' => 'Mã quyền',
+            'is_active' => 'Kích hoạt'
         ];
 
-        try {
+        try{
             DB::beginTransaction();
             $validator = Validator::make($request->all(), $rules, $messages, $attributes);
-            if($validator->fails()) {
+            if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $roleUpdate = Role::find($id);
-            if(empty($roleUpdate)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Vai trò không tồn tại !',
-                ], 404);
-            }
-            $roleUpdate->name = $request->name ?? $roleUpdate->name;
-            $roleUpdate->level = $request->level ?? $roleUpdate->level;
-            $roleUpdate->updated_by = auth('sanctum')->user()->id;
-            $roleUpdate->save();
+            $rolePermissionUpdate = RolePermission::find($id);
+            $rolePermissionUpdate->role_id = $request->role_id ?? $rolePermissionUpdate->role_id;
+            $rolePermissionUpdate->permission_id = $request->permission_id ?? $rolePermissionUpdate->permission_id;
+            $rolePermissionUpdate->is_active = $request->is_active ?? $rolePermissionUpdate->is_active;
+            $rolePermissionUpdate->save();
             DB::commit();
         }
         catch(HttpException $e){
@@ -217,7 +205,7 @@ class RoleController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Vai trò ['.$roleUpdate->name.'] đã được cập nhật !',
+            'message' => 'Đã sửa thành công !',
         ]);
     }
 
@@ -231,11 +219,11 @@ class RoleController extends Controller
     {
         try{
             DB::beginTransaction();
-            $data = Role::find($id);
+            $data = RolePermission::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Vai trò không tồn tại !',
+                    'message' => 'Không tìm thấy quyền !',
                 ], 404);
             }
             $data->update([
@@ -258,7 +246,7 @@ class RoleController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Đã xóa ['.$data->name.']',
+            'message' => 'Đã xóa !',
         ]);
     }
 }

@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class GroupPermissionController extends Controller
 {
@@ -17,24 +18,31 @@ class GroupPermissionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $input = $request->all();
+        $input['limit'] = $request->limit;
         try{
-            $data = GroupPermission::orderBy('created_at', 'desc')->paginate();
+            $data = GroupPermission::where('is_active', 1)->where(function($query) use($input){
+                if(!empty($input['name'])){
+                    $query->where('name', 'like', '%'.$input['name'].'%');
+                }
+                if(!empty($input['code'])){
+                    $query->where('code', $input['code']);
+                }
+                if(!empty($input['is_active'])){
+                    $query->where('is_active', $input['is_active']);
+                }
+            })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new GroupPermissionCollection($data);
-            $result = $resource->toArray($data);
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data'],
-            'paginator' => $result['paginator'],
-        ]);
+        return response()->json($resource);
     }
 
     /**
@@ -49,6 +57,7 @@ class GroupPermissionController extends Controller
             'code' => 'required|string|max:50|unique:group_permissions,code',
             'name' => 'required|string|max:50',
             'table_name' => 'string',
+            'is_active' => 'numeric',
         ];
 
         $messages = [
@@ -60,12 +69,14 @@ class GroupPermissionController extends Controller
             'name.string' => ':attribute phải là chuỗi !',
             'name.max' => ':attribute tối đa 50 ký tự !',
             'table_name.string' => ':attribute phải là chuỗi !',
+            'is_active.numeric' => ':attribute chưa đúng !',
         ];
 
         $attributes = [
             'code' => 'Mã nhóm quyền',
             'name' => 'Tên nhóm quyền',
             'table_name' => 'Tên bảng',
+            'is_active' => 'Kích hoạt',
         ];
 
         try{
@@ -87,12 +98,12 @@ class GroupPermissionController extends Controller
             ]);
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollback();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -117,11 +128,11 @@ class GroupPermissionController extends Controller
                 ], 404);
             }
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -141,6 +152,7 @@ class GroupPermissionController extends Controller
         $rules = [
             'name' => 'required|string|max:50',
             'table_name' => 'string',
+            'is_active' => 'numeric',
         ];
 
         $messages = [
@@ -148,11 +160,13 @@ class GroupPermissionController extends Controller
             'name.string' => ':attribute phải là chuỗi !',
             'name.max' => ':attribute tối đa 50 ký tự !',
             'table_name.string' => ':attribute phải là chuỗi !',
+            'is_active.numeric' => ':attribute phải là số !',
         ];
 
         $attributes = [
             'name' => 'Tên nhóm quyền',
             'table_name' => 'Tên bảng',
+            'is_active' => 'Kích hoạt',
         ];
 
         try{
@@ -177,12 +191,12 @@ class GroupPermissionController extends Controller
             $groupPermissionUpdate->save();
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollback();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -214,12 +228,12 @@ class GroupPermissionController extends Controller
             $data->delete();
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',

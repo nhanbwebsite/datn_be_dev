@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PermissionController extends Controller
 {
@@ -17,24 +18,31 @@ class PermissionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $input = $request->all();
+        $input['limit'] = $request->limit;
         try{
-            $data = Permission::orderBy('created_at', 'desc')->paginate();
+            $data = Permission::where('is_active', 1)->where(function($query) use($input){
+                if(!empty($input['name'])){
+                    $query->where('name', 'like', '%'.$input['name'].'%');
+                }
+                if(!empty($input['code'])){
+                    $query->where('code', $input['code']);
+                }
+                if(!empty($input['is_active'])){
+                    $query->where('is_active', $input['is_active']);
+                }
+            })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new PermissionCollection($data);
-            $result = $resource->toArray($data);
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
-        return response()->json([
-            'status' => 'success',
-            'data' => $result['data'],
-            'paginator' => $result['paginator'],
-        ]);
+        return response()->json($resource);
     }
 
     /**
@@ -49,6 +57,7 @@ class PermissionController extends Controller
             'code' => 'required|string|max:50|unique:permissions,code',
             'name' => 'required|string|max:50',
             'group_id' => 'required|numeric|exists:group_permissions,id',
+            'is_active' => 'numeric',
         ];
 
         $messages = [
@@ -62,12 +71,14 @@ class PermissionController extends Controller
             'group_id.required' => ':attribute không được để trống !',
             'group_id.numeric' => ':attribute phải là số !',
             'group_id.exists' => ':attribute không tồn tại !',
+            'is_active.numeric' => ':attribute chưa đúng !',
         ];
 
         $attributes = [
             'code' => 'Mã quyền',
             'name' => 'Tên quyền',
             'group_id' => 'Mã nhóm quyền',
+            'is_active' => 'Kích hoạt'
         ];
 
         try{
@@ -89,12 +100,12 @@ class PermissionController extends Controller
             ]);
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollback();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -119,11 +130,11 @@ class PermissionController extends Controller
                 ], 404);
             }
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -181,12 +192,12 @@ class PermissionController extends Controller
             $permissionUpdate->save();
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollback();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -218,12 +229,12 @@ class PermissionController extends Controller
             $data->delete();
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',

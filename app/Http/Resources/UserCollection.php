@@ -15,7 +15,7 @@ class UserCollection extends ResourceCollection
     public function toArray($request)
     {
         // return parent::toArray($request);
-        if(!empty($request)){
+        if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $value){
                 $result['data'][] = [
@@ -28,7 +28,6 @@ class UserCollection extends ResourceCollection
                     'province' => $value->province->name,
                     'role' => !empty($value->role->name) ? $value->role->name : null,
                     'is_active' => $value->is_active,
-                    'deleted' => $value->deleted,
                     'created_at' => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $value->updated_at->format('Y-m-d H:i:s'),
                     'created_by' => $value->createdBy($value->created_by)->name ?? null,
@@ -48,6 +47,8 @@ class UserCollection extends ResourceCollection
         }
 
         // $request is empty
-        return [];
+        $result['data'] = [];
+        $result['paginator'] = [];
+        return $result;
     }
 }
