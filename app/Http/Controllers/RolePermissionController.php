@@ -7,7 +7,7 @@ use App\Http\Resources\RolePermissionResource;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RolePermission;
-use Exception;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -36,11 +36,11 @@ class RolePermissionController extends Controller
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new RolePermissionCollection($data);
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json($resource);
     }
@@ -94,7 +94,7 @@ class RolePermissionController extends Controller
             ]);
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -103,7 +103,7 @@ class RolePermissionController extends Controller
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ],
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -128,7 +128,7 @@ class RolePermissionController extends Controller
                 ], 404);
             }
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => [
@@ -136,7 +136,7 @@ class RolePermissionController extends Controller
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ],
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -192,7 +192,7 @@ class RolePermissionController extends Controller
             $rolePermissionUpdate->save();
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -201,7 +201,7 @@ class RolePermissionController extends Controller
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ],
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -233,7 +233,7 @@ class RolePermissionController extends Controller
             $data->delete();
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -242,7 +242,7 @@ class RolePermissionController extends Controller
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ],
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',

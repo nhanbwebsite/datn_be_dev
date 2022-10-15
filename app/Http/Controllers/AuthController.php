@@ -6,12 +6,13 @@ use App\Http\Resources\UserResource;
 use App\Models\RolePermission;
 use App\Models\User;
 use App\Models\UserSession;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
 class AuthController extends Controller
 {
     /**
@@ -98,12 +99,12 @@ class AuthController extends Controller
             ]);
             DB::commit();
         }
-        catch (Exception $e){
+        catch (HttpException $e){
             DB::rollback();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
 
         return response()->json([
@@ -189,12 +190,12 @@ class AuthController extends Controller
             ]);
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollback();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -213,11 +214,11 @@ class AuthController extends Controller
                 ], 401);
             }
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage()
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -248,12 +249,12 @@ class AuthController extends Controller
             }
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ],400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
