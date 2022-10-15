@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UserController extends Controller
 {
@@ -54,7 +54,7 @@ class UserController extends Controller
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new UserCollection($data);
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => [
@@ -62,7 +62,7 @@ class UserController extends Controller
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ],
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json($resource);
     }
@@ -142,7 +142,7 @@ class UserController extends Controller
             ]);
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -151,7 +151,7 @@ class UserController extends Controller
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ],
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -176,7 +176,7 @@ class UserController extends Controller
                 ], 404);
             }
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => [
@@ -184,7 +184,7 @@ class UserController extends Controller
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ],
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -276,7 +276,7 @@ class UserController extends Controller
 
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -285,7 +285,7 @@ class UserController extends Controller
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ],
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
@@ -317,7 +317,7 @@ class UserController extends Controller
             $data->delete();
             DB::commit();
         }
-        catch(Exception $e){
+        catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -326,7 +326,7 @@ class UserController extends Controller
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ],
-            ], 400);
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
