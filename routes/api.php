@@ -34,7 +34,3 @@ require __DIR__ . '/Subcategories/subcategories.php';
 
 // brands routers
 require __DIR__ . '/brands/brands.php';
-
-
-
-

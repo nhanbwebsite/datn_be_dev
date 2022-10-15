@@ -20,7 +20,7 @@ class SubcategoryController extends Controller
     public function index()
     {
         try {
-            $data = SubCategory::orderBy('id','DESC')->paginate(9);
+            $data = SubCategory::paginate(9);
             return response()->json([
                 'message' => 'SubCategories',
                 'data' => $data
