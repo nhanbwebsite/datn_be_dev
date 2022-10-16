@@ -27,7 +27,7 @@ class Product extends Model
         'amount',
         'deleted_by',
         'brand_id',
-        'branch_id',
+        'store_id',
         'subcategories_id',
         'is_active',
     ];

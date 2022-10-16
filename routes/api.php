@@ -45,4 +45,9 @@ require __DIR__ . '/Categories/categories.php';
 require __DIR__ . '/Subcategories/subcategories.php';
 
 // brands routers
-require __DIR__ . '/brands/brands.php';
+require __DIR__ . '/Brands/brands.php';
+
+require __DIR__ . '/Products/products.php';
+
+// Stores routes
+require __DIR__ . '/Stores/stores.php';
