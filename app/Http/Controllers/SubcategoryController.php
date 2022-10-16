@@ -197,24 +197,26 @@ class SubcategoryController extends Controller
     {
         try {
 
-            $dataDelete = SubCategory::find($id);
-            if(!empty($dataDelete)){
-                $dataDelete->update([
-                    'is_delete' => 1,
-                    // 'updated_by' => auth('sanctum')->user()->id,
-                ]);
-
-                $dataDelete->delete();
+            $data = SubCategory::find($id);
+            if(!empty($data)){
+                // $data->update([
+                //     'is_delete' => 1,
+                //     'updated_by' => auth('sanctum')->user()->id,
+                // ]);
+                $data->is_delete = 1;
+                $data->deleted_by = auth('sanctum')->user()->id;
+                $data->save();
+                $data->delete();
 
                 return response()->json([
                    'message' => 'deleted subcategory successfully',
-                   'data' => $dataDelete
+                   'data' => $data
                 ],200);
             }
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Danh mục '. "[$dataDelete->name]" . ' không tồn tại !'
+                'message' => 'Danh mục '. "[$data->name]" . ' không tồn tại !'
             ]);
 
 
