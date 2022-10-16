@@ -27,6 +27,7 @@ class User extends Authenticatable
         'district_id',
         'province_id',
         'role_id',
+        'store_id',
         'avatar',
         'verified_at',
         'password',
@@ -85,5 +86,9 @@ class User extends Authenticatable
 
     public function updatedBy($id){
         return $this->find($id);
+    }
+
+    public function store(){
+        return $this->hasOne(Store::class, 'id', 'store_id');
     }
 }

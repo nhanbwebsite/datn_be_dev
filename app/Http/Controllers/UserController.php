@@ -51,6 +51,9 @@ class UserController extends Controller
                 if(!empty($input['role_id'])){
                     $query->where('role_id', $input['role_id']);
                 }
+                if(!empty($input['store_id'])){
+                    $query->where('store_id', $input['store_id']);
+                }
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new UserCollection($data);
         }
@@ -78,10 +81,11 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:255',
             'role_id'   => 'nullable|numeric|exists:roles,id',
+            'store_id'   => 'nullable|numeric|exists:stores,id',
             'ward_id' => 'required|exists:wards,id',
             'district_id' => 'required|exists:districts,id',
             'province_id' => 'required|exists:provinces,id',
-            'phone' => 'required|string|min:10|unique:users,phone|regex:/^0[2-9]{1}[0-9]{8}$/',
+            'phone' => 'required|string|min:10|regex:/^0[2-9]{1}[0-9]{8}$/',
             'password' => 'required|string|min:8',
             'is_active' => 'numeric',
         ];
@@ -93,6 +97,9 @@ class UserController extends Controller
             'address.string' => ':attribute phải là chuỗi !',
             'address.max' => ':attribute tối đa 255 ký tự!',
             'role_id.numeric' => ':attribute chưa đúng !',
+            'role_id.exists' => ':attribute không tồn tại !',
+            'store_id.numeric' => ':attribute chưa đúng !',
+            'store_id.exists' => ':attribute không tồn tại !',
             'ward_id.required' => ':attribute không được để trống !',
             'district_id.required' => ':attribute không được để trống !',
             'province_id.required' => ':attribute không được để trống !',
@@ -111,6 +118,7 @@ class UserController extends Controller
             'name' => 'Họ tên',
             'address' => 'Địa chỉ',
             'role_id' => 'Vai trò',
+            'store_id' => 'Cửa hàng',
             'ward_id' => 'Xã/Phường/Thị trấn',
             'district_id' => 'Quận/Huyện',
             'province_id' => 'Tỉnh/Thành phố',
@@ -130,7 +138,7 @@ class UserController extends Controller
             $userCreate = User::create([
                 'name' => $request->name,
                 'address' => $request->address,
-                'role_id' => $request->role_id,
+                'role_id' => $request->role_id ?? ROLE_ID_USER,
                 'ward_id' => $request->ward_id,
                 'district_id' => $request->district_id,
                 'province_id' => $request->province_id,
@@ -205,7 +213,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:255',
             'email' => 'nullable|string|max:255|email',
-            'role_id'   => 'nullable|numeric',
+            'role_id'   => 'nullable|numeric|exists:roles,id',
+            'store_id'   => 'nullable|numeric|exists:stores,id',
             'ward_id' => 'required',
             'district_id' => 'required',
             'province_id' => 'required',
@@ -223,6 +232,9 @@ class UserController extends Controller
             'email.email' => ':attribute chưa đúng định dạng ! VD: duynh123@gmail.com',
             'email.max' => ':attribute tối đa 255 ký tự !',
             'role_id.numeric' => ':attribute chưa đúng !',
+            'role_id.exists' => ':attribute không tồn tại !',
+            'store_id.numeric' => ':attribute chưa đúng !',
+            'store_id.exists' => ':attribute không tồn tại !',
             'ward_id.required' => ':attribute không được để trống !',
             'district_id.required' => ':attribute không được để trống !',
             'province_id.required' => ':attribute không được để trống !',
@@ -238,6 +250,7 @@ class UserController extends Controller
             'address' => 'Địa chỉ',
             'email' => 'Email',
             'role_id' => 'Vai trò',
+            'store_id' => 'Cửa hàng',
             'ward_id' => 'Xã/Phường/Thị trấn',
             'district_id' => 'Quận/Huyện',
             'province_id' => 'Tỉnh/Thành phố',
@@ -266,6 +279,7 @@ class UserController extends Controller
             $user->address = $request->address ?? $user->address;
             $user->email = $request->email ?? $user->email;
             $user->role_id = $request->role_id ?? $user->role_id;
+            $user->store_id = $request->store_id ?? $user->store_id;
             $user->ward_id = $request->ward_id ?? $user->ward_id;
             $user->district_id = $request->district_id ?? $user->district_id;
             $user->province_id = $request->province_id ?? $user->province_id;
@@ -303,18 +317,21 @@ class UserController extends Controller
     {
         try{
             DB::beginTransaction();
-            $data = User::find($id);
-            if(empty($data)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Không tìm thấy người dùng !',
-                ], 404);
+            if(!is_array($id)){
+                $data = User::find($id);
+                if(empty($data)){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Không tìm thấy người dùng !',
+                    ], 404);
+                }
+                $data->is_delete = 1;
+                $data->deleted_by = auth('sanctum')->user()->id;
+                $data->save();
+
+                $data->delete();
             }
-            $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
-            ]);
-            $data->delete();
+
             DB::commit();
         }
         catch(HttpException $e){
