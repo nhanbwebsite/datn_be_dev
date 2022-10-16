@@ -25,7 +25,7 @@ class UserResource extends JsonResource
                 'district' => $this->district->name,
                 'province' => $this->province->name,
                 'role' => $this->role->name,
-                'store' => $this->store->name,
+                'store' => $this->store->name ?? null,
                 'is_active' => $this->is_active,
                 'created_at' => $this->created_at->format('d-m-Y H:i:s'),
                 'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
