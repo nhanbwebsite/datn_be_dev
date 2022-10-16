@@ -27,6 +27,7 @@ class UserCollection extends ResourceCollection
                     'district' => $value->district->name,
                     'province' => $value->province->name,
                     'role' => !empty($value->role->name) ? $value->role->name : null,
+                    'store' => !empty($value->store->name) ? $value->store->name : null,
                     'is_active' => $value->is_active,
                     'created_at' => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $value->updated_at->format('Y-m-d H:i:s'),
