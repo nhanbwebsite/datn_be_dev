@@ -233,11 +233,15 @@ class ProductController extends Controller
             $data = Product::find($id);
 
             if(!empty($data)){
-                $data->update([
-                    'is_delete' => 1
-                ]);
+                // $data->update([
+                //     'is_delete' => 1,
+                //     'delete_by' => auth('sanctum')->user()->id
+                // ]);
+                $data->is_delete = 1;
+                $data->deleted_by = auth('sanctum')->user()->id;
+                $data->save();
 
-             $delete = $data->delete();
+                $delete = $data->delete();
 
                 if($delete) {
                     return response()->json([

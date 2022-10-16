@@ -185,6 +185,15 @@ class StoreController extends Controller
                     'message' => 'Cửa hàng không tồn tại, vui lòng kiểm tra lại !',
                 ], 404);
             }
+
+            // $data->update([
+            //     'is_delete' => 1,
+            //     'deleted_by' => auth('sanctum')->user()->id
+            // ]);
+            $data->is_delete = 1;
+            $data->deleted_by = auth('sanctum')->user()->id;
+            $data->save();
+            $data->delete();
             DB::commit();
         } catch(Exception $e ) {
             DB::rollBack();
@@ -194,7 +203,6 @@ class StoreController extends Controller
             ],400);
         }
 
-        $data->delete();
         return response()->json([
             'status' => 'successfully',
             'message' => 'Đã xóa thành công cửa hàng '. "[$data->store_name]"
