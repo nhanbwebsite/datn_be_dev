@@ -50,22 +50,27 @@ class ProductController extends Controller
         $rules = [
             'name' => 'required|min:6|max:255',
             'brand_id' => 'required',
+            'meta_description' => 'required',
+            'store_id' => 'required'
         ];
         $messages = [
             'name.required' => ':attribute không được để trống !',
             'name.min' => ':attribute tối thiểu 6 ký tự !',
             'name.max' => ':attribute tối đa 255 ký tự !',
             'brand_id.required' => ':attribute không được để trống !',
+            'meta_description.required' => ':attribute không được để trống !',
+            'store_id.required' => ':attribute không được để trống !'
         ];
         $attributes = [
             'name' => 'Tên sản phẩm',
             'brand_id' => 'Tên thương hiệu',
-            'branch_id' => 'Tên chi nhánh'
+            'meta_description' => 'meta_description',
+            'store_id.required' => 'Cửa hàng'
         ];
 
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->only(['name','brand_id']), $rules, $messages, $attributes);
+            $validator = Validator::make($request->only(['name','brand_id','meta_description','store_id']), $rules, $messages, $attributes);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -74,9 +79,23 @@ class ProductController extends Controller
             }
 
             $create = Product::create([
+                'meta_title' => $request->meta_description,
+                'meta_keywords'=>$request->meta_keywords,
+                'meta_description' => $request->meta_description,
                 'name' => $request->name,
                 'slug' =>   Str::slug($request->name),
+                'description' => $request->description,
+                'url_image'=>  $request->url_image,
+                'price' =>  $request->price,
+                'promotion' =>  $request->promotion,
+                'color_ids' =>  $request->color_ids,
+                'product_weight' =>  $request->product_weight,
+                'product_height' =>  $request->product_height,
+                'product_width' =>  $request->product_width,
                 'brand_id' => $request->brand_id,
+                'store_id'=>  $request->store_id,
+                'subcategories_id' => $request->subcategories_id,
+                'amount' => $request->amount
             ]);
             DB::commit();
         } catch (Exception $e) {
