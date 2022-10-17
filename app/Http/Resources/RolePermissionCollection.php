@@ -17,13 +17,16 @@ class RolePermissionCollection extends ResourceCollection
         if(!$this->collection->isEmpty()){
             foreach($this->collection as $value){
                 $result['data'][] = [
-                    'role' => $value->role->name,
-                    'permission' => $value->permission->name,
-                    'is_active' => $value->is_active,
-                    'created_at' => $value->created_at->format('Y-m-d H:i:s'),
-                    'updated_at' => $value->updated_at->format('Y-m-d H:i:s'),
-                    'created_by' => $value->createdBy->name ?? null,
-                    'updated_by' => $value->updatedBy->name ?? null,
+                    'id'            => $value->id,
+                    'role_id'       => $value->role_id,
+                    'role'          => $value->role->name,
+                    'permission_id' => $value->permission_id,
+                    'permission'    => $value->permission->name,
+                    'is_active'     => $value->is_active,
+                    'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
+                    'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
+                    'created_by'    => $value->createdBy->name ?? null,
+                    'updated_by'    => $value->updatedBy->name ?? null,
                 ];
             }
             $result['paginator'] = [

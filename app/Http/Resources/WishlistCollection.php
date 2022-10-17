@@ -19,8 +19,13 @@ class WishlistCollection extends ResourceCollection
             // $request not empty
             foreach($this->collection as $value){
                 $result['data'][] = [
-                    'user' => $value->user->name,
-                    'product' => $value->product->name, // chưa có
+                    'user_id' => $value->user_id,
+                    'user_name' => $value->user->name,
+                    'product_id' => $value->product_id, // chưa có
+                    'product_name' => $value->product->name, // chưa có
+                    'product_price' => $value->product->price, // chưa có
+                    'product_price_sale' => $value->product->price_sale, // chưa có
+                    'product_image' => $value->product->image, // chưa có, sau này file url
                     'created_at' => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $value->updated_at->format('Y-m-d H:i:s'),
                     'created_by' => $value->createdBy->name ?? null,
