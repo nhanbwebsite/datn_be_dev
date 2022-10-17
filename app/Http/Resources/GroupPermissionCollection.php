@@ -19,14 +19,15 @@ class GroupPermissionCollection extends ResourceCollection
             // $request not empty
             foreach($this->collection as $value){
                 $result['data'][] = [
-                    'name' => $value->name,
-                    'code' => $value->code,
-                    'table_name' => $value->table_name,
-                    'is_active' => $value->is_active,
-                    'created_at' => $value->created_at->format('Y-m-d H:i:s'),
-                    'updated_at' => $value->updated_at->format('Y-m-d H:i:s'),
-                    'created_by' => $value->createdBy->name ?? null,
-                    'updated_by' => $value->updatedBy->name ?? null,
+                    'id'            => $value->id,
+                    'name'          => $value->name,
+                    'code'          => $value->code,
+                    'table_name'    => $value->table_name,
+                    'is_active'     => $value->is_active,
+                    'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
+                    'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
+                    'created_by'    => $value->createdBy->name ?? null,
+                    'updated_by'    => $value->updatedBy->name ?? null,
                 ];
             }
             $result['paginator'] = [

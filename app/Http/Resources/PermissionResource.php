@@ -17,14 +17,16 @@ class PermissionResource extends JsonResource
         // return parent::toArray($request);
         if(!empty($request)){
             return [
-                'code' => $this->code,
-                'name' => $this->name,
-                'group' => $this->group->name,
-                'is_active' => $this->is_active,
-                'created_at' => $this->created_at->format('d-m-Y H:i:s'),
-                'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
-                'created_by' => $this->createdBy->name ?? null,
-                'updated_by' => $this->updatedBy->name ?? null,
+                'id'            => $this->id,
+                'code'          => $this->code,
+                'name'          => $this->name,
+                'group_id'      => $this->group_id,
+                'group'         => $this->group->name,
+                'is_active'     => $this->is_active,
+                'created_at'    => $this->created_at->format('d-m-Y H:i:s'),
+                'updated_at'    => $this->updated_at->format('d-m-Y H:i:s'),
+                'created_by'    => $this->createdBy->name ?? null,
+                'updated_by'    => $this->updatedBy->name ?? null,
             ];
         }
         return [];
