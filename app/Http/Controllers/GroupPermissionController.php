@@ -53,35 +53,10 @@ class GroupPermissionController extends Controller
      */
     public function store(Request $request)
     {
-        $rules = [
-            'code' => 'required|string|max:50|unique:group_permissions,code',
-            'name' => 'required|string|max:50',
-            'table_name' => 'string',
-            'is_active' => 'numeric',
-        ];
-
-        $messages = [
-            'code.required' => ':attribute không được để trống !',
-            'code.string' => ':attribute phải là chuỗi !',
-            'code.max' => ':attribute tối đa 50 ký tự !',
-            'code.unique' => ':attribute đã tồn tại !',
-            'name.required' => ':attribute không được để trống !',
-            'name.string' => ':attribute phải là chuỗi !',
-            'name.max' => ':attribute tối đa 50 ký tự !',
-            'table_name.string' => ':attribute phải là chuỗi !',
-            'is_active.numeric' => ':attribute chưa đúng !',
-        ];
-
-        $attributes = [
-            'code' => 'Mã nhóm quyền',
-            'name' => 'Tên nhóm quyền',
-            'table_name' => 'Tên bảng',
-            'is_active' => 'Kích hoạt',
-        ];
-
+        $input = $request->all();
         try{
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+            $validator = $this->upsertValidate($input);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -149,29 +124,11 @@ class GroupPermissionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $rules = [
-            'name' => 'required|string|max:50',
-            'table_name' => 'string',
-            'is_active' => 'numeric',
-        ];
-
-        $messages = [
-            'name.required' => ':attribute không được để trống !',
-            'name.string' => ':attribute phải là chuỗi !',
-            'name.max' => ':attribute tối đa 50 ký tự !',
-            'table_name.string' => ':attribute phải là chuỗi !',
-            'is_active.numeric' => ':attribute phải là số !',
-        ];
-
-        $attributes = [
-            'name' => 'Tên nhóm quyền',
-            'table_name' => 'Tên bảng',
-            'is_active' => 'Kích hoạt',
-        ];
-
+        $input = $request->all();
+        $input['id'] = $id;
         try{
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+            $validator = $this->upsertValidate($input);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -239,5 +196,58 @@ class GroupPermissionController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa ['.$data->name.']',
         ]);
+    }
+
+    public function upsertValidate($input){
+        if(!empty($input['id'])){
+            $rules = [
+                'name' => 'required|string|max:50',
+                'table_name' => 'string',
+                'is_active' => 'numeric',
+            ];
+
+            $messages = [
+                'name.required' => ':attribute không được để trống !',
+                'name.string' => ':attribute phải là chuỗi !',
+                'name.max' => ':attribute tối đa 50 ký tự !',
+                'table_name.string' => ':attribute phải là chuỗi !',
+                'is_active.numeric' => ':attribute phải là số !',
+            ];
+
+            $attributes = [
+                'name' => 'Tên nhóm quyền',
+                'table_name' => 'Tên bảng',
+                'is_active' => 'Kích hoạt',
+            ];
+        }
+        else{
+            $rules = [
+                'code' => 'required|string|max:50|unique:group_permissions,code',
+                'name' => 'required|string|max:50',
+                'table_name' => 'string',
+                'is_active' => 'numeric',
+            ];
+
+            $messages = [
+                'code.required' => ':attribute không được để trống !',
+                'code.string' => ':attribute phải là chuỗi !',
+                'code.max' => ':attribute tối đa 50 ký tự !',
+                'code.unique' => ':attribute đã tồn tại !',
+                'name.required' => ':attribute không được để trống !',
+                'name.string' => ':attribute phải là chuỗi !',
+                'name.max' => ':attribute tối đa 50 ký tự !',
+                'table_name.string' => ':attribute phải là chuỗi !',
+                'is_active.numeric' => ':attribute chưa đúng !',
+            ];
+
+            $attributes = [
+                'code' => 'Mã nhóm quyền',
+                'name' => 'Tên nhóm quyền',
+                'table_name' => 'Tên bảng',
+                'is_active' => 'Kích hoạt',
+            ];
+        }
+        $v = Validator::make($input, $rules, $messages, $attributes);
+        return $v;
     }
 }

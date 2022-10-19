@@ -53,30 +53,10 @@ class RolePermissionController extends Controller
      */
     public function store(Request $request)
     {
-        $rules = [
-            'role_id' => 'required|numeric|exists:roles,id',
-            'permission_id' => 'required|numeric|exists:permissions,id',
-            'is_active' => 'numeric',
-        ];
-
-        $messages = [
-            'role_id.required' => ':attribute không được để trống !',
-            'role_id.numeric' => ':attribute phải là số !',
-            'role_id.exists' => ':attribute không tồn tại !',
-            'permission_id.required' => ':attribute không được để trống !',
-            'permission_id.numeric' => ':attribute phải là số !',
-            'permission_id.exists' => ':attribute không tồn tại !',
-            'is_active.numeric' => ':attribute chưa đúng !',
-        ];
-
-        $attributes = [
-            'role_id' => 'Mã vai trò',
-            'permission_id' => 'Mã quyền',
-            'is_active' => 'Kích hoạt'
-        ];
+        $input = $request->all();
         try{
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+            $validator = $this->upsertValidate($input);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -153,39 +133,24 @@ class RolePermissionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $rules = [
-            'role_id' => 'required|numeric|exists:roles,id',
-            'permission_id' => 'required|numeric|exists:permissions,id',
-            'is_active' => 'required|numeric',
-        ];
-
-        $messages = [
-            'role_id.required' => ':attribute không được để trống !',
-            'role_id.numeric' => ':attribute phải là số !',
-            'role_id.exists' => ':attribute không tồn tại !',
-            'permission_id.required' => ':attribute không được để trống !',
-            'permission_id.numeric' => ':attribute phải là số !',
-            'permission_id.exists' => ':attribute không tồn tại !',
-            'is_active.required' => ':attribute không được để trống !',
-            'is_active.numeric' => ':attribute chưa đúng !',
-        ];
-
-        $attributes = [
-            'role_id' => 'Mã vai trò',
-            'permission_id' => 'Mã quyền',
-            'is_active' => 'Kích hoạt'
-        ];
-
+        $input = $request->all();
+        $input['id'] = $id;
         try{
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+            $validator = $this->upsertValidate($input);
+            $rolePermissionUpdate = RolePermission::find($id);
+            if(!empty($rolePermissionUpdate)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Quyền không tồn tại !',
+                ], 404);
+            }
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $rolePermissionUpdate = RolePermission::find($id);
             $rolePermissionUpdate->role_id = $request->role_id ?? $rolePermissionUpdate->role_id;
             $rolePermissionUpdate->permission_id = $request->permission_id ?? $rolePermissionUpdate->permission_id;
             $rolePermissionUpdate->is_active = $request->is_active ?? $rolePermissionUpdate->is_active;
@@ -248,5 +213,58 @@ class RolePermissionController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa !',
         ]);
+    }
+
+    public function upsertValidate($input){
+        if(!empty($input['id'])){
+            $rules = [
+                'role_id' => 'required|numeric|exists:roles,id',
+                'permission_id' => 'required|numeric|exists:permissions,id',
+                'is_active' => 'required|numeric',
+            ];
+
+            $messages = [
+                'role_id.required' => ':attribute không được để trống !',
+                'role_id.numeric' => ':attribute phải là số !',
+                'role_id.exists' => ':attribute không tồn tại !',
+                'permission_id.required' => ':attribute không được để trống !',
+                'permission_id.numeric' => ':attribute phải là số !',
+                'permission_id.exists' => ':attribute không tồn tại !',
+                'is_active.required' => ':attribute không được để trống !',
+                'is_active.numeric' => ':attribute chưa đúng !',
+            ];
+
+            $attributes = [
+                'role_id' => 'Mã vai trò',
+                'permission_id' => 'Mã quyền',
+                'is_active' => 'Kích hoạt'
+            ];
+        }
+        else{
+            $rules = [
+                'role_id' => 'required|numeric|exists:roles,id',
+                'permission_id' => 'required|numeric|exists:permissions,id',
+                'is_active' => 'numeric',
+            ];
+
+            $messages = [
+                'role_id.required' => ':attribute không được để trống !',
+                'role_id.numeric' => ':attribute phải là số !',
+                'role_id.exists' => ':attribute không tồn tại !',
+                'permission_id.required' => ':attribute không được để trống !',
+                'permission_id.numeric' => ':attribute phải là số !',
+                'permission_id.exists' => ':attribute không tồn tại !',
+                'is_active.numeric' => ':attribute chưa đúng !',
+            ];
+
+            $attributes = [
+                'role_id' => 'Mã vai trò',
+                'permission_id' => 'Mã quyền',
+                'is_active' => 'Kích hoạt'
+            ];
+        }
+
+        $v = Validator::make($input, $rules, $messages, $attributes);
+        return $v;
     }
 }

@@ -51,33 +51,17 @@ class WishlistController extends Controller
      */
     public function store(Request $request)
     {
-        $rules = [
-            'user_id' => 'required|numeric',
-            'product_id' => 'required|numeric',
-        ];
-
-        $messages = [
-            'user_id.required' => ':attribute không được để trống !',
-            'user_id.numeric' => ':attribute chưa đúng !',
-            'product_id.required' => ':attribute không được để trống !',
-            'product_id.numeric' => ':attribute chưa đúng !',
-        ];
-
-        $attributes = [
-            'user_id' => 'Mã người dùng',
-            'product_id' => 'Mã sản phẩm',
-        ];
-
+        $input = $request->all();
         try{
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+            $validator = $this->insertValidate($input);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $wishlistCreate = Wishlist::create([
+            Wishlist::create([
                 'user_id' => $request->user_id,
                 'product_id' => $request->product_id,
                 'created_by' => auth('sanctum')->user()->id,
@@ -164,5 +148,27 @@ class WishlistController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa sản phẩm khỏi yêu thích !',
         ]);
+    }
+
+    public function insertValidate($input){
+        $rules = [
+            'user_id' => 'required|numeric',
+            'product_id' => 'required|numeric',
+        ];
+
+        $messages = [
+            'user_id.required' => ':attribute không được để trống !',
+            'user_id.numeric' => ':attribute chưa đúng !',
+            'product_id.required' => ':attribute không được để trống !',
+            'product_id.numeric' => ':attribute chưa đúng !',
+        ];
+
+        $attributes = [
+            'user_id' => 'Mã người dùng',
+            'product_id' => 'Mã sản phẩm',
+        ];
+
+        $v = Validator::make($input, $rules, $messages, $attributes);
+        return $v;
     }
 }
