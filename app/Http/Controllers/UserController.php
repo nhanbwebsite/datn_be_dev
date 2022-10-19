@@ -77,58 +77,10 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'role_id'   => 'nullable|numeric|exists:roles,id',
-            'store_id'   => 'nullable|numeric|exists:stores,id',
-            'ward_id' => 'required|exists:wards,id',
-            'district_id' => 'required|exists:districts,id',
-            'province_id' => 'required|exists:provinces,id',
-            'phone' => 'required|string|min:10|regex:/^0[2-9]{1}[0-9]{8}$/',
-            'password' => 'required|string|min:8',
-            'is_active' => 'numeric',
-        ];
-
-        $messages = [
-            'name.required' => ':attribute không được để trống !',
-            'name.string' => ':attribute phải là chuỗi !',
-            'name.max' => ':attribute tối đa 255 ký tự !',
-            'address.string' => ':attribute phải là chuỗi !',
-            'address.max' => ':attribute tối đa 255 ký tự!',
-            'role_id.numeric' => ':attribute chưa đúng !',
-            'role_id.exists' => ':attribute không tồn tại !',
-            'store_id.numeric' => ':attribute chưa đúng !',
-            'store_id.exists' => ':attribute không tồn tại !',
-            'ward_id.required' => ':attribute không được để trống !',
-            'district_id.required' => ':attribute không được để trống !',
-            'province_id.required' => ':attribute không được để trống !',
-            'phone.required' => ':attribute không được để trống !',
-            'phone.string' => ':attribute phải là chuỗi !',
-            'phone.min' => ':attribute phải đủ 10 ký tự !',
-            'phone.unique' => ':attribute đã được đăng ký !',
-            'phone.regex' => ':attribute chưa đúng định dạng VD: 0946636842 !',
-            'password.required' => ':attribute không được để trống !',
-            'password.string' => ':attribute phải là chuỗi !',
-            'password.min' => ':attribute tối thiểu 8 ký tự !',
-            'is_active.numeric' => ':attribute chưa đúng !',
-        ];
-
-        $attributes = [
-            'name' => 'Họ tên',
-            'address' => 'Địa chỉ',
-            'role_id' => 'Vai trò',
-            'store_id' => 'Cửa hàng',
-            'ward_id' => 'Xã/Phường/Thị trấn',
-            'district_id' => 'Quận/Huyện',
-            'province_id' => 'Tỉnh/Thành phố',
-            'phone' => 'Số điện thoại',
-            'password' => 'Mật khẩu',
-            'is_active' => 'Trạng thái',
-        ];
+        $input = $request->all();
         try{
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+            $validator = $this->upsertValidate($input);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -209,72 +161,23 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'email' => 'nullable|string|max:255|email',
-            'role_id'   => 'nullable|numeric|exists:roles,id',
-            'store_id'   => 'nullable|numeric|exists:stores,id',
-            'ward_id' => 'required',
-            'district_id' => 'required',
-            'province_id' => 'required',
-            'password' => 'required|string|min:8',
-            'is_active' => 'required|numeric',
-        ];
-
-        $messages = [
-            'name.required' => ':attribute không được để trống !',
-            'name.string' => ':attribute phải là chuỗi !',
-            'name.max' => ':attribute tối đa 255 ký tự !',
-            'address.string' => ':attribute phải là chuỗi !',
-            'address.max' => ':attribute tối đa 255 ký tự!',
-            'email.string' => ':attribute phải là chuỗi !',
-            'email.email' => ':attribute chưa đúng định dạng ! VD: duynh123@gmail.com',
-            'email.max' => ':attribute tối đa 255 ký tự !',
-            'role_id.numeric' => ':attribute chưa đúng !',
-            'role_id.exists' => ':attribute không tồn tại !',
-            'store_id.numeric' => ':attribute chưa đúng !',
-            'store_id.exists' => ':attribute không tồn tại !',
-            'ward_id.required' => ':attribute không được để trống !',
-            'district_id.required' => ':attribute không được để trống !',
-            'province_id.required' => ':attribute không được để trống !',
-            'password.required' => ':attribute không được để trống !',
-            'password.string' => ':attribute phải là chuỗi !',
-            'password.min' => ':attribute tối thiểu 8 ký tự !',
-            'is_active.required' => ':attribute không để trống !',
-            'is_active.numeric' => ':attribute chưa đúng !',
-        ];
-
-        $attributes = [
-            'name' => 'Họ tên',
-            'address' => 'Địa chỉ',
-            'email' => 'Email',
-            'role_id' => 'Vai trò',
-            'store_id' => 'Cửa hàng',
-            'ward_id' => 'Xã/Phường/Thị trấn',
-            'district_id' => 'Quận/Huyện',
-            'province_id' => 'Tỉnh/Thành phố',
-            'password' => 'Mật khẩu',
-            'is_active' => 'Trạng thái',
-        ];
-
+        $input = $request->all();
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
-            if($validator->fails()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
+            $validator = $this->upsertValidate($input);
             $user = User::find($id);
             if(empty($user)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Người dùng không tồn tại !',
                 ], 404);
-;           }
-
+            }
+            if($validator->fails()){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $validator->errors(),
+                ], 422);
+            }
             $user->name = $request->name ?? $user->name;
             $user->address = $request->address ?? $user->address;
             $user->email = $request->email ?? $user->email;
@@ -349,5 +252,116 @@ class UserController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa ['.$data->name.']',
         ]);
+    }
+
+    public function upsertValidate($input){
+        if(!empty($input['id'])){
+            // Update
+            $rules = [
+                'name' => 'required|string|max:255',
+                'address' => 'nullable|string|max:255',
+                'email' => 'nullable|string|max:255|email',
+                'role_id'   => 'nullable|numeric|exists:roles,id',
+                'store_id'   => 'nullable|numeric|exists:stores,id',
+                'ward_id' => 'required|exists:wards,id',
+                'district_id' => 'required|exists:districts,id',
+                'province_id' => 'required|exists:provinces,id',
+                'password' => 'required|string|min:8',
+                'is_active' => 'required|numeric',
+            ];
+
+            $messages = [
+                'name.required' => ':attribute không được để trống !',
+                'name.string' => ':attribute phải là chuỗi !',
+                'name.max' => ':attribute tối đa 255 ký tự !',
+                'address.string' => ':attribute phải là chuỗi !',
+                'address.max' => ':attribute tối đa 255 ký tự!',
+                'email.string' => ':attribute phải là chuỗi !',
+                'email.email' => ':attribute chưa đúng định dạng ! VD: duynh123@gmail.com',
+                'email.max' => ':attribute tối đa 255 ký tự !',
+                'role_id.numeric' => ':attribute chưa đúng !',
+                'role_id.exists' => ':attribute không tồn tại !',
+                'store_id.numeric' => ':attribute chưa đúng !',
+                'store_id.exists' => ':attribute không tồn tại !',
+                'ward_id.required' => ':attribute không được để trống !',
+                'ward_id.exists' => ':attribute không tồn tại !',
+                'district_id.required' => ':attribute không được để trống !',
+                'district_id.exists' => ':attribute không tồn tại !',
+                'province_id.required' => ':attribute không được để trống !',
+                'province_id.exists' => ':attribute không tồn tại !',
+                'password.required' => ':attribute không được để trống !',
+                'password.string' => ':attribute phải là chuỗi !',
+                'password.min' => ':attribute tối thiểu 8 ký tự !',
+                'is_active.required' => ':attribute không để trống !',
+                'is_active.numeric' => ':attribute chưa đúng !',
+            ];
+
+            $attributes = [
+                'name' => 'Họ tên',
+                'address' => 'Địa chỉ',
+                'email' => 'Email',
+                'role_id' => 'Vai trò',
+                'store_id' => 'Cửa hàng',
+                'ward_id' => 'Xã/Phường/Thị trấn',
+                'district_id' => 'Quận/Huyện',
+                'province_id' => 'Tỉnh/Thành phố',
+                'password' => 'Mật khẩu',
+                'is_active' => 'Trạng thái',
+            ];
+        }
+        else{
+            // Create
+            $rules = [
+                'name' => 'required|string|max:255',
+                'address' => 'nullable|string|max:255',
+                'role_id'   => 'nullable|numeric|exists:roles,id',
+                'store_id'   => 'nullable|numeric|exists:stores,id',
+                'ward_id' => 'required|exists:wards,id',
+                'district_id' => 'required|exists:districts,id',
+                'province_id' => 'required|exists:provinces,id',
+                'phone' => 'required|string|min:10|regex:/^0[2-9]{1}[0-9]{8}$/',
+                'password' => 'required|string|min:8',
+                'is_active' => 'numeric',
+            ];
+
+            $messages = [
+                'name.required' => ':attribute không được để trống !',
+                'name.string' => ':attribute phải là chuỗi !',
+                'name.max' => ':attribute tối đa 255 ký tự !',
+                'address.string' => ':attribute phải là chuỗi !',
+                'address.max' => ':attribute tối đa 255 ký tự!',
+                'role_id.numeric' => ':attribute chưa đúng !',
+                'role_id.exists' => ':attribute không tồn tại !',
+                'store_id.numeric' => ':attribute chưa đúng !',
+                'store_id.exists' => ':attribute không tồn tại !',
+                'ward_id.required' => ':attribute không được để trống !',
+                'district_id.required' => ':attribute không được để trống !',
+                'province_id.required' => ':attribute không được để trống !',
+                'phone.required' => ':attribute không được để trống !',
+                'phone.string' => ':attribute phải là chuỗi !',
+                'phone.min' => ':attribute phải đủ 10 ký tự !',
+                'phone.unique' => ':attribute đã được đăng ký !',
+                'phone.regex' => ':attribute chưa đúng định dạng VD: 0946636842 !',
+                'password.required' => ':attribute không được để trống !',
+                'password.string' => ':attribute phải là chuỗi !',
+                'password.min' => ':attribute tối thiểu 8 ký tự !',
+                'is_active.numeric' => ':attribute chưa đúng !',
+            ];
+
+            $attributes = [
+                'name' => 'Họ tên',
+                'address' => 'Địa chỉ',
+                'role_id' => 'Vai trò',
+                'store_id' => 'Cửa hàng',
+                'ward_id' => 'Xã/Phường/Thị trấn',
+                'district_id' => 'Quận/Huyện',
+                'province_id' => 'Tỉnh/Thành phố',
+                'phone' => 'Số điện thoại',
+                'password' => 'Mật khẩu',
+                'is_active' => 'Trạng thái',
+            ];
+        }
+        $v = Validator::make($input, $rules, $messages, $attributes);
+        return $v;
     }
 }

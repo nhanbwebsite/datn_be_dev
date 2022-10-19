@@ -59,36 +59,10 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        $rules = [
-            'code' => 'required|string|max:50|unique:roles,code',
-            'name' => 'required|string|max:50',
-            'level' => 'required|numeric',
-            'is_active' => 'numeric',
-        ];
-
-        $messages = [
-            'code.required' => ':attribute không được để trống !',
-            'code.string' => ':attribute phải là chuỗi !',
-            'code.max' => ':attribute tối đa 50 ký tự !',
-            'code.unique' => ':attribute đã tồn tại !',
-            'name.required' => ':attribute không được để trống !',
-            'name.string' => ':attribute phải là chuỗi !',
-            'name.max' => ':attribute tối đa 50 ký tự !',
-            'level.required' => ':attribute không được để trống !',
-            'level.numeric' => ':attribute phải là số !',
-            'is_active.numeric' => ':attribute chưa đúng !',
-        ];
-
-        $attributes = [
-            'code' => 'Mã vai trò',
-            'name' => 'Tên vai trò',
-            'level' => 'Cấp',
-            'is_active' => 'Kích hoạt'
-        ];
-
+        $input = $request->all();
         try{
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+            $validator = $this->upsertValidate($input);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -164,39 +138,23 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $rules = [
-            'name' => 'required|string|max:50',
-            'level' => 'required|numeric',
-        ];
-
-        $messages = [
-            'name.required' => ':attribute không được để trống !',
-            'name.string' => ':attribute phải là chuỗi !',
-            'name.max' => ':attribute tối đa 50 ký tự !',
-            'level.required' => ':attribute không được để trống !',
-            'level.numeric' => ':attribute phải là số !',
-        ];
-
-        $attributes = [
-            'name' => 'Tên vai trò',
-            'level' => 'Cấp',
-        ];
-
+        $input = $request->all();
+        $input['id'] = $id;
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
-            if($validator->fails()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
+            $validator = $this->upsertValidate($input);
             $roleUpdate = Role::find($id);
             if(empty($roleUpdate)) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Vai trò không tồn tại !',
                 ], 404);
+            }
+            if($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $validator->errors(),
+                ], 422);
             }
             $roleUpdate->name = $request->name ?? $roleUpdate->name;
             $roleUpdate->level = $request->level ?? $roleUpdate->level;
@@ -260,5 +218,57 @@ class RoleController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa ['.$data->name.']',
         ]);
+    }
+
+    public function upsertValidate($input){
+        if(!empty($input['id'])){
+            $rules = [
+                'name' => 'required|string|max:50',
+                'level' => 'required|numeric',
+            ];
+
+            $messages = [
+                'name.required' => ':attribute không được để trống !',
+                'name.string' => ':attribute phải là chuỗi !',
+                'name.max' => ':attribute tối đa 50 ký tự !',
+                'level.required' => ':attribute không được để trống !',
+                'level.numeric' => ':attribute phải là số !',
+            ];
+
+            $attributes = [
+                'name' => 'Tên vai trò',
+                'level' => 'Cấp',
+            ];
+        }
+        else{
+            $rules = [
+                'code' => 'required|string|max:50|unique:roles,code',
+                'name' => 'required|string|max:50',
+                'level' => 'required|numeric',
+                'is_active' => 'numeric',
+            ];
+
+            $messages = [
+                'code.required' => ':attribute không được để trống !',
+                'code.string' => ':attribute phải là chuỗi !',
+                'code.max' => ':attribute tối đa 50 ký tự !',
+                'code.unique' => ':attribute đã tồn tại !',
+                'name.required' => ':attribute không được để trống !',
+                'name.string' => ':attribute phải là chuỗi !',
+                'name.max' => ':attribute tối đa 50 ký tự !',
+                'level.required' => ':attribute không được để trống !',
+                'level.numeric' => ':attribute phải là số !',
+                'is_active.numeric' => ':attribute chưa đúng !',
+            ];
+
+            $attributes = [
+                'code' => 'Mã vai trò',
+                'name' => 'Tên vai trò',
+                'level' => 'Cấp',
+                'is_active' => 'Kích hoạt'
+            ];
+        }
+        $v = Validator::make($input, $rules, $messages, $attributes);
+        return $v;
     }
 }
