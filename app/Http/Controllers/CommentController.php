@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CommentCollection;
 use App\Http\Resources\CommentResource;
+use App\Http\Validators\User\CommentCreateValidator;
+use App\Http\Validators\User\CommentUpdateValidator;
 use App\Models\Comment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
 {
@@ -47,18 +48,12 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, CommentCreateValidator $validator)
     {
         $input = $request->all();
+        $validator->validate($input);
         try{
             DB::beginTransaction();
-            $validator = $this->upsertValidate($input);
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
             Comment::create([
                 'user_id' => auth('sanctum')->user()->id,
                 'parent_id' => $request->parent_id ?? null,
@@ -126,25 +121,18 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, CommentUpdateValidator $validator)
     {
         $input = $request->all();
-        $input['id'] = $id;
+        $validator->validate($input);
         try {
             DB::beginTransaction();
-            $validator = $this->upsertValidate($input);
             $comment = Comment::find($id);
             if(empty($comment)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Người dùng không tồn tại !',
                 ], 404);
-            }
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
             }
             $comment->content = $request->content ?? $comment->content;
             $comment->is_active = $request->is_active ?? $comment->is_active;
@@ -211,56 +199,5 @@ class CommentController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa bình luận !',
         ]);
-    }
-
-    public function upsertValidate($input){
-        if(!empty($input['id'])){
-            $rules = [
-                'user_id' => 'required|numeric|exists:users,id',
-                'post_id' => 'required|numeric|exists:posts,id',
-                'content' => 'required',
-                'is_active' => 'required|numeric',
-            ];
-
-            $messages = [
-                'user_id.required' => ':attribute không được để trống !',
-                'user_id.numeric' => ':attribute chưa đúng !',
-                'post_id.required' => ':attribute không được để trống !',
-                'post_id.numeric' => ':attribute chưa đúng !',
-                'content.required' => ':attribute không được để trống !',
-                'is_active.required' => ':attribute không được để trống !',
-                'is_active.numeric' => ':attribute chưa đúng !',
-            ];
-
-            $attributes = [
-                'user_id' => 'Mã người dùng',
-                'post_id' => 'Mã bài viết',
-                'content' => 'Nội dung',
-                'is_active' => 'Trạng thái',
-            ];
-        }
-        else{
-            $rules = [
-                'user_id' => 'required|numeric|exists:users,id',
-                'post_id' => 'required|numeric|exists:posts,id',
-                'content' => 'required',
-            ];
-
-            $messages = [
-                'user_id.required' => ':attribute không được để trống !',
-                'user_id.numeric' => ':attribute chưa đúng !',
-                'post_id.required' => ':attribute không được để trống !',
-                'post_id.numeric' => ':attribute chưa đúng !',
-                'content.required' => ':attribute không được để trống !',
-            ];
-
-            $attributes = [
-                'user_id' => 'Mã người dùng',
-                'post_id' => 'Mã bài viết',
-                'content' => 'Nội dung',
-            ];
-        }
-        $v = Validator::make($input, $rules, $messages, $attributes);
-        return $v;
     }
 }
