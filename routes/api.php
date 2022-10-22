@@ -51,3 +51,6 @@ require __DIR__ . '/Products/products.php';
 
 // Stores routes
 require __DIR__ . '/Stores/stores.php';
+
+// City routes
+require __DIR__ . '/City/city.php';
