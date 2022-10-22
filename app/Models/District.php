@@ -18,4 +18,8 @@ class District extends Model
     {
         return $this->hasOne(Province::class, 'id', 'province_id');
     }
+
+    public function wards(){
+        return $this->hasMany(Ward::class, 'district_id', 'id');
+    }
 }
