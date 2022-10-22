@@ -41,13 +41,13 @@ class CityController extends Controller
     public function getDistrict($province_id){
         try{
             $province = Province::find($province_id);
-            $data = $province->districts;
-            if(empty($province) || empty($data)){
+            if(empty($province) || empty($province->districts)){
                 return response()->json([
                     'status' => 'success',
                     'data' => [],
                 ]);
             }
+            $data = $province->districts;
         }
         catch(HttpException $e){
             return response()->json([
@@ -66,14 +66,15 @@ class CityController extends Controller
 
     public function getWard($province_id, $district_id){
         try{
-            $district = District::find($district_id);
-            $data = $district->wards;
-            if(empty($district) || empty($data)){
+            // $district = District::find($district_id);
+            $district = District::where('id', $district_id)->where('province_id', $province_id)->first();
+            if(empty($district) || empty($district->wards)){
                 return response()->json([
                     'status' => 'success',
                     'data' => [],
                 ]);
             }
+            $data = $district->wards;
         }
         catch(HttpException $e){
             return response()->json([
