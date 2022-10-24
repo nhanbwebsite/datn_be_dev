@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\GroupPermissionCollection;
 use App\Http\Resources\GroupPermissionResource;
-use App\Http\Validators\User\GroupPermissionCreateValidator;
-use App\Http\Validators\User\GroupPermissionUpdateValidator;
+use App\Http\Validators\GroupPermission\GroupPermissionCreateValidator;
+use App\Http\Validators\GroupPermission\GroupPermissionUpdateValidator;
 use App\Models\GroupPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

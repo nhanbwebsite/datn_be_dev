@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\RolePermissionCollection;
 use App\Http\Resources\RolePermissionResource;
-use App\Http\Validators\User\RolePermissionCreateValidator;
-use App\Http\Validators\User\RolePermissionUpdateValidator;
+use App\Http\Validators\RolePermission\RolePermissionCreateValidator;
+use App\Http\Validators\RolePermission\RolePermissionUpdateValidator;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\RolePermission;
