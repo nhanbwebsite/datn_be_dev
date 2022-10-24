@@ -91,4 +91,8 @@ class User extends Authenticatable
     public function store(){
         return $this->hasOne(Store::class, 'id', 'store_id');
     }
+
+    public function addressNote(){
+        return $this->hasMany(AddressNote::class, 'user_id', 'id');
+    }
 }
