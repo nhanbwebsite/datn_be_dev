@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CommentCollection;
 use App\Http\Resources\CommentResource;
-use App\Http\Validators\User\CommentCreateValidator;
-use App\Http\Validators\User\CommentUpdateValidator;
+use App\Http\Validators\Comment\CommentCreateValidator;
+use App\Http\Validators\Comment\CommentUpdateValidator;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CommentController extends Controller
 {
@@ -55,7 +56,7 @@ class CommentController extends Controller
         try{
             DB::beginTransaction();
             Comment::create([
-                'user_id' => auth('sanctum')->user()->id,
+                'user_id' => $request->user_id ?? auth('sanctum')->user()->id,
                 'parent_id' => $request->parent_id ?? null,
                 'post_id' => $request->post_id,
                 'content' => $request->content,

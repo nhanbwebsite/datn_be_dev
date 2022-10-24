@@ -26,6 +26,10 @@ class Wishlist extends Model
         return $this->hasOne(User::class, 'id', 'user_id');
     }
 
+    public function product(){
+        return $this->hasOne(Product::class, 'id', 'product_id');
+    }
+
     public function createdBy(){
         return $this->hasOne(User::class, 'id', 'created_by');
     }

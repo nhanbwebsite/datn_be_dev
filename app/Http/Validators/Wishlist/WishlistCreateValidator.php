@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Validators\User;
+namespace App\Http\Validators\Wishlist;
 
 use App\Http\Validators\ValidatorBase;
 
 class WishlistCreateValidator extends ValidatorBase{
     protected function rules(){
         return [
-            'user_id' => 'required|numeric',
+            'user_id' => 'numeric|exists:users,id',
+            'product_id' => 'required|numeric|exists:products,id',
             'product_id' => 'required|numeric',
         ];
     }
