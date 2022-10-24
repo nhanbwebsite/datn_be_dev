@@ -19,6 +19,7 @@ class WishlistCollection extends ResourceCollection
             // $request not empty
             foreach($this->collection as $value){
                 $result['data'][] = [
+                    'id' => $value->id,
                     'user_id' => $value->user_id,
                     'user_name' => $value->user->name,
                     'product_id' => $value->product_id, // chưa có

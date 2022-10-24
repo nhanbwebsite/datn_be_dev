@@ -22,7 +22,7 @@ class CommentResource extends JsonResource
                 'user_id'       => $this->user_id,
                 'user_name'     => $this->user->name,
                 'post_id'       => $this->post_id,
-                'post_name'     => $this->post->name,
+                'post_title'     => $this->post->title,
                 'role_id'       => $this->user->role_id,
                 'role'          => $this->user->role->name,
                 'content'       => $this->content,

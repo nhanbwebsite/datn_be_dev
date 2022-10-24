@@ -20,9 +20,14 @@ class CommentCollection extends ResourceCollection
             foreach($this->collection as $value){
                 $result['data'][] = [
                     'id'            => $value->id,
-                    'name'          => $value->name,
-                    'code'          => $value->code,
-                    'table_name'    => $value->table_name,
+                    'user_id'       => $value->user_id,
+                    'user_name'     => $value->user->name,
+                    'post_id'       => $value->post_id,
+                    'post_title'    => $value->post->title,
+                    'parent_id'     => $value->parent_id,
+                    'role_id'       => $value->user->role_id,
+                    'role'          => $value->user->role->name,
+                    'content'       => $value->content,
                     'is_active'     => $value->is_active,
                     'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\WishlistCollection;
-use App\Http\Validators\User\WishlistCreateValidator;
+use App\Http\Validators\Wishlist\WishlistCreateValidator;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class WishlistController extends Controller
@@ -56,7 +57,7 @@ class WishlistController extends Controller
         try{
             DB::beginTransaction();
             Wishlist::create([
-                'user_id' => $request->user_id,
+                'user_id' => $request->user_id ?? auth('sanctum')->user()->id,
                 'product_id' => $request->product_id,
                 'created_by' => auth('sanctum')->user()->id,
                 'updated_by' => auth('sanctum')->user()->id,
