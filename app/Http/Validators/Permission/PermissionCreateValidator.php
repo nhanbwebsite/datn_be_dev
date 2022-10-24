@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Validators\User;
+namespace App\Http\Validators\Permission;
 
 use App\Http\Validators\ValidatorBase;
 

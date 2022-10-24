@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PermissionCollection;
 use App\Http\Resources\PermissionResource;
-use App\Http\Validators\User\PermissionCreateValidator;
-use App\Http\Validators\User\PermissionUpdateValidator;
+use App\Http\Validators\Permission\PermissionCreateValidator;
+use App\Http\Validators\Permission\PermissionUpdateValidator;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
