@@ -56,7 +56,7 @@ class CommentController extends Controller
         try{
             DB::beginTransaction();
             Comment::create([
-                'user_id' => $request->user_id ?? auth('sanctum')->user()->id,
+                'user_id' => auth('sanctum')->user()->id,
                 'parent_id' => $request->parent_id ?? null,
                 'post_id' => $request->post_id,
                 'content' => $request->content,
