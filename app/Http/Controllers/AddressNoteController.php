@@ -24,7 +24,7 @@ class AddressNoteController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = AddressNote::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where('user_id', auth('sanctum')->user()->id)->where(function($query) use ($input){
+            $data = AddressNote::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use ($input){
                 if(!empty($input['user_id'])){
                     $query->where('user_id', $input['user_id']);
                 }
