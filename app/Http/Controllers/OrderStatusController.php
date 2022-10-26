@@ -56,6 +56,13 @@ class OrderStatusController extends Controller
         $input = $request->all();
         $validator->validate($input);
         try{
+            $check = OrderStatus::where('code', $request->code)->whereNull('deleted_at')->first();
+            if(empty($check)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Trạng thái đã tồn tại !',
+                ], 400);
+            }
             DB::beginTransaction();
             $orderStatus = OrderStatus::create([
                 'name' => $request->name,
@@ -129,6 +136,13 @@ class OrderStatusController extends Controller
         $input = $request->all();
         $validator->validate($input);
         try {
+            $check = OrderStatus::where('code', $request->code)->whereNull('deleted_at')->first();
+            if(empty($check)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Trạng thái đã tồn tại !',
+                ], 400);
+            }
             DB::beginTransaction();
             $orderStatus = OrderStatus::find($id);
             if(empty($orderStatus)) {
@@ -139,6 +153,7 @@ class OrderStatusController extends Controller
             }
             $orderStatus->name = $request->name ?? $orderStatus->name;
             $orderStatus->code = $request->code ?? $orderStatus->code;
+            $orderStatus->sort_level = $request->sort_level ?? $orderStatus->sort_level;
             $orderStatus->is_active = $request->is_active ?? $orderStatus->is_active;
             $orderStatus->updated_by = auth('sanctum')->user()->id;
             $orderStatus->save();
