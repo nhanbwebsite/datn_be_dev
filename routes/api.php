@@ -64,3 +64,6 @@ require __DIR__. '/Comment/comment.php';
 
 // AddressNote
 require __DIR__ . '/AddressNote/address_note.php';
+
+// OrderStatus
+require __DIR__ . '/OrderStatus/order_status.php';

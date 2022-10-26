@@ -13,6 +13,8 @@ class OrderStatus extends Model
     protected $table = 'order_status';
     protected $fillable = [
         'name',
+        'code',
+        'sort_level',
         'created_at',
         'updated_at',
         'deleted_at',

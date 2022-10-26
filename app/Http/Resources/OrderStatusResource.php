@@ -19,6 +19,8 @@ class OrderStatusResource extends JsonResource
             return [
                 'id'         => $this->id,
                 'name'       => $this->name,
+                'code'       => $this->code,
+                'sort_level' => $this->sort_level,
                 'is_active'  => $this->is_active,
                 'created_at' => $this->created_at->format('d-m-Y H:i:s'),
                 'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
