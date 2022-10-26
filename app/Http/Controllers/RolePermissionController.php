@@ -24,7 +24,7 @@ class RolePermissionController extends Controller
     {
         $input['limit'] = $request->limit;
         try{
-            $data = RolePermission::where('is_active', 1)->where(function($query) use($input){
+            $data = RolePermission::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input){
                 if(!empty($input['role_id'])){
                     $query->where('role_id', $input['role_id']);
                 }

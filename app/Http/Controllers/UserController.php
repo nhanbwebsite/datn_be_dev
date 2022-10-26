@@ -24,7 +24,7 @@ class UserController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = User::where('is_active', 1)->where(function($query) use($input) {
+            $data = User::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
