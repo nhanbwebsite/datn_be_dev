@@ -7,6 +7,7 @@ use App\Http\Resources\OrderStatusResource;
 use App\Http\Validators\OrderStatus\OrderStatusUpsertValidator;
 use App\Models\OrderStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class OrderStatusController extends Controller
@@ -55,9 +56,18 @@ class OrderStatusController extends Controller
         $input = $request->all();
         $validator->validate($input);
         try{
+            $check = OrderStatus::where('code', $request->code)->whereNull('deleted_at')->first();
+            if(empty($check)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Trạng thái đã tồn tại !',
+                ], 400);
+            }
             DB::beginTransaction();
             $orderStatus = OrderStatus::create([
                 'name' => $request->name,
+                'code' => $request->code,
+                'sort_level' => $request->sort_level ?? null,
                 'is_active' => $request->is_active ?? 1,
                 'created_by' => auth('sanctum')->user()->id,
                 'updated_by' => auth('sanctum')->user()->id,
@@ -126,6 +136,13 @@ class OrderStatusController extends Controller
         $input = $request->all();
         $validator->validate($input);
         try {
+            $check = OrderStatus::where('code', $request->code)->whereNull('deleted_at')->first();
+            if(empty($check)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Trạng thái đã tồn tại !',
+                ], 400);
+            }
             DB::beginTransaction();
             $orderStatus = OrderStatus::find($id);
             if(empty($orderStatus)) {
@@ -135,6 +152,8 @@ class OrderStatusController extends Controller
                 ], 404);
             }
             $orderStatus->name = $request->name ?? $orderStatus->name;
+            $orderStatus->code = $request->code ?? $orderStatus->code;
+            $orderStatus->sort_level = $request->sort_level ?? $orderStatus->sort_level;
             $orderStatus->is_active = $request->is_active ?? $orderStatus->is_active;
             $orderStatus->updated_by = auth('sanctum')->user()->id;
             $orderStatus->save();
