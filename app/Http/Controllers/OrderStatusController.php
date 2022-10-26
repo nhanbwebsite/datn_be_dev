@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\RoleCollection;
-use App\Http\Resources\RoleResource;
-use App\Http\Validators\Role\RoleCreateValidator;
-use App\Http\Validators\Role\RoleUpdateValidator;
-use App\Models\Role;
+use App\Http\Resources\OrderStatusCollection;
+use App\Http\Resources\OrderStatusResource;
+use App\Http\Validators\OrderStatus\OrderStatusUpsertValidator;
+use App\Models\OrderStatus;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class RoleController extends Controller
+class OrderStatusController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,21 +21,15 @@ class RoleController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = Role::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
+            $data = OrderStatus::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
-                }
-                if(!empty($input['code'])){
-                    $query->where('code', $input['code']);
-                }
-                if(!empty($input['level'])){
-                    $query->where('level', $input['level']);
                 }
                 if(!empty($input['is_active'])){
                     $query->where('is_active', $input['is_active']);
                 }
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
-            $resource = new RoleCollection($data);
+            $resource = new OrderStatusCollection($data);
         }
         catch(HttpException $e){
             return response()->json([
@@ -58,16 +50,14 @@ class RoleController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, RoleCreateValidator $validator)
+    public function store(Request $request, OrderStatusUpsertValidator $validator)
     {
         $input = $request->all();
         $validator->validate($input);
         try{
             DB::beginTransaction();
-            $roleCreate = Role::create([
-                'code' => strtoupper($request->code),
+            $orderStatus = OrderStatus::create([
                 'name' => $request->name,
-                'level' => $request->level,
                 'is_active' => $request->is_active ?? 1,
                 'created_by' => auth('sanctum')->user()->id,
                 'updated_by' => auth('sanctum')->user()->id,
@@ -87,7 +77,7 @@ class RoleController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Vai trò ['.$roleCreate->name.'] đã được tạo thành công !',
+            'message' => 'Trạng thái đơn hàng ['.$orderStatus->name.'] đã được tạo thành công !',
         ]);
     }
 
@@ -100,11 +90,11 @@ class RoleController extends Controller
     public function show($id)
     {
         try{
-            $data = Role::find($id);
+            $data = OrderStatus::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Không tìm thấy vai trò !',
+                    'message' => 'Không tìm thấy trạng thái đơn hàng !',
                 ], 404);
             }
         }
@@ -120,7 +110,7 @@ class RoleController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data' => new RoleResource($data),
+            'data' => new OrderStatusResource($data),
         ]);
     }
 
@@ -131,24 +121,23 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, RoleUpdateValidator $validator)
+    public function update(Request $request, $id, OrderStatusUpsertValidator $validator)
     {
         $input = $request->all();
         $validator->validate($input);
         try {
             DB::beginTransaction();
-            $roleUpdate = Role::find($id);
-            if(empty($roleUpdate)) {
+            $orderStatus = OrderStatus::find($id);
+            if(empty($orderStatus)) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Vai trò không tồn tại !',
+                    'message' => 'Trạng thái đơn hàng không tồn tại !',
                 ], 404);
             }
-            $roleUpdate->name = $request->name ?? $roleUpdate->name;
-            $roleUpdate->level = $request->level ?? $roleUpdate->level;
-            $roleUpdate->is_active = $request->is_active ?? $roleUpdate->is_active;
-            $roleUpdate->updated_by = auth('sanctum')->user()->id;
-            $roleUpdate->save();
+            $orderStatus->name = $request->name ?? $orderStatus->name;
+            $orderStatus->is_active = $request->is_active ?? $orderStatus->is_active;
+            $orderStatus->updated_by = auth('sanctum')->user()->id;
+            $orderStatus->save();
             DB::commit();
         }
         catch(HttpException $e){
@@ -164,7 +153,7 @@ class RoleController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Vai trò ['.$roleUpdate->name.'] đã được cập nhật !',
+            'message' => 'Trạng thái đơn hàng ['.$orderStatus->name.'] đã được cập nhật !',
         ]);
     }
 
@@ -178,11 +167,11 @@ class RoleController extends Controller
     {
         try{
             DB::beginTransaction();
-            $data = Role::find($id);
+            $data = OrderStatus::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Vai trò không tồn tại !',
+                    'message' => 'Trạng thái đơn hàng không tồn tại !',
                 ], 404);
             }
             $data->update([
