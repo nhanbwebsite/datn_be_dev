@@ -14,7 +14,7 @@ class UserCreateValidator extends ValidatorBase{
             'ward_id' => 'required|exists:wards,id',
             'district_id' => 'required|exists:districts,id',
             'province_id' => 'required|exists:provinces,id',
-            'phone' => 'required|string|min:10|regex:/^0[2-9]{1}[0-9]{8}$/',
+            'phone' => 'required|string|min:10|unique_deleted_at_null:users,phone|regex:/^0[2-9]{1}[0-9]{8}$/',
             'password' => 'required|string|min:8',
             'is_active' => 'numeric',
         ];
@@ -37,7 +37,7 @@ class UserCreateValidator extends ValidatorBase{
             'phone.required' => ':attribute không được để trống !',
             'phone.string' => ':attribute phải là chuỗi !',
             'phone.min' => ':attribute phải đủ 10 ký tự !',
-            'phone.unique' => ':attribute đã được đăng ký !',
+            'phone.unique_deleted_at_null' => ':attribute đã tồn tại !',
             'phone.regex' => ':attribute chưa đúng định dạng VD: 0946636842 !',
             'password.required' => ':attribute không được để trống !',
             'password.string' => ':attribute phải là chuỗi !',

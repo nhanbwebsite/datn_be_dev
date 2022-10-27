@@ -94,11 +94,11 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Đăng nhập bằng ['.$userData->phone.'] thành công !',
+            'message' => 'Đăng nhập bằng ['.$userData->name.'] thành công !',
             'data' => new UserResource($userData),
             'token' => [
                 'Bearer' => $token,
-                'expired' => $userSessionNew->expired,
+                'expired_at' => $userSessionNew->expired,
             ]
         ]);
     }
