@@ -67,3 +67,6 @@ require __DIR__ . '/AddressNote/address_note.php';
 
 // OrderStatus
 require __DIR__ . '/OrderStatus/order_status.php';
+
+// PaymentMethod
+require __DIR__ . '/PaymentMethod/payment_method.php';
