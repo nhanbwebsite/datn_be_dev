@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
+use App\Http\Validators\Auth\LoginValidator;
+use App\Http\Validators\Auth\RegisterValidator;
 use App\Models\RolePermission;
 use App\Models\User;
 use App\Models\UserSession;
@@ -10,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AuthController extends Controller
@@ -18,40 +19,18 @@ class AuthController extends Controller
     /**
      * Login function
      *
-     * @param Request $request
-     * @return response
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Validators\Auth\LoginValidator $validator
+     * @return \Illuminate\Http\Response
      */
-    public function login(Request $request)
+    public function login(Request $request, LoginValidator $validator)
     {
-        $rules = [
-            'phone' => 'required|string|regex:/^0[2-9]{1}[0-9]{8}$/',
-            'password' => 'required|string',
-        ];
-
-        $messages = [
-            'phone.required' => ':attribute không được để trống !',
-            'phone.string' => ':attribute phải là chuỗi !',
-            'phone.regex' => ':attribute chưa đúng định dạng ! VD: 0946636842',
-            'password.required' => ':attribute không được để trống !',
-            'password.string' => ':attribute phải là chuỗi !',
-        ];
-
-        $attributes = [
-            'phone' => 'Số điện thoại',
-            'password' => 'Mật khẩu',
-        ];
-
+        $input = $request->all();
+        $validator->validate($input);
         try{
             DB::beginTransaction();
-            $validator = Validator::make($request->only(['phone', 'password']), $rules, $messages, $attributes);
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
             $remmemberMe = false;
-            if(!empty($request->remember)){
+            if(!empty($input['remember'])){
                 $remmemberMe = true;
             }
             $data = $request->only(['phone', 'password']);
@@ -62,7 +41,7 @@ class AuthController extends Controller
                     'message' => 'Số điện thoại hoặc mật khẩu không đúng !',
                 ], 401);
             }
-            $userData = User::where('phone', $request->phone)->first();
+            $userData = User::where('phone', $input['phone'])->first();
             if($userData->is_active == 0){
                 return response()->json([
                     'status' => 'error',
@@ -80,6 +59,12 @@ class AuthController extends Controller
             $token = $userData->createToken('authToken', $permission_code ?? null)->plainTextToken;
 
             if(!empty($userData->session)){
+                if($userData->session->expired < date('Y-m-d H:i:s', time())){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Phiên đăng nhập đã hết hạn !',
+                    ], 401);
+                }
                 $oldSession = UserSession::where('user_id', $userData->id);
                 $oldSession->update([
                     'is_delete' => 1,
@@ -89,7 +74,7 @@ class AuthController extends Controller
                 $oldSession->delete();
             }
 
-            UserSession::create([
+            $userSessionNew = UserSession::create([
                 'user_id' => $userData->id,
                 'token' => $token,
                 'expired' => date('Y-m-d H:i:s', time()+7*24*60*60),
@@ -111,82 +96,34 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Đăng nhập bằng ['.$userData->phone.'] thành công !',
             'data' => new UserResource($userData),
-            'token' => 'Bearer '.$token,
+            'token' => [
+                'Bearer' => $token,
+                'expired' => $userSessionNew->expired,
+            ]
         ]);
     }
 
     /**
-     * Register function
+     * Register a new user
      *
-     * @param Request $request
-     * @return response
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Validators\Auth\RegisterValidator $validator
+     * @return \Illuminate\Http\Response
      */
-    public function register(Request $request)
+    public function register(Request $request, RegisterValidator $validator)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'ward_id' => 'required',
-            'district_id' => 'required',
-            'province_id' => 'required',
-            'phone' => 'required|string|min:10|unique:users,phone|regex:/^0[2-9]{1}[0-9]{8}$/',
-            'password' => 'required|string|min:8',
-            'password_confirm' => 'required|string|min:8|same:password',
-        ];
-
-        $messages = [
-            'name.required' => ':attribute không được để trống !',
-            'name.string' => ':attribute phải là chuỗi !',
-            'name.max' => ':attribute tối đa 255 ký tự !',
-            'address.string' => ':attribute phải là chuỗi !',
-            'address.max' => ':attribute tối đa 255 ký tự!',
-            'ward_id.required' => ':attribute không được để trống !',
-            'district_id.required' => ':attribute không được để trống !',
-            'province_id.required' => ':attribute không được để trống !',
-            'phone.required' => ':attribute không được để trống !',
-            'phone.string' => ':attribute phải là chuỗi !',
-            'phone.min' => ':attribute phải đủ 10 ký tự !',
-            'phone.unique' => ':attribute đã được đăng ký !',
-            'phone.regex' => ':attribute chưa đúng định dạng VD: 0946636842 !',
-            'password.required' => ':attribute không được để trống !',
-            'password.string' => ':attribute phải là chuỗi !',
-            'password.min' => ':attribute tối thiểu 8 ký tự !',
-            'password.confirmed' => ':attribute không đúng !',
-            'password_confirm.same' => ':attribute không đúng !',
-            'password_confirm.required' => ':attribute không được để trống !',
-            'password_confirm.string' => ':attribute phải là chuỗi !',
-            'password_confirm.min' => ':attribute tối thiểu 8 ký tự !',
-        ];
-
-        $attributes = [
-            'name' => 'Họ tên',
-            'address' => 'Địa chỉ',
-            'ward_id' => 'Xã/Phường/Thị trấn',
-            'district_id' => 'Quận/Huyện',
-            'province_id' => 'Tỉnh/Thành phố',
-            'phone' => 'Số điện thoại',
-            'password' => 'Mật khẩu',
-            'password_confirm' => 'Xác nhận mật khẩu',
-        ];
-
+        $input = $request->all();
+        $validator->validate($input);
         try{
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
-
             $userCreate = User::create([
-                'name' => $request->name,
-                'address' => $request->address,
-                'ward_id' => $request->ward_id,
-                'district_id' => $request->district_id,
-                'province_id' => $request->province_id,
-                'phone' => $request->phone,
-                'password' => Hash::make($request->password),
+                'name' => $input['name'],
+                'address' => $input['address'],
+                'ward_id' => $input['ward_id'],
+                'district_id' => $input['district_id'],
+                'province_id' => $input['province_id'],
+                'phone' => $input['phone'],
+                'password' => Hash::make($input['password']),
             ]);
             DB::commit();
         }
@@ -226,6 +163,12 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Logout current user
+     *
+     * @param Request $request
+     * @return void
+     */
     public function logout(Request $request)
     {
         try{
@@ -258,7 +201,6 @@ class AuthController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Đăng xuất thành công !',
         ]);
     }
 }
