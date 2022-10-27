@@ -16,7 +16,7 @@ class AddressNoteController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -64,9 +64,10 @@ class AddressNoteController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Create a new record.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Validators\AddressNote\AddressNoteCreateValidator  $validator
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request, AddressNoteCreateValidator $validator)
@@ -150,7 +151,7 @@ class AddressNoteController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified record.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -211,7 +212,7 @@ class AddressNoteController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified record.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response

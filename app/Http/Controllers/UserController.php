@@ -24,7 +24,7 @@ class UserController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = User::where('is_active', 1)->where(function($query) use($input) {
+            $data = User::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
@@ -92,8 +92,8 @@ class UserController extends Controller
                 'phone' => $request->phone,
                 'password' => Hash::make($request->password),
                 'is_active' => $request->is_active ?? 0,
-                'created_by' => auth('sanctum')->user()->id,
-                'updated_by' => auth('sanctum')->user()->id,
+                'created_by' => $request->user()->id,
+                'updated_by' => $request->user()->id,
             ]);
             DB::commit();
         }
@@ -177,7 +177,7 @@ class UserController extends Controller
             $user->province_id = $request->province_id ?? $user->province_id;
             $user->password = Hash::make($request->password ?? $user->password);
             $user->is_active = $request->is_active ?? $user->is_active;
-            $user->updated_by = auth('sanctum')->user()->id;
+            $user->updated_by = $request->user()->id;
             $user->save();
 
             DB::commit();
@@ -205,7 +205,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
@@ -218,7 +218,7 @@ class UserController extends Controller
                     ], 404);
                 }
                 $data->is_delete = 1;
-                $data->deleted_by = auth('sanctum')->user()->id;
+                $data->deleted_by = $request->user()->id;
                 $data->save();
 
                 $data->delete();

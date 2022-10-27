@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\RoleCollection;
 use App\Http\Resources\RoleResource;
-use App\Http\Validators\User\RoleUpdateValidator;
+use App\Http\Validators\Role\RoleCreateValidator;
+use App\Http\Validators\Role\RoleUpdateValidator;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,7 @@ class RoleController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = Role::where('is_active', 1)->where(function($query) use($input) {
+            $data = Role::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
@@ -145,6 +146,7 @@ class RoleController extends Controller
             }
             $roleUpdate->name = $request->name ?? $roleUpdate->name;
             $roleUpdate->level = $request->level ?? $roleUpdate->level;
+            $roleUpdate->is_active = $request->is_active ?? $roleUpdate->is_active;
             $roleUpdate->updated_by = auth('sanctum')->user()->id;
             $roleUpdate->save();
             DB::commit();

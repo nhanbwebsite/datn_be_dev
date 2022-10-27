@@ -21,7 +21,7 @@ class CommentController extends Controller
     {
         $input['limit'] = $request->limit;
         try{
-            $data = Comment::where('is_active', 1)->where(function($query) use($input){
+            $data = Comment::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input){
                 if(!empty($input['parent_id'])){
                     $query->where('parent_id', $input['parent_id']);
                 }

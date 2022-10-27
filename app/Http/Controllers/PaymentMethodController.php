@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PermissionCollection;
-use App\Http\Resources\PermissionResource;
-use App\Http\Validators\Permission\PermissionCreateValidator;
-use App\Http\Validators\Permission\PermissionUpdateValidator;
-use App\Models\Permission;
+use App\Http\Resources\PaymentMethodCollection;
+use App\Http\Resources\PaymentMethodResource;
+use App\Http\Validators\PaymentMethod\PaymentMethodUpsertValidator;
+use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class PermissionController extends Controller
+class PaymentMethodController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,7 +21,7 @@ class PermissionController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = Permission::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input){
+            $data = PaymentMethod::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
@@ -34,12 +32,16 @@ class PermissionController extends Controller
                     $query->where('is_active', $input['is_active']);
                 }
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
-            $resource = new PermissionCollection($data);
+            $resource = new PaymentMethodCollection($data);
         }
         catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], $e->getStatusCode());
         }
         return response()->json($resource);
@@ -51,32 +53,35 @@ class PermissionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, PermissionCreateValidator $validator)
+    public function store(Request $request, PaymentMethodUpsertValidator $validator)
     {
         $input = $request->all();
         $validator->validate($input);
         try{
             DB::beginTransaction();
-            $permissionCreate = Permission::create([
-                'code' => strtoupper($request->code),
-                'name' => $request->name,
-                'group_id' => $request->group_id,
-                'is_active' => $request->is_active ?? 1,
+            $paymentMethod = PaymentMethod::create([
+                'name' => $input['name'],
+                'code' => strtoupper($input['code']),
+                'is_active' => $input['is_active'] ?? 1,
                 'created_by' => auth('sanctum')->user()->id,
                 'updated_by' => auth('sanctum')->user()->id,
             ]);
             DB::commit();
         }
         catch(HttpException $e){
-            DB::rollback();
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Quyền ['.$permissionCreate->name.'] đã được tạo thành công !',
+            'message' => 'Trạng thái đơn hàng ['.$paymentMethod->name.'] đã được tạo thành công !',
         ]);
     }
 
@@ -89,23 +94,27 @@ class PermissionController extends Controller
     public function show($id)
     {
         try{
-            $data = Permission::find($id);
+            $data = PaymentMethod::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Không tìm thấy quyền !',
+                    'message' => 'Không tìm thấy phương thức thanh toán !',
                 ], 404);
             }
         }
         catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
-            'data' => new PermissionResource($data),
+            'data' => new PaymentMethodResource($data),
         ]);
     }
 
@@ -116,35 +125,41 @@ class PermissionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, PermissionUpdateValidator $validator)
+    public function update(Request $request, $id, PaymentMethodUpsertValidator $validator)
     {
         $input = $request->all();
         $validator->validate($input);
-        try{
+        try {
             DB::beginTransaction();
-            $permissionUpdate = Permission::find($id);
-            if(empty($permissionUpdate)){
+            $paymentMethod = PaymentMethod::find($id);
+            if(empty($paymentMethod)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Nhóm quyền không tồn tại !',
+                    'message' => 'Phương thức thanh toán không tồn tại !',
                 ], 404);
             }
-            $permissionUpdate->name = $request->name ?? $permissionUpdate->name;
-            $permissionUpdate->group_id = $request->group_id ?? $permissionUpdate->group_id;
-            $permissionUpdate->updated_by = auth('sanctum')->user()->id;
-            $permissionUpdate->save();
+            $paymentMethod->name = $request->name ?? $paymentMethod->name;
+            $paymentMethod->code = strtoupper($request->code) ?? $paymentMethod->code;
+            $paymentMethod->is_active = $request->is_active ?? $paymentMethod->is_active;
+            $paymentMethod->updated_by = auth('sanctum')->user()->id;
+            $paymentMethod->save();
+
             DB::commit();
         }
         catch(HttpException $e){
-            DB::rollback();
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Quyền ['.$permissionUpdate->name.'] đã được cập nhật !',
+            'message' => 'Phương thức thanh toán ['.$paymentMethod->name.'] đã được cập nhật !',
         ]);
     }
 
@@ -154,29 +169,36 @@ class PermissionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
-            $data = Permission::find($id);
-            if(empty($data)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Quyền không tồn tại !',
-                ], 404);
+            if(!is_array($id)){
+                $data = PaymentMethod::find($id);
+                if(empty($data)){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Không tìm thấy người dùng !',
+                    ], 404);
+                }
+                $data->is_delete = 1;
+                $data->deleted_by = auth('sanctum')->user()->id;
+                $data->save();
+
+                $data->delete();
             }
-            $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
-            ]);
-            $data->delete();
+
             DB::commit();
         }
         catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], $e->getStatusCode());
         }
         return response()->json([
