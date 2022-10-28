@@ -95,8 +95,8 @@ class AddressNoteController extends Controller
                 'district_id' => $request->district_id,
                 'ward_id' => $request->ward_id,
                 'is_default' => !empty($userData->addressNote) ? 0 : 1,
-                'created_by' => auth('sanctum')->user()->id,
-                'updated_by' => auth('sanctum')->user()->id,
+                'created_by' => $request->user()->id,
+                'updated_by' => $request->user()->id,
             ]);
             DB::commit();
         }
@@ -130,7 +130,7 @@ class AddressNoteController extends Controller
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Không tìm thấy người dùng !',
+                    'message' => 'Không tìm thấy địa chỉ !',
                 ], 404);
             }
         }
@@ -194,7 +194,7 @@ class AddressNoteController extends Controller
             $addressNote->ward_id = $request->ward_id ?? $addressNote->ward_id;
             $addressNote->is_default = $request->is_default ?? $addressNote->is_default;
             $addressNote->is_active = $request->is_active ?? $addressNote->is_active;
-            $addressNote->updated_by = auth('sanctum')->user()->id;
+            $addressNote->updated_by = $request->user()->id;
             $addressNote->save();
             DB::commit();
         }
@@ -217,7 +217,7 @@ class AddressNoteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
@@ -230,7 +230,7 @@ class AddressNoteController extends Controller
                     ], 404);
                 }
                 $data->is_delete = 1;
-                $data->deleted_by = auth('sanctum')->user()->id;
+                $data->deleted_by = $request->user()->id;
                 $data->save();
 
                 $data->delete();
@@ -253,5 +253,28 @@ class AddressNoteController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa địa chỉ !',
         ]);
+    }
+
+    public function getAddressNoteByCurrentUser(Request $request){
+        try{
+            $current_user_id = $request->user()->id;
+            $data = AddressNote::where('user_id', $current_user_id)->where('is_active', 1)->paginate($request->limit ?? 10);
+            if(empty($data)){
+                return response()->json([
+                    'data' => []
+                ]);
+            }
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new AddressNoteCollection($data));
     }
 }
