@@ -41,7 +41,7 @@ class PostCategoryController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'name_post_category' => 'required|max:255',
+            'name_post_category' => 'required|max:255|unique:post_categories',
         ];
         $messages = [
             'name_post_category.required' => ':atribuite không được để trống !',
@@ -61,21 +61,12 @@ class PostCategoryController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
 
             $data = PostCategories::create([
-                'name_post_category' => $request->name_post_category,
+                'name_post_category' => mb_strtolower($request->name_post_category),
                 'slug' => Str::slug($request->name_post_category)
-
             ]);
             DB::commit();
-
-
         } catch(Exception $e) {
             DB::rollback();
             return response()->json([
@@ -156,14 +147,11 @@ class PostCategoryController extends Controller
             $data = PostCategories::find($id);
             if(!empty($data)){
                  $data->update([
-                    'name_post_category' => $request->name_post_category,
+                    'name_post_category' => mb_strtolower($request->name_post_category),
                     'slug' => Str::slug($request->name_post_category),
                     // 'updated_by' => auth('sanctum')->user()->id,
                 ]);
             }
-
-
-
         } catch(Exception $e) {
             DB::rollback();
             return response()->json([
@@ -174,7 +162,7 @@ class PostCategoryController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' =>'Danh mục đã được cập nhật thành '.$request->name_post_category.'!',
+            'message' =>'Danh mục đã được cập nhật thành !',
         ]);
     }
 
@@ -208,7 +196,6 @@ class PostCategoryController extends Controller
                 'status' => 'success',
                 'message' => 'Đã xóa thành công danh mục ' . $data->name_post_category
             ]);
-
             $data->update([
                 'is_delete' => 1,
                 'deleted_at' => Carbon::now()
