@@ -217,7 +217,6 @@ class UserController extends Controller
                         'message' => 'Không tìm thấy người dùng !',
                     ], 404);
                 }
-                $data->is_delete = 1;
                 $data->deleted_by = $request->user()->id;
                 $data->save();
 

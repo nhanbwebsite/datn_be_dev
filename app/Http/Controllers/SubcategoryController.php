@@ -199,11 +199,6 @@ class SubcategoryController extends Controller
 
             $data = SubCategory::find($id);
             if(!empty($data)){
-                // $data->update([
-                //     'is_delete' => 1,
-                //     'updated_by' => auth('sanctum')->user()->id,
-                // ]);
-                $data->is_delete = 1;
                 $data->deleted_by = auth('sanctum')->user()->id;
                 $data->save();
                 $data->delete();

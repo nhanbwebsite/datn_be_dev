@@ -128,6 +128,7 @@ class CommentController extends Controller
         $validator->validate($input);
         try {
             DB::beginTransaction();
+            $user = $request->user();
             $comment = Comment::find($id);
             if(empty($comment)){
                 return response()->json([
@@ -137,7 +138,7 @@ class CommentController extends Controller
             }
             $comment->content = $request->content ?? $comment->content;
             $comment->is_active = $request->is_active ?? $comment->is_active;
-            $comment->updated_by = auth('sanctum')->user()->id;
+            $comment->updated_by = $user->id;
             $comment->save();
 
             DB::commit();
@@ -165,10 +166,11 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
+            $user = $request->user();
             if(!is_array($id)){
                 $data = Comment::find($id);
                 if(empty($data)){
@@ -177,8 +179,7 @@ class CommentController extends Controller
                         'message' => 'Không tìm thấy bình luận !',
                     ], 404);
                 }
-                $data->is_delete = 1;
-                $data->deleted_by = auth('sanctum')->user()->id;
+                $data->deleted_by = $user->id;
                 $data->save();
 
                 $data->delete();

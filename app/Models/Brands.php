@@ -13,7 +13,6 @@ class Brands extends Model
         'brand_name',
         'slug',
         'is_active',
-        'is_delete',
         'created_by',
         'updated_by',
         'deleted_by',

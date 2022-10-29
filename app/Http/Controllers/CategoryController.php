@@ -186,12 +186,6 @@ class CategoryController extends Controller
             $data = Category::find($id);
 
             if(!empty($data)){
-
-                // $data->update([
-                //     'is_delete' => '1',
-                //     'deleted_by' => auth('sanctum')->user()->id
-                // ]);
-                $data->is_delete = 1;
                 $data->deleted_by = auth('sanctum')->user()->id;
                 $data->save();
                $data->delete();

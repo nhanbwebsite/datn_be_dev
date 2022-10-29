@@ -136,6 +136,8 @@ class OrderStatusController extends Controller
         $input = $request->all();
         $validator->validate($input);
         try {
+            DB::beginTransaction();
+            $user = $request->user();
             $check = OrderStatus::where('code', $request->code)->whereNull('deleted_at')->first();
             if(empty($check)){
                 return response()->json([
@@ -155,7 +157,7 @@ class OrderStatusController extends Controller
             $orderStatus->code = $request->code ?? $orderStatus->code;
             $orderStatus->sort_level = $request->sort_level ?? $orderStatus->sort_level;
             $orderStatus->is_active = $request->is_active ?? $orderStatus->is_active;
-            $orderStatus->updated_by = auth('sanctum')->user()->id;
+            $orderStatus->updated_by = $user->id;
             $orderStatus->save();
             DB::commit();
         }
@@ -182,10 +184,11 @@ class OrderStatusController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
+            $user = $request->user();
             $data = OrderStatus::find($id);
             if(empty($data)){
                 return response()->json([
@@ -193,10 +196,8 @@ class OrderStatusController extends Controller
                     'message' => 'Trạng thái đơn hàng không tồn tại !',
                 ], 404);
             }
-            $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
-            ]);
+            $data->deleted_by = $user->id;
+            $data->save();
             $data->delete();
             DB::commit();
         }

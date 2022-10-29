@@ -225,7 +225,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
 
         try {
@@ -233,11 +233,6 @@ class ProductController extends Controller
             $data = Product::find($id);
 
             if(!empty($data)){
-                // $data->update([
-                //     'is_delete' => 1,
-                //     'delete_by' => auth('sanctum')->user()->id
-                // ]);
-                $data->is_delete = 1;
                 $data->deleted_by = auth('sanctum')->user()->id;
                 $data->save();
 

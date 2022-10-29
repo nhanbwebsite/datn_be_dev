@@ -22,7 +22,6 @@ class OrderStatus extends Model
         'updated_by',
         'deleted_by',
         'is_active',
-        'is_delete',
     ];
 
     public function createdBy(){

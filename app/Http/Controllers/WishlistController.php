@@ -110,7 +110,7 @@ class WishlistController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
@@ -121,10 +121,8 @@ class WishlistController extends Controller
                     'message' => 'Sản phẩm không tồn tại trong yêu thích !',
                 ], 404);
             }
-            $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
-            ]);
+            $data->deleted_by = $request->user()->id;
+            $data->save();
             $data->delete();
             DB::commit();
         }

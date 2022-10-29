@@ -15,7 +15,6 @@ class Permission extends Model
         'name',
         'group_id',
         'is_active',
-        'is_delete',
         'created_at',
         'updated_at',
         'deleted_at',
