@@ -20,7 +20,6 @@ class AddressNote extends Model
         'ward_id',
         'is_default',
         'is_active',
-        'is_delete',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -43,5 +42,13 @@ class AddressNote extends Model
 
     public function ward(){
         return $this->hasOne(Ward::class, 'id', 'ward_id');
+    }
+
+    public function createdBy(){
+        return $this->hasOne(User::class, 'id', 'created_by');
+    }
+
+    public function updatedBy(){
+        return $this->hasOne(User::class, 'id', 'updated_by');
     }
 }

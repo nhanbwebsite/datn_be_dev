@@ -16,7 +16,6 @@ class Comment extends Model
         'post_id',
         'content',
         'is_active',
-        'is_delete',
         'created_at',
         'deleted_at',
         'updated_at',

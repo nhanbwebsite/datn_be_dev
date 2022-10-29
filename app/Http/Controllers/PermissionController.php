@@ -154,10 +154,11 @@ class PermissionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
+            $user = $request->user();
             $data = Permission::find($id);
             if(empty($data)){
                 return response()->json([
@@ -166,8 +167,7 @@ class PermissionController extends Controller
                 ], 404);
             }
             $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
+                'deleted_by' => $user->id
             ]);
             $data->delete();
             DB::commit();

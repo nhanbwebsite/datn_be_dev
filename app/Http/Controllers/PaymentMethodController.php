@@ -131,6 +131,7 @@ class PaymentMethodController extends Controller
         $validator->validate($input);
         try {
             DB::beginTransaction();
+            $user = $request->user();
             $paymentMethod = PaymentMethod::find($id);
             if(empty($paymentMethod)){
                 return response()->json([
@@ -141,7 +142,7 @@ class PaymentMethodController extends Controller
             $paymentMethod->name = $request->name ?? $paymentMethod->name;
             $paymentMethod->code = strtoupper($request->code) ?? $paymentMethod->code;
             $paymentMethod->is_active = $request->is_active ?? $paymentMethod->is_active;
-            $paymentMethod->updated_by = auth('sanctum')->user()->id;
+            $paymentMethod->updated_by = $user->id;
             $paymentMethod->save();
 
             DB::commit();
@@ -173,6 +174,7 @@ class PaymentMethodController extends Controller
     {
         try{
             DB::beginTransaction();
+            $user = $request->user();
             if(!is_array($id)){
                 $data = PaymentMethod::find($id);
                 if(empty($data)){
@@ -181,8 +183,7 @@ class PaymentMethodController extends Controller
                         'message' => 'Không tìm thấy người dùng !',
                     ], 404);
                 }
-                $data->is_delete = 1;
-                $data->deleted_by = auth('sanctum')->user()->id;
+                $data->deleted_by = $user->id;
                 $data->save();
 
                 $data->delete();

@@ -14,7 +14,6 @@ class PaymentMethod extends Model
         'code',
         'name',
         'is_active',
-        'is_delete',
         'created_at',
         'updated_at',
         'deleted_at',

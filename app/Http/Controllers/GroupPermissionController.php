@@ -122,6 +122,7 @@ class GroupPermissionController extends Controller
         $validator->validate($input);
         try{
             DB::beginTransaction();
+            $user = $request->user();
             $groupPermissionUpdate = GroupPermission::find($id);
             if(empty($groupPermissionUpdate)){
                 return response()->json([
@@ -131,7 +132,7 @@ class GroupPermissionController extends Controller
             }
             $groupPermissionUpdate->name = $request->name ?? $groupPermissionUpdate->name;
             $groupPermissionUpdate->table_name = $request->table_name ?? $groupPermissionUpdate->table_name;
-            $groupPermissionUpdate->name = auth('sanctum')->user()->id;
+            $groupPermissionUpdate->name = $user->id;
             $groupPermissionUpdate->save();
             DB::commit();
         }
@@ -154,10 +155,11 @@ class GroupPermissionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
+            $user = $request->user();
             $data = GroupPermission::find($id);
             if(empty($data)){
                 return response()->json([
@@ -166,8 +168,7 @@ class GroupPermissionController extends Controller
                 ], 404);
             }
             $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
+                'deleted_by' => $user->user()->id
             ]);
             $data->delete();
             DB::commit();

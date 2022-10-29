@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CommentResource extends JsonResource
+class StoreResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,14 +18,15 @@ class CommentResource extends JsonResource
         if(!empty($request)){
             return [
                 'id'            => $this->id,
-                'parent_id'     => $this->parent_id ?? null,
-                'user_id'       => $this->user_id,
-                'user_name'     => $this->user->name,
-                'post_id'       => $this->post_id,
-                'post_title'     => $this->post->title,
-                'role_id'       => $this->user->role_id,
-                'role'          => $this->user->role->name,
-                'content'       => $this->content,
+                'name'          => $this->name,
+                'slug'          => $this->slug,
+                'address'       => $this->address,
+                'province_id'   => $this->province_id,
+                'province'      => $this->province->name,
+                'district_id'   => $this->district_id,
+                'district'      => $this->district->name,
+                'ward_id'       => $this->ward_id,
+                'ward'          => $this->ward->name,
                 'is_active'     => $this->is_active,
                 'created_at'    => $this->created_at->format('d-m-Y H:i:s'),
                 'updated_at'    => $this->updated_at->format('d-m-Y H:i:s'),
