@@ -2,12 +2,12 @@
 
 use App\Http\Controllers\RoleController;
 
-Route::controller(RoleController::class)->middleware(['auth:sanctum', 'checkAction:all,view-role,create-role,update-role,delete-role'])->prefix('roles')->group(function(){
-    Route::get('/', 'index');
-    Route::post('/', 'store');
-    Route::get('/{id}', 'show');
-    Route::put('/{id}', 'update');
-    Route::delete('/{id}', 'destroy');
+Route::controller(RoleController::class)->middleware(['auth:sanctum'])->prefix('roles')->group(function(){
+    Route::get('/', 'index')->middleware(['checkAction:all,view-role']);
+    Route::post('/', 'store')->middleware(['checkAction:all,create-role']);
+    Route::get('/{id}', 'show')->middleware(['checkAction:all,view-role']);
+    Route::put('/{id}', 'update')->middleware(['checkAction:all,update-role']);
+    Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-role']);
 });
 
 ?>
