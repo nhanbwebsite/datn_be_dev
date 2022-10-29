@@ -51,7 +51,7 @@ class ProductController extends Controller
             'name' => 'required|min:6|max:255',
             'brand_id' => 'required',
             'meta_description' => 'required',
-            'store_id' => 'required'
+            // 'store_id' => 'required'
         ];
         $messages = [
             'name.required' => ':attribute không được để trống !',
@@ -77,7 +77,7 @@ class ProductController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-
+            // dd(auth('sanctum')->user()->store_id);
             $create = Product::create([
                 'meta_title' => $request->meta_description,
                 'meta_keywords'=>$request->meta_keywords,
@@ -93,7 +93,7 @@ class ProductController extends Controller
                 'product_height' =>  $request->product_height,
                 'product_width' =>  $request->product_width,
                 'brand_id' => $request->brand_id,
-                'store_id'=>  $request->store_id,
+                'store_id'=>  auth('sanctum')->user()->store_id,
                 'subcategories_id' => $request->subcategories_id,
                 'amount' => $request->amount
             ]);
@@ -225,7 +225,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
 
         try {
@@ -233,11 +233,6 @@ class ProductController extends Controller
             $data = Product::find($id);
 
             if(!empty($data)){
-                // $data->update([
-                //     'is_delete' => 1,
-                //     'delete_by' => auth('sanctum')->user()->id
-                // ]);
-                $data->is_delete = 1;
                 $data->deleted_by = auth('sanctum')->user()->id;
                 $data->save();
 

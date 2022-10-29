@@ -38,7 +38,6 @@ class User extends Authenticatable
         'updated_by',
         'deleted_by',
         'is_active',
-        'is_delete',
     ];
 
     /**
@@ -90,5 +89,9 @@ class User extends Authenticatable
 
     public function store(){
         return $this->hasOne(Store::class, 'id', 'store_id');
+    }
+
+    public function addressNote(){
+        return $this->hasMany(AddressNote::class, 'user_id', 'id');
     }
 }

@@ -47,7 +47,26 @@ require __DIR__ . '/Subcategories/subcategories.php';
 // brands routers
 require __DIR__ . '/Brands/brands.php';
 
+// Product
 require __DIR__ . '/Products/products.php';
 
 // Stores routes
-require __DIR__ . '/Stores/stores.php';
+require __DIR__ . '/Store/store.php';
+
+// City routes
+require __DIR__ . '/City/city.php';
+
+// Wishlist
+require __DIR__ . '/Wishlist/wishlist.php';
+
+// Comment
+require __DIR__. '/Comment/comment.php';
+
+// AddressNote
+require __DIR__ . '/AddressNote/address_note.php';
+
+// OrderStatus
+require __DIR__ . '/OrderStatus/order_status.php';
+
+// PaymentMethod
+require __DIR__ . '/PaymentMethod/payment_method.php';

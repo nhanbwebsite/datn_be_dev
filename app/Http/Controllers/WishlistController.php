@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\WishlistCollection;
+use App\Http\Validators\Wishlist\WishlistCreateValidator;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class WishlistController extends Controller
@@ -49,20 +50,14 @@ class WishlistController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, WishlistCreateValidator $validator)
     {
         $input = $request->all();
+        $validator->validate($input);
         try{
             DB::beginTransaction();
-            $validator = $this->insertValidate($input);
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
             Wishlist::create([
-                'user_id' => $request->user_id,
+                'user_id' => $request->user_id ?? auth('sanctum')->user()->id,
                 'product_id' => $request->product_id,
                 'created_by' => auth('sanctum')->user()->id,
                 'updated_by' => auth('sanctum')->user()->id,
@@ -115,7 +110,7 @@ class WishlistController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
@@ -126,10 +121,8 @@ class WishlistController extends Controller
                     'message' => 'Sản phẩm không tồn tại trong yêu thích !',
                 ], 404);
             }
-            $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
-            ]);
+            $data->deleted_by = $request->user()->id;
+            $data->save();
             $data->delete();
             DB::commit();
         }
@@ -148,27 +141,5 @@ class WishlistController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa sản phẩm khỏi yêu thích !',
         ]);
-    }
-
-    public function insertValidate($input){
-        $rules = [
-            'user_id' => 'required|numeric',
-            'product_id' => 'required|numeric',
-        ];
-
-        $messages = [
-            'user_id.required' => ':attribute không được để trống !',
-            'user_id.numeric' => ':attribute chưa đúng !',
-            'product_id.required' => ':attribute không được để trống !',
-            'product_id.numeric' => ':attribute chưa đúng !',
-        ];
-
-        $attributes = [
-            'user_id' => 'Mã người dùng',
-            'product_id' => 'Mã sản phẩm',
-        ];
-
-        $v = Validator::make($input, $rules, $messages, $attributes);
-        return $v;
     }
 }

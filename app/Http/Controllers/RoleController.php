@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\RoleCollection;
 use App\Http\Resources\RoleResource;
+use App\Http\Validators\Role\RoleCreateValidator;
+use App\Http\Validators\Role\RoleUpdateValidator;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RoleController extends Controller
@@ -22,7 +23,7 @@ class RoleController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = Role::where('is_active', 1)->where(function($query) use($input) {
+            $data = Role::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
@@ -57,18 +58,12 @@ class RoleController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, RoleCreateValidator $validator)
     {
         $input = $request->all();
+        $validator->validate($input);
         try{
             DB::beginTransaction();
-            $validator = $this->upsertValidate($input);
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
             $roleCreate = Role::create([
                 'code' => strtoupper($request->code),
                 'name' => $request->name,
@@ -136,13 +131,13 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, RoleUpdateValidator $validator)
     {
         $input = $request->all();
-        $input['id'] = $id;
+        $validator->validate($input);
         try {
             DB::beginTransaction();
-            $validator = $this->upsertValidate($input);
+            $user = $request->user();
             $roleUpdate = Role::find($id);
             if(empty($roleUpdate)) {
                 return response()->json([
@@ -150,15 +145,10 @@ class RoleController extends Controller
                     'message' => 'Vai trò không tồn tại !',
                 ], 404);
             }
-            if($validator->fails()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
             $roleUpdate->name = $request->name ?? $roleUpdate->name;
             $roleUpdate->level = $request->level ?? $roleUpdate->level;
-            $roleUpdate->updated_by = auth('sanctum')->user()->id;
+            $roleUpdate->is_active = $request->is_active ?? $roleUpdate->is_active;
+            $roleUpdate->updated_by = $user->id;
             $roleUpdate->save();
             DB::commit();
         }
@@ -185,10 +175,11 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
+            $user = $request->user();
             $data = Role::find($id);
             if(empty($data)){
                 return response()->json([
@@ -197,8 +188,7 @@ class RoleController extends Controller
                 ], 404);
             }
             $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
+                'deleted_by' => $user->id
             ]);
             $data->delete();
             DB::commit();
@@ -218,57 +208,5 @@ class RoleController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa ['.$data->name.']',
         ]);
-    }
-
-    public function upsertValidate($input){
-        if(!empty($input['id'])){
-            $rules = [
-                'name' => 'required|string|max:50',
-                'level' => 'required|numeric',
-            ];
-
-            $messages = [
-                'name.required' => ':attribute không được để trống !',
-                'name.string' => ':attribute phải là chuỗi !',
-                'name.max' => ':attribute tối đa 50 ký tự !',
-                'level.required' => ':attribute không được để trống !',
-                'level.numeric' => ':attribute phải là số !',
-            ];
-
-            $attributes = [
-                'name' => 'Tên vai trò',
-                'level' => 'Cấp',
-            ];
-        }
-        else{
-            $rules = [
-                'code' => 'required|string|max:50|unique:roles,code',
-                'name' => 'required|string|max:50',
-                'level' => 'required|numeric',
-                'is_active' => 'numeric',
-            ];
-
-            $messages = [
-                'code.required' => ':attribute không được để trống !',
-                'code.string' => ':attribute phải là chuỗi !',
-                'code.max' => ':attribute tối đa 50 ký tự !',
-                'code.unique' => ':attribute đã tồn tại !',
-                'name.required' => ':attribute không được để trống !',
-                'name.string' => ':attribute phải là chuỗi !',
-                'name.max' => ':attribute tối đa 50 ký tự !',
-                'level.required' => ':attribute không được để trống !',
-                'level.numeric' => ':attribute phải là số !',
-                'is_active.numeric' => ':attribute chưa đúng !',
-            ];
-
-            $attributes = [
-                'code' => 'Mã vai trò',
-                'name' => 'Tên vai trò',
-                'level' => 'Cấp',
-                'is_active' => 'Kích hoạt'
-            ];
-        }
-        $v = Validator::make($input, $rules, $messages, $attributes);
-        return $v;
     }
 }

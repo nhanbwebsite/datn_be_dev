@@ -2,11 +2,11 @@
 
 use App\Http\Controllers\RolePermissionController;
 
-Route::controller(RolePermissionController::class)->middleware(['auth:sanctum', 'checkAction:all,view-role-permission,create-role-permission,update-role-permission,delete-role-permission'])->prefix('role-permissions')->group(function (){
-    Route::get('/', 'index');
-    Route::get('/{id}', 'show');
-    Route::post('/', 'store');
-    Route::put('/{id}', 'update');
-    Route::delete('/{id}', 'destroy');
+Route::controller(RolePermissionController::class)->middleware(['auth:sanctum'])->prefix('role-permissions')->group(function (){
+    Route::get('/', 'index')->middleware(['checkAction:all,view-role-permission']);
+    Route::get('/{id}', 'show')->middleware(['checkAction:all,view-role-permission']);
+    Route::post('/', 'store')->middleware(['checkAction:all,create-role-permission']);
+    Route::put('/{id}', 'update')->middleware(['checkAction:all,update-role-permission']);
+    Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-role-permission']);
 });
 ?>

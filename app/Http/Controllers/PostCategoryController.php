@@ -197,7 +197,6 @@ class PostCategoryController extends Controller
                 'message' => 'Đã xóa thành công danh mục ' . $data->name_post_category
             ]);
             $data->update([
-                'is_delete' => 1,
                 'deleted_at' => Carbon::now()
             ]);
             // DB::commit();

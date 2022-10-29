@@ -13,7 +13,6 @@ class Wishlist extends Model
     protected $fillable = [
         'user_id',
         'product_id',
-        'is_delete',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -24,6 +23,10 @@ class Wishlist extends Model
 
     public function user(){
         return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+    public function product(){
+        return $this->hasOne(Product::class, 'id', 'product_id');
     }
 
     public function createdBy(){

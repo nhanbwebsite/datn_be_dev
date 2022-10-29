@@ -13,7 +13,6 @@ class RolePermission extends Model
         'role_id',
         'permission_id',
         'is_active',
-        'is_delete',
         'created_at',
         'updated_at',
         'deleted_at',

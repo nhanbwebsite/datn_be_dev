@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\GroupPermissionCollection;
 use App\Http\Resources\GroupPermissionResource;
+use App\Http\Validators\GroupPermission\GroupPermissionCreateValidator;
+use App\Http\Validators\GroupPermission\GroupPermissionUpdateValidator;
 use App\Models\GroupPermission;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class GroupPermissionController extends Controller
@@ -23,7 +23,7 @@ class GroupPermissionController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = GroupPermission::where('is_active', 1)->where(function($query) use($input){
+            $data = GroupPermission::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input){
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
@@ -51,18 +51,12 @@ class GroupPermissionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, GroupPermissionCreateValidator $validator)
     {
         $input = $request->all();
+        $validator->validate($input);
         try{
             DB::beginTransaction();
-            $validator = $this->upsertValidate($input);
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
             $groupPermissionCreate = GroupPermission::create([
                 'code' => strtoupper($request->code),
                 'name' => $request->name,
@@ -122,19 +116,13 @@ class GroupPermissionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, GroupPermissionUpdateValidator $validator)
     {
         $input = $request->all();
-        $input['id'] = $id;
+        $validator->validate($input);
         try{
             DB::beginTransaction();
-            $validator = $this->upsertValidate($input);
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
+            $user = $request->user();
             $groupPermissionUpdate = GroupPermission::find($id);
             if(empty($groupPermissionUpdate)){
                 return response()->json([
@@ -144,7 +132,7 @@ class GroupPermissionController extends Controller
             }
             $groupPermissionUpdate->name = $request->name ?? $groupPermissionUpdate->name;
             $groupPermissionUpdate->table_name = $request->table_name ?? $groupPermissionUpdate->table_name;
-            $groupPermissionUpdate->name = auth('sanctum')->user()->id;
+            $groupPermissionUpdate->name = $user->id;
             $groupPermissionUpdate->save();
             DB::commit();
         }
@@ -167,10 +155,11 @@ class GroupPermissionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
+            $user = $request->user();
             $data = GroupPermission::find($id);
             if(empty($data)){
                 return response()->json([
@@ -179,8 +168,7 @@ class GroupPermissionController extends Controller
                 ], 404);
             }
             $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
+                'deleted_by' => $user->user()->id
             ]);
             $data->delete();
             DB::commit();
@@ -196,58 +184,5 @@ class GroupPermissionController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa ['.$data->name.']',
         ]);
-    }
-
-    public function upsertValidate($input){
-        if(!empty($input['id'])){
-            $rules = [
-                'name' => 'required|string|max:50',
-                'table_name' => 'string',
-                'is_active' => 'numeric',
-            ];
-
-            $messages = [
-                'name.required' => ':attribute không được để trống !',
-                'name.string' => ':attribute phải là chuỗi !',
-                'name.max' => ':attribute tối đa 50 ký tự !',
-                'table_name.string' => ':attribute phải là chuỗi !',
-                'is_active.numeric' => ':attribute phải là số !',
-            ];
-
-            $attributes = [
-                'name' => 'Tên nhóm quyền',
-                'table_name' => 'Tên bảng',
-                'is_active' => 'Kích hoạt',
-            ];
-        }
-        else{
-            $rules = [
-                'code' => 'required|string|max:50|unique:group_permissions,code',
-                'name' => 'required|string|max:50',
-                'table_name' => 'string',
-                'is_active' => 'numeric',
-            ];
-
-            $messages = [
-                'code.required' => ':attribute không được để trống !',
-                'code.string' => ':attribute phải là chuỗi !',
-                'code.max' => ':attribute tối đa 50 ký tự !',
-                'code.unique' => ':attribute đã tồn tại !',
-                'name.required' => ':attribute không được để trống !',
-                'name.string' => ':attribute phải là chuỗi !',
-                'name.max' => ':attribute tối đa 50 ký tự !',
-                'table_name.string' => ':attribute phải là chuỗi !',
-                'is_active.numeric' => ':attribute chưa đúng !',
-            ];
-
-            $attributes = [
-                'code' => 'Mã nhóm quyền',
-                'name' => 'Tên nhóm quyền',
-                'table_name' => 'Tên bảng',
-                'is_active' => 'Kích hoạt',
-            ];
-        }
-        $v = Validator::make($input, $rules, $messages, $attributes);
-        return $v;
     }
 }
