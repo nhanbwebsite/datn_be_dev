@@ -2,12 +2,12 @@
 
 use App\Http\Controllers\GroupPermissionController;
 
-Route::controller(GroupPermissionController::class)->middleware(['auth:sanctum', 'checkAction:all,view-group-permission,create-group-permission,update-group-permission,delete-group-permission'])->prefix('group-permissions')->group(function () {
-    Route::get('/', 'index');
-    Route::post('/', 'store');
-    Route::get('/{id}', 'show');
-    Route::put('/{id}', 'update');
-    Route::delete('/{id}', 'destroy');
+Route::controller(GroupPermissionController::class)->middleware(['auth:sanctum'])->prefix('group-permissions')->group(function () {
+    Route::get('/', 'index')->middleware(['checkAction:all,view-group-permission']);
+    Route::post('/', 'store')->middleware(['checkAction:all,create-group-permission']);
+    Route::get('/{id}', 'show')->middleware(['checkAction:all,view-group-permission']);
+    Route::put('/{id}', 'update')->middleware(['checkAction:all,update-group-permission']);
+    Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-group-permission']);
 });
 
 ?>
