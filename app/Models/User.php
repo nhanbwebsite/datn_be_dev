@@ -38,7 +38,6 @@ class User extends Authenticatable
         'updated_by',
         'deleted_by',
         'is_active',
-        'is_delete',
     ];
 
     /**

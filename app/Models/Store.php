@@ -11,15 +11,38 @@ class Store extends Model
 
     protected $table = 'stores';
     protected $fillable = [
-        'store_name',
+        'name',
         'slug',
+        'address',
+        'ward_id',
+        'district_id',
+        'province_id',
         'is_active',
-        'delete_by',
-        'update_by',
-        'create_by',
+        'deleted_by',
+        'updated_by',
+        'created_by',
         'deleted_at',
         'created_at',
         'updated_at'
     ];
 
+    public function ward(){
+        return $this->hasOne(Ward::class, 'id', 'ward_id');
+    }
+
+    public function district(){
+        return $this->hasOne(District::class, 'id', 'district_id');
+    }
+
+    public function province(){
+        return $this->hasOne(Province::class, 'id', 'province_id');
+    }
+
+    public function createdBy(){
+        return $this->hasOne(User::class, 'id', 'created_by');
+    }
+
+    public function updatedBy(){
+        return $this->hasOne(User::class, 'id', 'updated_by');
+    }
 }

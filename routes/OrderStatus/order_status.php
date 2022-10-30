@@ -2,12 +2,12 @@
 
 use App\Http\Controllers\OrderStatusController;
 
-Route::controller(OrderStatusController::class)->middleware(['auth:sanctum', 'checkAction:all,view-order-status,create-order-status,update-order-status,delete-order-status'])->prefix('order-status')->group(function (){
-    Route::get('/', 'index');
-    Route::post('/', 'store');
-    Route::get('/{id}', 'show');
-    Route::put('/{id}', 'update');
-    Route::delete('/{id}', 'destroy');
+Route::controller(OrderStatusController::class)->middleware(['auth:sanctum'])->prefix('order-status')->group(function (){
+    Route::get('/', 'index')->middleware(['checkAction:all,view-order-status']);
+    Route::post('/', 'store')->middleware(['checkAction:all,create-order-status']);
+    Route::get('/{id}', 'show')->middleware(['checkAction:all,view-order-status']);
+    Route::put('/{id}', 'update')->middleware(['checkAction:all,update-order-status']);
+    Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-order-status']);
 });
 
 ?>

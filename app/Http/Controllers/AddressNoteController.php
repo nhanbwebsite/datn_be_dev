@@ -76,8 +76,9 @@ class AddressNoteController extends Controller
         $validator->validate($input);
         try{
             DB::beginTransaction();
-            $userData = User::find(auth('sanctum')->user()->id);
-            $old_addressNote = AddressNote::where('is_active', 1)->where('user_id', auth('sanctum')->user()->id)->get()->toArray();
+            $user = $request->user();
+            $userData = User::find($user->id);
+            $old_addressNote = AddressNote::where('is_active', 1)->where('user_id', $user->id)->get()->toArray();
             foreach($old_addressNote as $key => $value){
                 if($value['phone'] == $request->phone && $value['address'] == $request->address && $value['province_id'] == $request->province_id && $value['district_id'] == $request->district_id && $value['ward_id'] == $request->ward_id){
                     return response()->json([
@@ -87,7 +88,7 @@ class AddressNoteController extends Controller
                 }
             }
             AddressNote::create([
-                'user_id' => auth('sanctum')->user()->id,
+                'user_id' => $user->id,
                 'phone' => $request->phone,
                 'email' => $request->email ?? null,
                 'address' => $request->address,
@@ -95,8 +96,8 @@ class AddressNoteController extends Controller
                 'district_id' => $request->district_id,
                 'ward_id' => $request->ward_id,
                 'is_default' => !empty($userData->addressNote) ? 0 : 1,
-                'created_by' => auth('sanctum')->user()->id,
-                'updated_by' => auth('sanctum')->user()->id,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
             ]);
             DB::commit();
         }
@@ -130,7 +131,7 @@ class AddressNoteController extends Controller
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Không tìm thấy người dùng !',
+                    'message' => 'Không tìm thấy địa chỉ !',
                 ], 404);
             }
         }
@@ -163,7 +164,8 @@ class AddressNoteController extends Controller
         $validator->validate($input);
         try{
             DB::beginTransaction();
-            $old_addressNote = AddressNote::whereNotIn('id', [$id])->where('is_active', 1)->where('user_id', auth('sanctum')->user()->id)->get()->toArray();
+            $user = $request->user();
+            $old_addressNote = AddressNote::whereNotIn('id', [$id])->where('is_active', 1)->where('user_id', $user->id)->get()->toArray();
             foreach($old_addressNote as $key => $value){
                 if($value['phone'] == $request->phone && $value['address'] == $request->address && $value['province_id'] == $request->province_id && $value['district_id'] == $request->district_id && $value['ward_id'] == $request->ward_id){
                     return response()->json([
@@ -181,7 +183,7 @@ class AddressNoteController extends Controller
             }
 
             if(!empty($request->is_default)){
-                AddressNote::where('user_id', auth('sanctum')->user()->id)->update([
+                AddressNote::where('user_id', $user->id)->update([
                     'is_default' => 0
                 ]);
             }
@@ -194,7 +196,7 @@ class AddressNoteController extends Controller
             $addressNote->ward_id = $request->ward_id ?? $addressNote->ward_id;
             $addressNote->is_default = $request->is_default ?? $addressNote->is_default;
             $addressNote->is_active = $request->is_active ?? $addressNote->is_active;
-            $addressNote->updated_by = auth('sanctum')->user()->id;
+            $addressNote->updated_by = $user->id;
             $addressNote->save();
             DB::commit();
         }
@@ -217,10 +219,11 @@ class AddressNoteController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
+            $user = $request->user();
             if(!is_array($id)){
                 $data = AddressNote::find($id);
                 if(empty($data)){
@@ -229,8 +232,7 @@ class AddressNoteController extends Controller
                         'message' => 'Không tìm thấy địa chỉ !',
                     ], 404);
                 }
-                $data->is_delete = 1;
-                $data->deleted_by = auth('sanctum')->user()->id;
+                $data->deleted_by = $user->id;
                 $data->save();
 
                 $data->delete();
@@ -253,5 +255,28 @@ class AddressNoteController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa địa chỉ !',
         ]);
+    }
+
+    public function getAddressNoteByCurrentUser(Request $request){
+        try{
+            $current_user_id = $request->user()->id;
+            $data = AddressNote::where('user_id', $current_user_id)->where('is_active', 1)->paginate($request->limit ?? 10);
+            if(empty($data)){
+                return response()->json([
+                    'data' => []
+                ]);
+            }
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new AddressNoteCollection($data));
     }
 }

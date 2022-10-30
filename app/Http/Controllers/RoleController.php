@@ -137,6 +137,7 @@ class RoleController extends Controller
         $validator->validate($input);
         try {
             DB::beginTransaction();
+            $user = $request->user();
             $roleUpdate = Role::find($id);
             if(empty($roleUpdate)) {
                 return response()->json([
@@ -147,7 +148,7 @@ class RoleController extends Controller
             $roleUpdate->name = $request->name ?? $roleUpdate->name;
             $roleUpdate->level = $request->level ?? $roleUpdate->level;
             $roleUpdate->is_active = $request->is_active ?? $roleUpdate->is_active;
-            $roleUpdate->updated_by = auth('sanctum')->user()->id;
+            $roleUpdate->updated_by = $user->id;
             $roleUpdate->save();
             DB::commit();
         }
@@ -174,10 +175,11 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
+            $user = $request->user();
             $data = Role::find($id);
             if(empty($data)){
                 return response()->json([
@@ -186,8 +188,7 @@ class RoleController extends Controller
                 ], 404);
             }
             $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
+                'deleted_by' => $user->id
             ]);
             $data->delete();
             DB::commit();

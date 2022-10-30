@@ -210,7 +210,6 @@ class PostCategoryController extends Controller
             ]);
 
             $data->update([
-                'is_delete' => 1,
                 'deleted_at' => Carbon::now()
             ]);
             // DB::commit();

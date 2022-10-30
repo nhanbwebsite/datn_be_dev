@@ -142,6 +142,7 @@ class RolePermissionController extends Controller
             $rolePermissionUpdate->role_id = $request->role_id ?? $rolePermissionUpdate->role_id;
             $rolePermissionUpdate->permission_id = $request->permission_id ?? $rolePermissionUpdate->permission_id;
             $rolePermissionUpdate->is_active = $request->is_active ?? $rolePermissionUpdate->is_active;
+            $rolePermissionUpdate->updated_by = $request->user()->id;
             $rolePermissionUpdate->save();
             DB::commit();
         }
@@ -168,10 +169,11 @@ class RolePermissionController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         try{
             DB::beginTransaction();
+            $user = $request->user();
             $data = RolePermission::find($id);
             if(empty($data)){
                 return response()->json([
@@ -180,8 +182,7 @@ class RolePermissionController extends Controller
                 ], 404);
             }
             $data->update([
-                'is_delete' => 1,
-                'deleted_by' => auth('sanctum')->user()->id
+                'deleted_by' => $user->id
             ]);
             $data->delete();
             DB::commit();

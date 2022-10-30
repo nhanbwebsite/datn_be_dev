@@ -16,7 +16,6 @@ class UserSession extends Model
         'expired',
         'ip_address',
         'user_agent',
-        'is_delete',
         'created_at',
         'created_by',
         'updated_at',
