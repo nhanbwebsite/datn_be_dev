@@ -13,15 +13,15 @@ class ProductImportSlipModel extends Model
     protected $fillable = [
         'name',
         'slug',
-        'user_id',
         'product_id',
-        'warehouse_id',
+        'store_id',
         'product_amount',
+        'import_price',
         'delete_by',
         'update_by',
         'created_at',
         'deleted_at',
-        'created_by',
+        'create_by',
         'updated_at',
     ];
 }
