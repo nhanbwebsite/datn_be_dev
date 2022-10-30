@@ -70,3 +70,6 @@ require __DIR__ . '/OrderStatus/order_status.php';
 
 // PaymentMethod
 require __DIR__ . '/PaymentMethod/payment_method.php';
+
+// productImportSlip
+require __DIR__ . '/ProductImportSlip/productImportSlip.php';
