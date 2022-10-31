@@ -73,3 +73,6 @@ require __DIR__ . '/PaymentMethod/payment_method.php';
 
 // productImportSlip
 require __DIR__ . '/ProductImportSlip/productImportSlip.php';
+
+// Warehouse
+require __DIR__ . '/Warehouse/warehouse.php';
