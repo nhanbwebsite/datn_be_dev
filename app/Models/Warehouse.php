@@ -5,31 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-class Store extends Model
+
+class Warehouse extends Model
 {
     use HasFactory, SoftDeletes;
-
-    protected $table = 'stores';
+    protected $table = 'warehouses';
     protected $fillable = [
         'name',
-        'slug',
-        'warehouse_id',
         'address',
         'ward_id',
         'district_id',
         'province_id',
-        'is_active',
-        'deleted_by',
-        'updated_by',
-        'created_by',
-        'deleted_at',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'deleted_at',
+        'created_by',
+        'updated_by',
+        'deleted_by',
+        'is_active',
     ];
-
-    public function warehouse(){
-        return $this->hasOne(Warehouse::class, 'id', 'warehouse_id');
-    }
 
     public function ward(){
         return $this->hasOne(Ward::class, 'id', 'ward_id');
