@@ -51,7 +51,7 @@ class ProductController extends Controller
             'name' => 'required|min:6|max:255',
             'brand_id' => 'required',
             'meta_description' => 'required',
-            'store_id' => 'required'
+            // 'store_id' => 'required'
         ];
         $messages = [
             'name.required' => ':attribute không được để trống !',
@@ -77,7 +77,7 @@ class ProductController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-
+            // dd(auth('sanctum')->user()->store_id);
             $create = Product::create([
                 'meta_title' => $request->meta_description,
                 'meta_keywords'=>$request->meta_keywords,
@@ -88,14 +88,14 @@ class ProductController extends Controller
                 'url_image'=>  $request->url_image,
                 'price' =>  $request->price,
                 'promotion' =>  $request->promotion,
-                'color_ids' =>  $request->color_ids,
-                'product_weight' =>  $request->product_weight,
-                'product_height' =>  $request->product_height,
-                'product_width' =>  $request->product_width,
+                // 'color_ids' =>  $request->color_ids,
+                // 'product_weight' =>  $request->product_weight,
+                // 'product_height' =>  $request->product_height,
+                // 'product_width' =>  $request->product_width,
                 'brand_id' => $request->brand_id,
-                'store_id'=>  $request->store_id,
+                'store_id'=>  auth('sanctum')->user()->store_id,
                 'subcategories_id' => $request->subcategories_id,
-                'amount' => $request->amount
+
             ]);
             DB::commit();
         } catch (Exception $e) {
@@ -192,11 +192,10 @@ class ProductController extends Controller
                         'url_image' =>  $request->url_image,
                         'price'=>  $request->price,
                         'promotion' =>  $request->promotion,
-                        'color_ids' =>  $request->color_ids,
-                        'product_weight' =>  $request->product_weight,
-                        'product_height'  => $request->product_height,
-                        'product_width'  => $request->product_width,
-                        'amount'  => $request->amount,
+                        // 'color_ids' =>  $request->color_ids,
+                        // 'product_weight' =>  $request->product_weight,
+                        // 'product_height'  => $request->product_height,
+                        // 'product_width'  => $request->product_width,
                         'deleted_by' =>  $request->deleted_by,
                         'brand_id' =>  $request->brand_id,
                         'branch_id'  => $request->branch_id,
