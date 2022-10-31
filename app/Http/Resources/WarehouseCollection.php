@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class StoreCollection extends ResourceCollection
+class WarehouseCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -21,9 +21,6 @@ class StoreCollection extends ResourceCollection
                 $result['data'][] = [
                     'id'            => $value->id,
                     'name'          => $value->name,
-                    'slug'          => $value->slug,
-                    'warehouse_id'  => $value->warehouse_id,
-                    'warehouse'     => $value->warehouse->name,
                     'address'       => $value->address,
                     'province_id'   => $value->province_id,
                     'province'      => $value->province->name,

@@ -13,6 +13,7 @@ class Store extends Model
     protected $fillable = [
         'name',
         'slug',
+        'warehouse_id',
         'address',
         'ward_id',
         'district_id',
@@ -25,6 +26,10 @@ class Store extends Model
         'created_at',
         'updated_at'
     ];
+
+    public function warehouse(){
+        return $this->hasOne(Warehouse::class, 'id', 'warehouse_id');
+    }
 
     public function ward(){
         return $this->hasOne(Ward::class, 'id', 'ward_id');
