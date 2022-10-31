@@ -7,7 +7,7 @@ use App\Http\Validators\ValidatorBase;
 class WarehouseUpsertValidator extends ValidatorBase{
     protected function rules(){
         return [
-            'name' => 'required|string|max:50',
+            'name' => 'required|string|max:50|unique_deleted_at_null:warehouses,name',
             'address' => 'required|string|max:255',
             'ward_id' => 'required|numeric|exists:wards,id',
             'district_id' => 'required|numeric|exists:districts,id',
@@ -21,6 +21,7 @@ class WarehouseUpsertValidator extends ValidatorBase{
             'name.required' => ':attribute không được để trống !',
             'name.string' => ':attribute phải là chuỗi !',
             'name.max' => ':attribute tối đa 50 ký tự !',
+            'name.unique_deleted_at_null' => ':attribute đã tồn tại !',
             'address.required' => ':attribute không được để trống !',
             'address.string' => ':attribute phải là chuỗi !',
             'address.max' => ':attribute tối đa 255 ký tự !',

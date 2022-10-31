@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\WarehouseCollection;
+use App\Http\Resources\WarehouseResource;
+use App\Http\Validators\Warehouse\WarehouseUpsertValidator;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class WarehouseController extends Controller
@@ -57,9 +60,39 @@ class WarehouseController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, WarehouseUpsertValidator $validator)
     {
-        //
+        $input = $request->all();
+        $validator->validate($input);
+        try{
+            DB::beginTransaction();
+            $warehouseCreate = Warehouse::create([
+                'name' => $input['name'],
+                'address' => $input['address'],
+                'province_id' => $input['province_id'],
+                'district_id' => $input['district_id'],
+                'ward_id' => $input['ward_id'],
+                'is_active' => $input['is_active'] ?? 1,
+                'created_by' => $request->user()->id,
+                'updated_by' => $request->user()->id,
+            ]);
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kho ['.$warehouseCreate->name.'] đã được tạo thành công !',
+        ]);
     }
 
     /**
@@ -70,7 +103,29 @@ class WarehouseController extends Controller
      */
     public function show($id)
     {
-        //
+        try{
+            $data = Warehouse::find($id);
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Không tìm thấy kho !',
+                ], 404);
+            }
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new WarehouseResource($data),
+        ]);
     }
 
     /**
@@ -80,9 +135,42 @@ class WarehouseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, WarehouseUpsertValidator $validator)
     {
-        //
+        $input = $request->all();
+        $validator->validate($input);
+        try{
+            DB::beginTransaction();
+            $user = $request->user();
+            $warehouse = Warehouse::find($id);
+            if(empty($warehouse)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Kho không tồn tại !',
+                ], 404);
+            }
+
+            $warehouse->name = $request->name ?? $warehouse->name;
+            $warehouse->address = $request->address ?? $warehouse->address;
+            $warehouse->province_id = $request->province_id ?? $warehouse->province_id;
+            $warehouse->district_id = $request->district_id ?? $warehouse->province_id;
+            $warehouse->ward_id = $request->ward_id ?? $warehouse->ward_id;
+            $warehouse->is_active = $request->is_active ?? $warehouse->is_active;
+            $warehouse->updated_by = $user->id;
+            $warehouse->save();
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollback();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã cập nhật thông tin ['.$warehouse->name.'] !',
+        ]);
     }
 
     /**
@@ -91,8 +179,41 @@ class WarehouseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
-        //
+        try{
+            DB::beginTransaction();
+            $user = $request->user();
+            if(!is_array($id)){
+                $data = Warehouse::find($id);
+                if(empty($data)){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Không tìm thấy kho !',
+                    ], 404);
+                }
+                $data->deleted_by = $user->id;
+                $data->save();
+
+                $data->delete();
+            }
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xóa kho ['.$data->name.'] !',
+        ]);
     }
 }
