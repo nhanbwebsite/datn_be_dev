@@ -7,7 +7,7 @@ use App\Http\Validators\ValidatorBase;
 class WarehouseUpsertValidator extends ValidatorBase{
     protected function rules(){
         return [
-            'name' => 'required|string|max:50|unique_deleted_at_null:warehouses,name',
+            'name' => 'required|string|max:50',
             'address' => 'required|string|max:255',
             'ward_id' => 'required|numeric|exists:wards,id',
             'district_id' => 'required|numeric|exists:districts,id',

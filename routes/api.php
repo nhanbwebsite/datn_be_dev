@@ -76,3 +76,6 @@ require __DIR__ . '/ProductImportSlip/productImportSlip.php';
 
 // Warehouse
 require __DIR__ . '/Warehouse/warehouse.php';
+
+// Specification
+require __DIR__ . '/Specification/specification.php';
