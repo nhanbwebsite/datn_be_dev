@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
@@ -12,16 +13,15 @@ class Order extends Model
     protected $table = 'orders';
     protected $fillable = [
         'code',
+        'address_note_id',
         'total',
         'discount',
         'coupon_id',
         'promotion_id',
         'fee_ship',
-        'address_note_id',
         'payment_method_id',
         'shipping_method_id',
         'status',
-        'is_active',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -30,17 +30,21 @@ class Order extends Model
         'deleted_by',
     ];
 
+    public function details(){
+        return $this->hasMany(OrderDetail::class, 'order_id', 'id');
+    }
+
     public function addressNote(){
         return $this->hasOne(AddressNote::class, 'id', 'address_note_id');
     }
 
-    public function status(){
+    public function getStatus(){
         return $this->hasOne(OrderStatus::class, 'id', 'status');
     }
 
-    // public function paymentMethod(){
-    //     return $this->hasOne(AddressNote::class, 'id', 'address_note_id');
-    // }
+    public function paymentMethod(){
+        return $this->hasOne(PaymentMethod::class, 'id', 'payment_method_id');
+    }
 
     // public function shippingMethod(){
     //     return $this->hasOne(AddressNote::class, 'id', 'address_note_id');
