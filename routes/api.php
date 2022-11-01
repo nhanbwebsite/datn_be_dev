@@ -79,3 +79,6 @@ require __DIR__ . '/Warehouse/warehouse.php';
 
 // Specification
 require __DIR__ . '/Specification/specification.php';
+
+// Order
+require __DIR__ . '/Order/order.php';

@@ -9,7 +9,7 @@ class AddressNoteCreateValidator extends ValidatorBase{
         return [
             'user_id' => 'numeric|exists:users,id',
             'phone' => 'required|string|min:10|regex:/^0[2-9]{1}[0-9]{8}$/',
-            'email' => 'string|email|max:255',
+            'email' => 'string|nullable|max:255',
             'address' => 'required|string|max:255',
             'province_id' => 'required|numeric|exists:provinces,id',
             'district_id' => 'required|numeric|exists:districts,id',
