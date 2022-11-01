@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\WarehouseCollection;
-use App\Http\Resources\WarehouseResource;
-use App\Http\Validators\Warehouse\WarehouseUpsertValidator;
-use App\Models\Warehouse;
+use App\Http\Resources\SpecificationCollection;
+use App\Http\Resources\SpecificationResource;
+use App\Http\Validators\Specification\SpecificationUpsertValidator;
+use App\Models\Specification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class WarehouseController extends Controller
+class SpecificationController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,26 +20,15 @@ class WarehouseController extends Controller
     public function index(Request $request)
     {
         $input = $request->all();
-        $input['limit'] = $request->limit;
         try{
-            $data = Warehouse::where('is_active', !empty($input['is_active'] ) ? $input['is_active'] : 1)->where(function($query) use($input) {
+            $data = Specification::where('is_active', $input['is_active'] ?? 1)->where(function($query) use ($input){
+                if(!empty($input['id_category'])){
+                    $query->where('id_category', $input['id_category']);
+                }
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
-                if(!empty($input['address'])){
-                    $query->where('address', 'like', '%'.$input['address'].'%');
-                }
-                if(!empty($input['ward_id'])){
-                    $query->where('ward_id', $input['ward_id']);
-                }
-                if(!empty($input['district_id'])){
-                    $query->where('district_id', $input['district_id']);
-                }
-                if(!empty($input['province_id'])){
-                    $query->where('province_id', $input['province_id']);
-                }
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
-            $resource = new WarehouseCollection($data);
         }
         catch(HttpException $e){
             return response()->json([
@@ -51,7 +40,7 @@ class WarehouseController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        return response()->json($resource);
+        return response()->json(new SpecificationCollection($data));
     }
 
     /**
@@ -60,37 +49,22 @@ class WarehouseController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, WarehouseUpsertValidator $validator)
+    public function store(Request $request, SpecificationUpsertValidator $validator)
     {
         $input = $request->all();
         $validator->validate($input);
         try{
             DB::beginTransaction();
-
-            $check = Warehouse::select('id')
-            ->where('name', $input['name'])
-            ->where('address', $input['address'])
-            ->where('province_id', $input['province_id'])
-            ->where('district_id', $input['district_id'])
-            ->where('ward_id', $input['ward_id'])
-            ->get();
-            if(!empty($check)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Kho đã tồn tại !',
-                ], 400);
-            }
-
-            $warehouseCreate = Warehouse::create([
+            $user = $request->user();
+            $specificationCreate = Specification::create([
+                'id_category' => $input['id_category'],
                 'name' => $input['name'],
-                'address' => $input['address'],
-                'province_id' => $input['province_id'],
-                'district_id' => $input['district_id'],
-                'ward_id' => $input['ward_id'],
+                'infomation' => json_encode($input['infomation']),
                 'is_active' => $input['is_active'] ?? 1,
-                'created_by' => $request->user()->id,
-                'updated_by' => $request->user()->id,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
             ]);
+
             DB::commit();
         }
         catch(HttpException $e){
@@ -106,7 +80,7 @@ class WarehouseController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Kho ['.$warehouseCreate->name.'] đã được tạo thành công !',
+            'message' => 'Đã tạo ['.$specificationCreate->name.'] thành công !',
         ]);
     }
 
@@ -119,11 +93,11 @@ class WarehouseController extends Controller
     public function show($id)
     {
         try{
-            $data = Warehouse::find($id);
+            $data = Specification::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Không tìm thấy kho !',
+                    'message' => 'Không tìm thấy thông số !',
                 ], 404);
             }
         }
@@ -139,7 +113,7 @@ class WarehouseController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data' => new WarehouseResource($data),
+            'data' => new SpecificationResource($data),
         ]);
     }
 
@@ -150,68 +124,27 @@ class WarehouseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, WarehouseUpsertValidator $validator)
+    public function update(Request $request, $id, SpecificationUpsertValidator $validator)
     {
         $input = $request->all();
         $validator->validate($input);
         try{
             DB::beginTransaction();
             $user = $request->user();
-            $warehouse = Warehouse::find($id);
-            if(empty($warehouse)){
+            $update = Specification::find($id);
+            if(empty($update)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Kho không tồn tại !',
+                    'message' => 'Thông số không tồn tại !',
                 ], 404);
             }
 
-            $warehouse->name = $request->name ?? $warehouse->name;
-            $warehouse->address = $request->address ?? $warehouse->address;
-            $warehouse->province_id = $request->province_id ?? $warehouse->province_id;
-            $warehouse->district_id = $request->district_id ?? $warehouse->province_id;
-            $warehouse->ward_id = $request->ward_id ?? $warehouse->ward_id;
-            $warehouse->is_active = $request->is_active ?? $warehouse->is_active;
-            $warehouse->updated_by = $user->id;
-            $warehouse->save();
-            DB::commit();
-        }
-        catch(HttpException $e){
-            DB::rollback();
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], $e->getStatusCode());
-        }
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Đã cập nhật thông tin ['.$warehouse->name.'] !',
-        ]);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id, Request $request)
-    {
-        try{
-            DB::beginTransaction();
-            $user = $request->user();
-            if(!is_array($id)){
-                $data = Warehouse::find($id);
-                if(empty($data)){
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Không tìm thấy kho !',
-                    ], 404);
-                }
-                $data->deleted_by = $user->id;
-                $data->save();
-
-                $data->delete();
-            }
+            $update->id_category = $input['id_category'] ?? $update->id_category;
+            $update->name = $input['name'] ?? $update->name;
+            $update->infomation = !empty($input['infomation']) ? json_encode($input['infomation']) : $update->infomation;
+            $update->is_active = $input['is_active'] ?? $update->is_active;
+            $update->updated_by = $user->id;
+            $update->save();
 
             DB::commit();
         }
@@ -228,7 +161,50 @@ class WarehouseController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Đã xóa kho ['.$data->name.'] !',
+            'message' => 'Đã cập nhật thông số ['.$update->name.'] !',
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id, Request $request)
+    {
+        try{
+            $user = $request->user();
+            DB::beginTransaction();
+
+            $del = Specification::find($id);
+            if(empty($del)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Thông số không tồn tại !',
+                ], 404);
+            }
+
+            $del->deleted_by = $user->id;
+            $del->save();
+            $del->delete();
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xóa thông số ['.$del->name.'] !'
         ]);
     }
 }
