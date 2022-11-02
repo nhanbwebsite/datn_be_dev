@@ -10,5 +10,6 @@ Route::controller(AuthController::class)->prefix('auth')->group(function (){
 Route::controller(AuthController::class)->middleware(['auth:sanctum'])->group(function (){
     Route::post('/me', 'me');
     Route::post('/logout', 'logout');
+    Route::post('/refresh', 'refresh');
 });
 ?>

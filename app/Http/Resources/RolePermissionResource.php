@@ -16,16 +16,18 @@ class RolePermissionResource extends JsonResource
     {
         if(!empty($request)){
             return [
-                'id'            => $this->id,
-                'role_id'       => $this->role_id,
-                'role'          => $this->role->name,
-                'permission_id' => $this->permission_id,
-                'permission'    => $this->permission->name,
-                'is_active'     => $this->is_active,
-                'created_at'    => $this->created_at->format('d-m-Y H:i:s'),
-                'updated_at'    => $this->updated_at->format('d-m-Y H:i:s'),
-                'created_by'    => $this->createdBy->name ?? null,
-                'updated_by'    => $this->updatedBy->name ?? null,
+                'id'                => $this->id,
+                'role_id'           => $this->role_id,
+                'role'              => $this->role->name,
+                'role_code'         => $this->role->code,
+                'permission_id'     => $this->permission_id,
+                'permission'        => $this->permission->name,
+                'permission_code'   => $this->permission->code,
+                'is_active'         => $this->is_active,
+                'created_at'        => $this->created_at->format('d-m-Y H:i:s'),
+                'updated_at'        => $this->updated_at->format('d-m-Y H:i:s'),
+                'created_by'        => $this->createdBy->name ?? null,
+                'updated_by'        => $this->updatedBy->name ?? null,
             ];
         }
 
