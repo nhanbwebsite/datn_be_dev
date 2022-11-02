@@ -82,3 +82,6 @@ require __DIR__ . '/Specification/specification.php';
 
 // Order
 require __DIR__ . '/Order/order.php';
+
+// ShippingMethod
+require __DIR__. '/ShippingMethod/shipping_method.php';

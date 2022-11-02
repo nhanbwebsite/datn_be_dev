@@ -7,7 +7,7 @@ use App\Http\Validators\ValidatorBase;
 class AddressNoteUpdateValidator extends ValidatorBase{
     protected function rules(){
         return [
-            'phone' => 'required|string|min:10|regex:/^0[2-9]{1}[0-9]{8}$/',
+            'phone' => 'string|min:10|regex:/^0[2-9]{1}[0-9]{8}$/',
             'email' => 'string|email|max:255',
             'address' => 'required|string|max:255',
             'province_id' => 'required|numeric|exists:provinces,id',
@@ -20,7 +20,6 @@ class AddressNoteUpdateValidator extends ValidatorBase{
 
     protected function messages(){
         return [
-            'phone.required' => ':attribute không được để trống !',
             'phone.string' => ':attribute chưa đúng !',
             'phone.min' => ':attribute phải đủ 10 ký tự !',
             'phone.regex' => ':attribute chưa đúng định dạng ! VD: 0946636842',

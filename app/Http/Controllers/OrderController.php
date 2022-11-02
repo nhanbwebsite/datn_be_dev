@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderCollection;
+use App\Http\Resources\OrderResource;
 use App\Http\Validators\Order\OrderCreateValidator;
 use App\Http\Validators\Order\OrderDetailCreateValidator;
+use App\Http\Validators\Order\OrderUpdateValidator;
 use App\Models\AddressNote;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -24,34 +26,36 @@ class OrderController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit ?? 10;
         try{
-            $data = Order::join('order_details', 'orders.id', '=', 'order_details.order_id')
-            ->join('address_notes', 'orders.address_note_id', '=', 'address_notes.id')
-            ->join('users', 'address_notes.user_id', '=', 'users.id')
-            ->select('orders.*')
-            ->where(function ($query) use($input){
+            $data = Order::with(['details', 'addressNote', 'createdBy'])
+            ->where(function ($query) use ($input) {
                 if(!empty($input['code'])){
-                    $query->where('orders.code', $input['code']);
+                    $query->where('code', $input['code']);
                 }
                 if(!empty($input['status'])){
-                    $query->where('orders.status', $input['status']);
+                    $query->where('status', $input['status']);
                 }
                 if(!empty($input['product_id'])){
-                    $query->where('order_details.product_id', $input['product_id']);
+                    $query->whereHas('details', function($q) use($input) {
+                        $q->where('product_id', $input['product_id']);
+                    });
                 }
                 if(!empty($input['user_id'])){
-                    $query->where('address_notes.user_id', $input['user_id']);
-                }
-                if(!empty($input['phone'])){
-                    $query->where('address_notes.phone', $input['phone']);
-                }
-                if(!empty($input['email'])){
-                    $query->where('address_notes.email', $input['email']);
+                    $query->whereHas('createdBy', function($q) use($input) {
+                        $q->where('user_id', $input['user_id']);
+                    });
                 }
                 if(!empty($input['role_id'])){
-                    $query->where('users.role_id', $input['role_id']);
+                    $query->whereHas('createdBy', function($q) use($input) {
+                        $q->where('role_id', $input['role_id']);
+                    });
                 }
-            })->groupBy('order_details.order_id')->orderBy('orders.created_at', 'desc')->paginate($input['limit']);
-            // dd($data);
+                if(!empty($input['from'])){
+                    $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', strtotime($input['from'])));
+                    if(!empty($input['to'])){
+                        $query->whereDate('created_at', '<=', date('Y-m-d H:i:s', strtotime($input['to'])));
+                    }
+                }
+            })->orderBy('orders.created_at', 'desc')->paginate($input['limit']);
         }
         catch(HttpException $e){
             return response()->json([
@@ -142,7 +146,29 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        //
+        try{
+            $data = Order::find($id);
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Đơn hàng không tồn tại !',
+                ], 404);
+            }
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new OrderResource($data),
+        ]);
     }
 
     /**
@@ -152,9 +178,45 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, OrderUpdateValidator $validator)
     {
-        //
+        $input = $request->all();
+        $validator->validate($input);
+        $user = $request->user();
+        try{
+            DB::beginTransaction();
+
+            $update = Order::find($id);
+            if(empty($update)){
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Đơn hàng không tồn tại !',
+                ], 404);
+            }
+
+            $update->status = $input['status'] ?? $update->status;
+            $update->address_note_id = $input['address_note_id'] ?? $update->address_note_id;
+            $update->shipping_method_id = $input['shipping_method_id'] ?? $update->shipping_method_id;
+            $update->payment_method_id = $input['payment_method_id'] ?? $update->payment_method_id;
+            $update->save();
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã cập nhật đơn hàng ['.$update->code.'] !',
+        ]);
     }
 
     /**
@@ -163,8 +225,49 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
-        //
+        $user = $request->user();
+        try{
+            DB::beginTransaction();
+
+            $data = Order::find($id);
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Đơn hàng không tồn tại !'
+                ], 404);
+            }
+
+            if(!empty($data->details)){
+                foreach($data->details as $detail){
+                    $detailDel = OrderDetail::find($detail->id);
+                    $detailDel->deleted_by = $user->id;
+                    $detailDel->save();
+                    $detailDel->delete();
+                }
+            }
+
+            $data->deleted_by = $user->id;
+            $data->save();
+            $data->delete();
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xóa đơn hàng ['.$data->code.'] !'
+        ]);
     }
 }

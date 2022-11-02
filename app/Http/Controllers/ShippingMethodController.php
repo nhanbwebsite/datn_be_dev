@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\OrderStatusCollection;
-use App\Http\Resources\OrderStatusResource;
-use App\Http\Validators\OrderStatus\OrderStatusUpsertValidator;
-use App\Models\OrderStatus;
+use App\Http\Resources\ShippingMethodCollection;
+use App\Http\Resources\ShippingMethodResource;
+use App\Http\Validators\ShippingMethod\ShippingMethodCreateValidator;
+use App\Http\Validators\ShippingMethod\ShippingMethodUpdateValidator;
+use App\Models\ShippingMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class OrderStatusController extends Controller
+class ShippingMethodController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -20,17 +21,16 @@ class OrderStatusController extends Controller
     public function index(Request $request)
     {
         $input = $request->all();
-        $input['limit'] = $request->limit;
+        $input['limit'] = $request->limit ?? 10;
         try{
-            $data = OrderStatus::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
+            $data = ShippingMethod::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input){
+                if(!empty($input['code'])){
+                    $query->where('code', $input['code']);
+                }
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
-                if(!empty($input['is_active'])){
-                    $query->where('is_active', $input['is_active']);
-                }
-            })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
-            $resource = new OrderStatusCollection($data);
+            })->orderBy('created_at', 'desc')->paginate($input['limit']);
         }
         catch(HttpException $e){
             return response()->json([
@@ -42,7 +42,7 @@ class OrderStatusController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        return response()->json($resource);
+        return response()->json(new ShippingMethodCollection($data));
     }
 
     /**
@@ -51,23 +51,25 @@ class OrderStatusController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, OrderStatusUpsertValidator $validator)
+    public function store(Request $request, ShippingMethodCreateValidator $validator)
     {
         $input = $request->all();
         $validator->validate($input);
+        $user = $request->user();
         try{
             DB::beginTransaction();
-            $orderStatus = OrderStatus::create([
-                'name' => $request->name,
-                'code' => strtoupper($request->code),
-                'sort_level' => $request->sort_level ?? null,
-                'is_active' => $request->is_active ?? 1,
-                'created_by' => auth('sanctum')->user()->id,
-                'updated_by' => auth('sanctum')->user()->id,
+
+            $create = ShippingMethod::create([
+                'name' => $input['name'],
+                'code' => strtoupper($input['code']),
+                'is_active' => $input['is_active'] ?? 1,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
             ]);
+
             DB::commit();
         }
-        catch(HttpException $e){
+        catch(HttpException $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -80,7 +82,7 @@ class OrderStatusController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Trạng thái đơn hàng ['.$orderStatus->name.'] đã được tạo thành công !',
+            'message' => 'Đã thêm hình thức vận chuyển ['.$create->name.'] thành công !'
         ]);
     }
 
@@ -93,11 +95,11 @@ class OrderStatusController extends Controller
     public function show($id)
     {
         try{
-            $data = OrderStatus::find($id);
+            $data = ShippingMethod::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Không tìm thấy trạng thái đơn hàng !',
+                    'message' => 'Hình thức vận chuyển không tồn tại !'
                 ], 404);
             }
         }
@@ -113,7 +115,7 @@ class OrderStatusController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data' => new OrderStatusResource($data),
+            'data' => new ShippingMethodResource($data),
         ]);
     }
 
@@ -124,34 +126,25 @@ class OrderStatusController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, OrderStatusUpsertValidator $validator)
+    public function update(Request $request, $id, ShippingMethodUpdateValidator $validator)
     {
         $input = $request->all();
         $validator->validate($input);
-        try {
+        try{
             DB::beginTransaction();
-            $user = $request->user();
-            $check = OrderStatus::where('code', $request->code)->whereNull('deleted_at')->first();
-            if(empty($check)){
+
+            $update = ShippingMethod::find($id);
+            if(empty($update)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Trạng thái đã tồn tại !',
-                ], 400);
-            }
-            DB::beginTransaction();
-            $orderStatus = OrderStatus::find($id);
-            if(empty($orderStatus)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Trạng thái đơn hàng không tồn tại !',
+                    'message' => 'Hình thức vận chuyển không tồn tại !'
                 ], 404);
             }
-            $orderStatus->name = $request->name ?? $orderStatus->name;
-            $orderStatus->code = $request->code ?? $orderStatus->code;
-            $orderStatus->sort_level = $request->sort_level ?? $orderStatus->sort_level;
-            $orderStatus->is_active = $request->is_active ?? $orderStatus->is_active;
-            $orderStatus->updated_by = $user->id;
-            $orderStatus->save();
+
+            $update->name = $input['name'] ?? $update->name;
+            $update->is_active = $input['is_active'] ?? $update->is_active;
+            $update->save();
+
             DB::commit();
         }
         catch(HttpException $e){
@@ -167,7 +160,7 @@ class OrderStatusController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Trạng thái đơn hàng ['.$orderStatus->name.'] đã được cập nhật !',
+            'message' => 'Đã cập nhật hình thức vận chuyển ['.$update->name.'] thành công !',
         ]);
     }
 
@@ -179,19 +172,21 @@ class OrderStatusController extends Controller
      */
     public function destroy($id, Request $request)
     {
+        $user = $request->user();
         try{
             DB::beginTransaction();
-            $user = $request->user();
-            $data = OrderStatus::find($id);
-            if(empty($data)){
+
+            $delete = ShippingMethod::find($id);
+            if(empty($delete)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Trạng thái đơn hàng không tồn tại !',
+                    'message' => 'Hình thức vận chuyển không tồn tại !'
                 ], 404);
             }
-            $data->deleted_by = $user->id;
-            $data->save();
-            $data->delete();
+            $delete->deleted_by = $user->id;
+            $delete->save();
+            $delete->delete();
+
             DB::commit();
         }
         catch(HttpException $e){
@@ -207,7 +202,7 @@ class OrderStatusController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Đã xóa ['.$data->name.']',
+            'message' => 'Đã xóa hình thức vận chuyển ['.$delete->name.'] !',
         ]);
     }
 }

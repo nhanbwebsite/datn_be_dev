@@ -42,13 +42,13 @@ class Order extends Model
         return $this->hasOne(OrderStatus::class, 'id', 'status');
     }
 
-    public function paymentMethod(){
+    public function getPaymentMetyhod(){
         return $this->hasOne(PaymentMethod::class, 'id', 'payment_method_id');
     }
 
-    // public function shippingMethod(){
-    //     return $this->hasOne(AddressNote::class, 'id', 'address_note_id');
-    // }
+    public function shippingMethod(){
+        return $this->hasOne(ShippingMethod::class, 'id', 'shipping_method_id');
+    }
 
     // public function coupon(){
     //     return $this->hasOne(AddressNote::class, 'id', 'address_note_id');

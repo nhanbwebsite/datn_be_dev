@@ -8,7 +8,7 @@ class AddressNoteCreateValidator extends ValidatorBase{
     protected function rules(){
         return [
             'user_id' => 'numeric|exists:users,id',
-            'phone' => 'required|string|min:10|regex:/^0[2-9]{1}[0-9]{8}$/',
+            'phone' => 'string|min:10|regex:/^0[2-9]{1}[0-9]{8}$/',
             'email' => 'string|nullable|max:255',
             'address' => 'required|string|max:255',
             'province_id' => 'required|numeric|exists:provinces,id',
@@ -21,7 +21,6 @@ class AddressNoteCreateValidator extends ValidatorBase{
         return [
             'user_id.numeric' => ':attribute chưa đúng !',
             'user_id.exists' => ':attribute không tồn tại !',
-            'phone.required' => ':attribute không được để trống !',
             'phone.string' => ':attribute chưa đúng !',
             'phone.min' => ':attribute phải đủ 10 ký tự !',
             'phone.regex' => ':attribute chưa đúng định dạng ! VD: 0946636842',
