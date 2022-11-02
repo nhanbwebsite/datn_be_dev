@@ -18,6 +18,7 @@ class OrderCollection extends ResourceCollection
         if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $value){
+
                 foreach($value->details as $key => $detail){
                     $dataDetails[$key]['product_id'] = $detail->product_id;
                     $dataDetails[$key]['product_name'] = $detail->product->name;
@@ -31,8 +32,8 @@ class OrderCollection extends ResourceCollection
                     'code'                  => $value->code,
                     'user_id'               => $value->addressNote->user_id,
                     'user_name'             => $value->addressNote->user->name,
-                    'phone'                 => $value->phone,
-                    'email'                 => $value->email,
+                    'phone'                 => $value->addressNote->user->phone,
+                    'email'                 => $value->addressNote->user->email,
                     'status'                => $value->status,
                     'status_code'           => $value->getStatus->code,
                     'status_name'           => $value->getStatus->name,
@@ -51,8 +52,8 @@ class OrderCollection extends ResourceCollection
                     'fee_ship'              => $value->fee_ship,
                     'fee_ship_formatted'    => number_format($value->fee_ship).'đ',
                     'payment_method_id'     => $value->payment_method_id,
-                    // 'payment_method_code'   => $value->paymentMethod->code,
-                    // 'payment_method_name'   => $value->paymentMethod->name,
+                    'payment_method_code'   => $value->getPaymentMetyhod->code,
+                    'payment_method_name'   => $value->getPaymentMetyhod->name,
                     'shipping_method_id'    => $value->shipping_method_id,
                     // 'shipping_method'       => $value->shipping_method->name,
 
