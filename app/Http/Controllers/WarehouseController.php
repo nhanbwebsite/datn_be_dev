@@ -74,7 +74,7 @@ class WarehouseController extends Controller
             ->where('district_id', $input['district_id'])
             ->where('ward_id', $input['ward_id'])
             ->get();
-            if(!empty($check)){
+            if(!$check->isEmpty()){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Kho đã tồn tại !',

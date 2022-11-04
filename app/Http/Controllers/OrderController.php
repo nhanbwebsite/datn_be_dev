@@ -97,6 +97,7 @@ class OrderController extends Controller
             }
             $create = Order::create([
                 'code' => 'DH'.date('dmYHis', time()),
+                'user_id' => $user->id,
                 'address_note_id' => $input['address_note_id'],
                 'total' => $input['total'],
                 'discount' => $input['discount'] ?? 0,

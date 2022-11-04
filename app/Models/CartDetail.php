@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-class RolePermission extends Model
+
+class CartDetail extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $table = 'role_permissions';
+    protected $table = 'cart_details';
     protected $fillable = [
-        'role_id',
-        'permission_id',
-        'is_active',
+        'cart_id',
+        'product_id',
+        'price',
+        'quantity',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -21,19 +23,19 @@ class RolePermission extends Model
         'deleted_by',
     ];
 
-    public function role(){
-        return $this->belongsTo(Role::class, 'role_id', 'id');
-    }
-
-    public function permission(){
-        return $this->belongsTo(Permission::class, 'permission_id', 'id');
-    }
-
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function updatedBy(){
         return $this->belongsTo(User::class, 'updated_by', 'id');
+    }
+
+    public function cart(){
+        return $this->belongsTo(Cart::class, 'cart_id', 'id');
+    }
+
+    public function product(){
+        return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 }
