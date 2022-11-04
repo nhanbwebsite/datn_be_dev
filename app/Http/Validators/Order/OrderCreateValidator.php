@@ -10,6 +10,7 @@ class OrderCreateValidator extends ValidatorBase
         return [
             'fee_ship' => 'required|numeric',
             'address_note_id' => 'required|numeric|exists:address_notes,id',
+            'user_id' => 'required|numeric|exists:users,id',
             'payment_method_id' => 'required|numeric|exists:payment_methods,id',
             'shipping_method_id' => 'required|numeric',
             'details' => 'required',
@@ -23,6 +24,9 @@ class OrderCreateValidator extends ValidatorBase
             'address_note_id.required' => ':attribute không được để trống !',
             'address_note_id.numeric' => ':attribute phải là số !',
             'address_note_id.exists' => ':attribute không tồn tại !',
+            'user_id.required' => ':attribute không được để trống !',
+            'user_id.numeric' => ':attribute phải là số !',
+            'user_id.exists' => ':attribute không tồn tại !',
             'payment_method_id.required' => ':attribute không được để trống !',
             'payment_method_id.numeric' => ':attribute phải là số !',
             'payment_method_id.exists' => ':attribute không tồn tại !',
@@ -35,7 +39,8 @@ class OrderCreateValidator extends ValidatorBase
     protected function attributes(){
         return [
             'fee_ship' => 'Phí vận chuyển',
-            'address_id' => 'Thông tin người nhận',
+            'address_note_id' => 'Địa chỉ người nhận',
+            'user_id' => 'Mã người dùng',
             'payment_method_id' => 'Phương thức thanh toán',
             'shipping_method_id' => 'Hình thức vận chuyển',
             'details' => 'Chi tiết đơn hàng',

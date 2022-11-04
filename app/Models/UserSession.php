@@ -25,6 +25,14 @@ class UserSession extends Model
     ];
 
     public function user(){
-        return $this->hasOne(User::class, 'id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by', 'id');
     }
 }

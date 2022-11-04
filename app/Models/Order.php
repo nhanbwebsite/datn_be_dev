@@ -13,6 +13,7 @@ class Order extends Model
     protected $table = 'orders';
     protected $fillable = [
         'code',
+        'user_id',
         'address_note_id',
         'total',
         'discount',
@@ -34,20 +35,24 @@ class Order extends Model
         return $this->hasMany(OrderDetail::class, 'order_id', 'id');
     }
 
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
     public function addressNote(){
-        return $this->hasOne(AddressNote::class, 'id', 'address_note_id');
+        return $this->belongsTo(AddressNote::class, 'address_note_id', 'id');
     }
 
     public function getStatus(){
-        return $this->hasOne(OrderStatus::class, 'id', 'status');
+        return $this->belongsTo(OrderStatus::class, 'status', 'id');
     }
 
     public function getPaymentMetyhod(){
-        return $this->hasOne(PaymentMethod::class, 'id', 'payment_method_id');
+        return $this->belongsTo(PaymentMethod::class, 'payment_method_id', 'id');
     }
 
     public function shippingMethod(){
-        return $this->hasOne(ShippingMethod::class, 'id', 'shipping_method_id');
+        return $this->belongsTo(ShippingMethod::class, 'shipping_method_id', 'id');
     }
 
     // public function coupon(){
@@ -59,10 +64,10 @@ class Order extends Model
     // }
 
     public function createdBy(){
-        return $this->hasOne(User::class, 'id', 'created_by');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function updatedBy(){
-        return $this->hasOne(User::class, 'id', 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by', 'id');
     }
 }

@@ -60,23 +60,23 @@ class User extends Authenticatable
     ];
 
     public function role(){
-        return $this->hasOne(Role::class, 'id', 'role_id');
+        return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 
     public function ward(){
-        return $this->hasOne(Ward::class, 'id', 'ward_id');
+        return $this->belongsTo(Ward::class, 'ward_id', 'id');
     }
 
     public function district(){
-        return $this->hasOne(District::class, 'id', 'district_id');
+        return $this->belongsTo(District::class, 'district_id', 'id');
     }
 
     public function province(){
-        return $this->hasOne(Province::class, 'id', 'province_id');
+        return $this->belongsTo(Province::class, 'province_id', 'id');
     }
 
     public function session(){
-        return $this->belongsTo(UserSession::class, 'id', 'user_id');
+        return $this->hasOne(UserSession::class, 'user_id', 'id');
     }
 
     public function createdBy($id){
@@ -88,7 +88,7 @@ class User extends Authenticatable
     }
 
     public function store(){
-        return $this->hasOne(Store::class, 'id', 'store_id');
+        return $this->belongsTo(Store::class, 'store_id', 'id');
     }
 
     public function addressNote(){
