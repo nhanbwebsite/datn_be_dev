@@ -20,6 +20,7 @@ class StoreResource extends JsonResource
                 'id'            => $this->id,
                 'name'          => $this->name,
                 'slug'          => $this->slug,
+                'warehouse'     => $this->warehouse->name,
                 'address'       => $this->address,
                 'province_id'   => $this->province_id,
                 'province'      => $this->province->name,

@@ -76,3 +76,14 @@ require __DIR__ . '/ProductImportSlip/productImportSlip.php';
 
 // specifications
 require __DIR__ . '/Specifications/specifications.php';
+// Warehouse
+require __DIR__ . '/Warehouse/warehouse.php';
+
+// Specification
+require __DIR__ . '/Specification/specification.php';
+
+// Order
+require __DIR__ . '/Order/order.php';
+
+// ShippingMethod
+require __DIR__. '/ShippingMethod/shipping_method.php';

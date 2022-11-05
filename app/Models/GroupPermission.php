@@ -24,10 +24,14 @@ class GroupPermission extends Model
     ];
 
     public function createdBy(){
-        return $this->hasOne(User::class, 'id', 'created_by');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function updatedBy(){
-        return $this->hasOne(User::class, 'id', 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by', 'id');
+    }
+
+    public function permission(){
+        return $this->hasMany(Permission::class, 'group_id', 'id');
     }
 }

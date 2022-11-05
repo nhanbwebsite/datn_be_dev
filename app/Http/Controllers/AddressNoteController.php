@@ -89,8 +89,8 @@ class AddressNoteController extends Controller
             }
             AddressNote::create([
                 'user_id' => $user->id,
-                'phone' => $request->phone,
-                'email' => $request->email ?? null,
+                'phone' => $user->phone,
+                'email' => $user->email ?? null,
                 'address' => $request->address,
                 'province_id' => $request->province_id,
                 'district_id' => $request->district_id,
@@ -188,8 +188,6 @@ class AddressNoteController extends Controller
                 ]);
             }
 
-            $addressNote->phone = $request->phone ?? $addressNote->phone;
-            $addressNote->email = $request->email ?? $addressNote->email;
             $addressNote->address = $request->address ?? $addressNote->address;
             $addressNote->province_id = $request->province_id ?? $addressNote->province_id;
             $addressNote->district_id = $request->district_id ?? $addressNote->province_id;

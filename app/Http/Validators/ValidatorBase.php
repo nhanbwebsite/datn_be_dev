@@ -23,7 +23,7 @@ abstract class ValidatorBase {
         Validator::extend('unique_deleted_at_null', function($attribute, $value, $parameters, $validator){
             $check = DB::table($parameters[0])->where($parameters[1] ?? $attribute, $value)->whereNull('deleted_at')->first();
             if(!empty($check)){
-                $validator->addReplacer('unique_deleted_at', function($message, $attribute, $rule, $parameters){
+                $validator->addReplacer('unique_deleted_at_null', function($message, $attribute, $rule, $parameters){
                     return str_replace(':attribute', $attribute, $message);
                 });
                 return false;

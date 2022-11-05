@@ -22,6 +22,8 @@ class StoreCollection extends ResourceCollection
                     'id'            => $value->id,
                     'name'          => $value->name,
                     'slug'          => $value->slug,
+                    'warehouse_id'  => $value->warehouse_id,
+                    'warehouse'     => $value->warehouse->name,
                     'address'       => $value->address,
                     'province_id'   => $value->province_id,
                     'province'      => $value->province->name,

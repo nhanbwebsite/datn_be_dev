@@ -24,14 +24,14 @@ class Permission extends Model
     ];
 
     public function group(){
-        return $this->hasOne(GroupPermission::class, 'id', 'group_id');
+        return $this->belongsTo(GroupPermission::class, 'group_id', 'id');
     }
 
     public function createdBy(){
-        return $this->hasOne(User::class, 'id', 'created_by');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function updatedBy(){
-        return $this->hasOne(User::class, 'id', 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by', 'id');
     }
 }

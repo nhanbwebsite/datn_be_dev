@@ -13,6 +13,7 @@ class Store extends Model
     protected $fillable = [
         'name',
         'slug',
+        'warehouse_id',
         'address',
         'ward_id',
         'district_id',
@@ -26,23 +27,27 @@ class Store extends Model
         'updated_at'
     ];
 
+    public function warehouse(){
+        return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
+    }
+
     public function ward(){
-        return $this->hasOne(Ward::class, 'id', 'ward_id');
+        return $this->belongsTo(Ward::class, 'ward_id', 'id');
     }
 
     public function district(){
-        return $this->hasOne(District::class, 'id', 'district_id');
+        return $this->belongsTo(District::class, 'district_id', 'id');
     }
 
     public function province(){
-        return $this->hasOne(Province::class, 'id', 'province_id');
+        return $this->belongsTo(Province::class, 'province_id', 'id');
     }
 
     public function createdBy(){
-        return $this->hasOne(User::class, 'id', 'created_by');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function updatedBy(){
-        return $this->hasOne(User::class, 'id', 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by', 'id');
     }
 }

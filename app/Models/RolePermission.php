@@ -22,18 +22,18 @@ class RolePermission extends Model
     ];
 
     public function role(){
-        return $this->hasOne(Role::class, 'id', 'role_id');
+        return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 
     public function permission(){
-        return $this->hasOne(Permission::class, 'id', 'permission_id');
+        return $this->belongsTo(Permission::class, 'permission_id', 'id');
     }
 
     public function createdBy(){
-        return $this->hasOne(User::class, 'id', 'created_by');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function updatedBy(){
-        return $this->hasOne(User::class, 'id', 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by', 'id');
     }
 }
