@@ -63,6 +63,7 @@ class ProductImportSlipController extends Controller
     {
         $input = $request->all();
         $validator->validate($input);
+
         foreach($input['details'] as $key => $value){
             $validatorDetail->validate($value);
         }
@@ -79,6 +80,7 @@ class ProductImportSlipController extends Controller
             ]);
 
             $details = $input['details'];
+
             foreach($details as $key => $detail) {
                 ProductImportSlipDetail::create([
                     'product_import_slip_id' => $ProductImportSlip->id,
