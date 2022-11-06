@@ -85,3 +85,6 @@ require __DIR__ . '/Order/order.php';
 
 // ShippingMethod
 require __DIR__. '/ShippingMethod/shipping_method.php';
+
+// Location
+require __DIR__. '/Location/location.php';

@@ -12,3 +12,4 @@ Route::prefix('admin')->group(function (){
 });
 
 
+Route::get('findProductByStore',[ProductController::class,'productByStore']);
