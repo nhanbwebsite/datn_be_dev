@@ -19,7 +19,7 @@ class Product extends Model
         'description',
         'url_image',
         'price',
-        'promotion',
+        'discount',
         // 'color_ids',
         // 'product_weight',
         // 'product_height',
