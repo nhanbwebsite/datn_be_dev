@@ -17,11 +17,15 @@ class CartResource extends JsonResource
         // return parent::toArray($request);
         if(!empty($request)){
             $dataDetail = [];
-            if(!empty($request->details)){
-                foreach($request->details as $key => $detail){
+            $totalPrice = 0;
+            if(!empty($this->details)){
+                foreach($this->details as $key => $detail){
+                    $totalPrice += $detail->price * $detail->quantity;
+
                     $dataDetail[$key]['product_id'] = $detail->product_id;
                     $dataDetail[$key]['product_image'] = $detail->product->url_image ?? null;
                     $dataDetail[$key]['price'] = $detail->price;
+                    $dataDetail[$key]['price_formatted'] = number_format($detail->price).'đ';
                     $dataDetail[$key]['quantity'] = $detail->quantity;
                 }
             }
@@ -40,6 +44,8 @@ class CartResource extends JsonResource
                 'district'      => $this->addressNote->district->name,
                 'ward_id'       => $this->addressNote->ward_id,
                 'ward'          => $this->addressNote->ward->name,
+                'total'         => $totalPrice,
+                'total_formatted' => number_format($totalPrice).'đ',
                 'coupon_id'     => $this->coupon_id,
                 'promotion_id'  => $this->promotion_id,
                 'fee_ship'      => $this->fee_ship,

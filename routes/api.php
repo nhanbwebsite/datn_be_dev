@@ -88,3 +88,6 @@ require __DIR__. '/ShippingMethod/shipping_method.php';
 
 // Location
 require __DIR__. '/Location/location.php';
+
+// Cart
+require __DIR__ . '/Cart/cart.php';

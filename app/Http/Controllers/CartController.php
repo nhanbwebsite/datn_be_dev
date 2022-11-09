@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CartResource;
 use App\Http\Validators\Cart\CartCreateValidator;
+use App\Http\Validators\Cart\CartDetailUpsertValidator;
 use App\Models\AddressNote;
 use App\Models\Cart;
 use App\Models\CartDetail;
@@ -20,11 +21,11 @@ class CartController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id, Request $request)
+    public function show(Request $request)
     {
         $user_id = $request->user()->id;
         try{
-            $cart = Cart::where('id', $id)->where('user_id', $user_id)->first();
+            $cart = Cart::where('user_id', $user_id)->whereNull('deleted_at')->first();
             if(empty($cart)){
                 return response()->json([
                     'status' => 'error',
@@ -49,13 +50,13 @@ class CartController extends Controller
         ]);
     }
 
-    public function addToCart($product_id, Request $request){
+    public function addToCart(Request $request, CartDetailUpsertValidator $detailValidator){
         $user = $request->user();
         $input = $request->all();
         try{
             DB::beginTransaction();
-            $product = Product::find($product_id);
-            if($product->isEmpty()){
+            $product = Product::find($input['product_id']);
+            if(empty($product)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Không tìm thấy sản phẩm !'
@@ -63,7 +64,9 @@ class CartController extends Controller
             }
 
             $cart = Cart::where('user_id', $user->id)->whereNull('deleted_at')->first();
-            if($cart->isEmpty()){
+            if(empty($cart)){
+                $detailValidator->validate($input);
+
                 $address = AddressNote::where('user_id', $user->id)->where('is_default', 1)->first();
                 $cartCreate = Cart::create([
                     'user_id' => $user->id,
@@ -74,7 +77,7 @@ class CartController extends Controller
 
                 CartDetail::create([
                     'cart_id' => $cartCreate->id,
-                    'product_id' => $product->id,
+                    'product_id' => $input['product_id'],
                     'price' => $product->discount == 0 ? $product->price : $product->price - $product->discount,
                     'quantity' => $input['quantity'],
                     'created_by' => $user->id,
@@ -83,11 +86,13 @@ class CartController extends Controller
                 $message = 'Đã thêm sản phẩm vào giỏ hàng !';
             }
             else {
-                $check = CartDetail::where('product_id', $product_id)->first();
+                $check = CartDetail::where('product_id', $input['product_id'])->first();
                 if(empty($check)){
+                    $detailValidator->validate($input);
+
                     CartDetail::create([
-                        'cart_id' => $$cart->id,
-                        'product_id' => $product->id,
+                        'cart_id' => $cart->id,
+                        'product_id' => $input['product_id'],
                         'price' => $product->discount == 0 ? $product->price : $product->price - $product->discount,
                         'quantity' => $input['quantity'],
                         'created_by' => $user->id,
@@ -97,7 +102,9 @@ class CartController extends Controller
 
                 }
                 else{
-                    $check->quantity = $input['quantity'];
+                    $detailValidator->validate($input);
+
+                    $check->quantity += $input['quantity'];
                     $check->save();
                     $message = 'Đã cập nhật giỏ hàng !';
                 }
@@ -129,7 +136,7 @@ class CartController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         //
     }
