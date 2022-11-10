@@ -48,6 +48,8 @@ class CartResource extends JsonResource
                 'total_formatted' => number_format($totalPrice).'đ',
                 'coupon_id'     => $this->coupon_id,
                 'promotion_id'  => $this->promotion_id,
+                'discount'      => $this->discount ?? 0,
+                'discount_formatted' => number_format($this->discount ?? 0).'đ',
                 'fee_ship'      => $this->fee_ship,
                 'fee_ship_formatted' => number_format($this->fee_ship),
                 'details'       => $dataDetail,

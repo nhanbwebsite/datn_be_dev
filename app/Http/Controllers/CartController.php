@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CartResource;
 use App\Http\Validators\Cart\CartCreateValidator;
 use App\Http\Validators\Cart\CartDetailUpsertValidator;
+use App\Http\Validators\Cart\CartUpdateValidator;
 use App\Models\AddressNote;
 use App\Models\Cart;
 use App\Models\CartDetail;
@@ -72,7 +73,9 @@ class CartController extends Controller
                     'user_id' => $user->id,
                     'address_note_id' => $address->id,
                     'fee_ship' => 18000,
-                    'discount' => 0
+                    'discount' => 0,
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id,
                 ]);
 
                 CartDetail::create([
@@ -136,19 +139,152 @@ class CartController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request, CartUpdateValidator $validator, CartDetailUpsertValidator $detailValidator)
     {
-        //
+        $input = $request->all();
+        $user_id = $request->user()->id;
+        $validator->validate($input);
+        try{
+            DB::beginTransaction();
+
+            $data = Cart::where('user_id', $user_id)->whereNull('deleted_at')->first();
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Giỏ hàng không tồn tại !'
+                ], 404);
+            }
+
+            $data->address_note_id = $input['address_note_id'] ?? $data->address_note_id;
+            $data->coupon_id = $input['coupon_id'] ?? $data->coupon_id;
+            $data->promotion_id = $input['promotion_id'] ?? $data->promotion_id;
+            $data->discount = $input['discount'] ?? $data->discount;
+            $data->fee_ship = $input['fee_ship'] ?? $data->fee_ship;
+            $data->updated_by = $user_id;
+            $data->save();
+
+            if(!empty($input['details'])){
+                foreach($input['details'] as $item){
+                    $detailValidator->validate($item);
+                    $detailDatas = CartDetail::where('cart_id', $data->id)->where('product_id', $item['product_id'])->whereNull('deleted_at')->first();
+                    $detailDatas->quantity = $item['quantity'];
+                    $detailDatas->save();
+                }
+            }
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã cập nhật giỏ hàng !'
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+    public function deleteDetail($product_id, Request $request){
+        $user_id = $request->user()->id;
+        try{
+            DB::beginTransaction();
+
+            $cart = Cart::where('user_id', $user_id)->whereNull('deleted_at')->first();
+            if(empty($cart)){
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Giỏ hàng không tồn tại !'
+                ], 404);
+            }
+
+            $data = CartDetail::where('cart_id', $cart->id)->where('product_id', $product_id)->first();
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Sản phẩm không tồn tại trong giỏ hàng !'
+                ], 404);
+            }
+            $data->updated_by = $user_id;
+            $data->save();
+            $data->delete();
+
+            if(count($cart->details) == 0){
+                $cart->updated_by = $user_id;
+                $cart->delete();
+            }
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xóa sản phẩm khỏi giỏ hàng !',
+        ]);
+    }
+
+    public function destroyCart(Request $request){
+        $user_id = $request->user()->id;
+        try{
+            DB::beginTransaction();
+
+            $cart = Cart::where('user_id', $user_id)->whereNull('deleted_at')->first();
+            if(empty($cart)){
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Giỏ hàng không tồn tại !'
+                ], 404);
+            }
+
+            $data = CartDetail::where('cart_id', $cart->id)->whereNull('deleted_at')->get();
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Sản phẩm không tồn tại trong giỏ hàng !'
+                ], 404);
+            }
+            foreach($data as $detail){
+                $detail->updated_by = $user_id;
+                $detail->delete();
+            }
+
+            $cart->updated_by = $user_id;
+            $cart->save();
+            $cart->delete();
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xóa giỏ hàng !',
+        ]);
     }
 }
