@@ -11,6 +11,7 @@ class Product extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'products';
     protected $fillable = [
+        'code',
         'meta_title',
         'meta_keywords',
         'meta_description',
@@ -20,15 +21,15 @@ class Product extends Model
         'url_image',
         'price',
         'discount',
-        // 'color_ids',
-        // 'product_weight',
-        // 'product_height',
-        // 'product_width',
-        'deleted_by',
         'brand_id',
-        'warehouse_id',
         'subcategories_id',
         'is_active',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
     public function createdBy(){
@@ -41,5 +42,13 @@ class Product extends Model
 
     public function inWarehouse(){
         return $this->hasMany(productAmountByWarehouse::class, 'product_id', 'id');
+    }
+
+    public function brand(){
+        return $this->belongsTo(Brands::class, 'brand_id', 'id');
+    }
+
+    public function subcategory(){
+        return $this->belongsTo(Subcategory::class, 'subcategories_id', 'id');
     }
 }
