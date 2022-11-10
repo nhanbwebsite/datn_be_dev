@@ -10,8 +10,8 @@ class CartUpdateValidator extends ValidatorBase
     protected function rules(){
         return [
             'address_note_id' => 'required|numeric|exists:address_notes,id',
-            'coupon_id' => 'required|numeric',
-            'promotion_id' => 'required|numeric',
+            'coupon_id' => 'nullable|numeric',
+            'promotion_id' => 'nullable|numeric',
             'discount' => 'required|numeric',
             'fee_ship' => 'required|numeric',
             'details' => 'required',
@@ -30,9 +30,7 @@ class CartUpdateValidator extends ValidatorBase
             'price.numeric' => ':attribute phải là số !',
             'quantity.required' => ':attribute không được để trống !',
             'quantity.numeric' => ':attribute phải là số !',
-            'coupon_id.required' => ':attribute không được để trống !',
             'coupon_id.numeric' => ':attribute phải là số !',
-            'promotion_id.required' => ':attribute không được để trống !',
             'promotion_id.numeric' => ':attribute phải là số !',
             'discount.required' => ':attribute không được để trống !',
             'discount.numeric' => ':attribute phải là số !',
