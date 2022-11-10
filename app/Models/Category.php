@@ -11,7 +11,6 @@ class Category extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'categories';
     protected $fillable = [
-        "id",
         "name",
         "slug" ,
         "url_img",
@@ -24,6 +23,7 @@ class Category extends Model
         "deleted_at" ,
     ];
 
-
-
+    public function subcategory(){
+        return $this->hasMany(SubCategory::class, 'category_id', 'id');
+    }
 }
