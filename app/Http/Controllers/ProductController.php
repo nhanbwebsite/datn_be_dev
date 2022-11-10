@@ -8,7 +8,6 @@ use App\Http\Validators\Product\ProductCreateValidator;
 use App\Http\Validators\Product\ProductUpdateValidator;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -221,7 +220,7 @@ class ProductController extends Controller
             $data->delete();
 
             DB::commit();
-        } catch(Exception $e){
+        } catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
