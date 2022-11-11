@@ -18,6 +18,7 @@ class OrderDetailCreateValidator extends ValidatorBase
         return [
             'product_id.required' => ':attribute không được để trống !',
             'product_id.numeric' => ':attribute phải là số !',
+            'product_id.exists' => ':attribute không tồn tại !',
             'quantity.required' => ':attribute không được để trống !',
             'quantity.numeric' => ':attribute phải là số !',
             'price.required' => ':attribute không được để trống !',

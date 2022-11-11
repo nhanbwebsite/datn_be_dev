@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CartResource;
-use App\Http\Validators\Cart\CartCreateValidator;
 use App\Http\Validators\Cart\CartDetailUpsertValidator;
 use App\Http\Validators\Cart\CartUpdateValidator;
 use App\Models\AddressNote;
@@ -72,6 +71,12 @@ class CartController extends Controller
                 $cartCreate = Cart::create([
                     'user_id' => $user->id,
                     'address_note_id' => $address->id,
+                    'address' => $address->address,
+                    'ward_id' => $address->ward_id,
+                    'district_id' => $address->district_id,
+                    'province_id' => $address->province_id,
+                    'phone' => $address->phone,
+                    'email' => $address->email,
                     'fee_ship' => 18000,
                     'discount' => 0,
                     'created_by' => $user->id,

@@ -1,7 +1,8 @@
 <?php
 
-define('ROLE_ID_USER', 2);
-define('ROLE_ID_ADMIN', 4);
+define('ROLE_USER', 2);
+define('ROLE_GUEST', 3);
+define('ROLE_ADMIN', 4);
 
 define('PAYMENT_METHOD_COD', 0);
 define('PAYMENT_METHOD_ONLINE', 1);
