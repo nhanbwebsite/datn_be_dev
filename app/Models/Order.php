@@ -14,7 +14,12 @@ class Order extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'address_note_id',
+        'address',
+        'ward_id',
+        'district_id',
+        'province_id',
+        'phone',
+        'email',
         'total',
         'discount',
         'coupon_id',
@@ -23,6 +28,7 @@ class Order extends Model
         'payment_method_id',
         'shipping_method_id',
         'status',
+        'type',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -69,5 +75,17 @@ class Order extends Model
 
     public function updatedBy(){
         return $this->belongsTo(User::class, 'updated_by', 'id');
+    }
+
+    public function ward(){
+        return $this->belongsTo(Ward::class, 'ward_id', 'id');
+    }
+
+    public function district(){
+        return $this->belongsTo(District::class, 'district_id', 'id');
+    }
+
+    public function province(){
+        return $this->belongsTo(Province::class, 'province_id', 'id');
     }
 }

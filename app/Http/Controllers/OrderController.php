@@ -98,7 +98,12 @@ class OrderController extends Controller
             $create = Order::create([
                 'code' => 'DH'.date('dmYHis', time()),
                 'user_id' => $user->id,
-                'address_note_id' => $input['address_note_id'],
+                'address' => $input['address'],
+                'ward_id' => $input['ward_id'],
+                'district_id' => $input['district_id'],
+                'province_id' => $input['province_id'],
+                'phone' => $input['phone'],
+                'email' => $input['email'],
                 'total' => $input['total'],
                 'discount' => $input['discount'] ?? 0,
                 'coupon_id' => $input['coupon_id'] ?? null,
@@ -196,7 +201,12 @@ class OrderController extends Controller
             }
 
             $update->status = $input['status'] ?? $update->status;
-            $update->address_note_id = $input['address_note_id'] ?? $update->address_note_id;
+            $update->address = $input['address'] ?? $update->address;
+            $update->ward_id =  $input['ward_id'] ?? $update->ward_id;
+            $update->district_id=  $input['district_id'] ?? $update->ward_id;
+            $update->province_id=  $input['province_id'] ?? $update->ward_id;
+            $update->phone=  $input['phone'] ?? $update->phone;
+            $update->email=  $input['email'] ?? $update->email;
             $update->shipping_method_id = $input['shipping_method_id'] ?? $update->shipping_method_id;
             $update->payment_method_id = $input['payment_method_id'] ?? $update->payment_method_id;
             $update->save();
