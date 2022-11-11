@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Validators\User;
+namespace App\Http\Validators\Comment;
 
 use App\Http\Validators\ValidatorBase;
 
