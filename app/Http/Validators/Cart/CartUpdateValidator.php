@@ -9,7 +9,12 @@ class CartUpdateValidator extends ValidatorBase
 
     protected function rules(){
         return [
-            'address_note_id' => 'required|numeric|exists:address_notes,id',
+            'phone' => 'required|regex:/^0[2-9]{1}[0-9]{8}$/',
+            'email' => 'nullable|email',
+            'address' => 'required|string|max:255',
+            'ward_id' => 'required|numeric|exists:wards,id',
+            'district_id' => 'required|numeric|exists:districts,id',
+            'province_id' => 'required|numeric|exists:provinces,id',
             'coupon_id' => 'nullable|numeric',
             'promotion_id' => 'nullable|numeric',
             'discount' => 'required|numeric',
@@ -20,16 +25,21 @@ class CartUpdateValidator extends ValidatorBase
 
     protected function messages(){
         return [
-            'address_note_id.required' => ':attribute không được để trống !',
-            'address_note_id.numeric' => ':attribute phải là số !',
-            'address_note_id.exists' => ':attribute không tồn tại !',
-            'product_id.required' => ':attribute không được để trống !',
-            'product_id.numeric' => ':attribute phải là số !',
-            'product_id.exists' => ':attribute không tồn tại !',
-            'price.required' => ':attribute không được để trống !',
-            'price.numeric' => ':attribute phải là số !',
-            'quantity.required' => ':attribute không được để trống !',
-            'quantity.numeric' => ':attribute phải là số !',
+            'phone.required' => ':attribute không được để trống !',
+            'phone.regex' => ':attribute không được để trống !',
+            'email.email' => ':attribute chưa đúng định dạng email !',
+            'address.required' => ':attribute không được để trống !',
+            'address.string' => ':attribute chưa đúng !',
+            'address.max' => ':attribute tối đa 255 ký tự !',
+            'ward_id.required' => ':attribute không được để trống !',
+            'ward_id.numeric' => ':attribute phải là số !',
+            'ward_id.exists' => ':attribute không tồn tại !',
+            'district_id.required' => ':attribute không được để trống !',
+            'district_id.numeric' => ':attribute phải là số !',
+            'district_id.exists' => ':attribute không tồn tại !',
+            'province_id.required' => ':attribute không được để trống !',
+            'province_id.numeric' => ':attribute phải là số !',
+            'province_id.exists' => ':attribute không tồn tại !',
             'coupon_id.numeric' => ':attribute phải là số !',
             'promotion_id.numeric' => ':attribute phải là số !',
             'discount.required' => ':attribute không được để trống !',
@@ -42,10 +52,12 @@ class CartUpdateValidator extends ValidatorBase
 
     protected function attributes(){
         return [
-            'address_note_id' => 'Mã sổ địa chỉ',
-            'product_id' => 'Mã sản phẩm',
-            'price' => 'Giá bán',
-            'quantity' => 'Số lượng mua',
+            'phone' => 'Số điện thoại',
+            'email' => 'Email',
+            'address' => 'Địa chỉ',
+            'ward_id' => 'Xã/Phường/Thị trấn',
+            'district_id' => 'Quận/Huyện',
+            'province_id' => 'Tỉnh/Thành phố',
             'coupon_id' => 'Mã giảm giá',
             'promotion_id' => 'Mã chương trình khuyến mãi',
             'discount' => 'Tiền giảm',

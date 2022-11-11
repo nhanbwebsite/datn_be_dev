@@ -70,7 +70,6 @@ class CartController extends Controller
                 $address = AddressNote::where('user_id', $user->id)->where('is_default', 1)->first();
                 $cartCreate = Cart::create([
                     'user_id' => $user->id,
-                    'address_note_id' => $address->id,
                     'address' => $address->address,
                     'ward_id' => $address->ward_id,
                     'district_id' => $address->district_id,
@@ -160,11 +159,18 @@ class CartController extends Controller
                 ], 404);
             }
 
-            $data->address_note_id = $input['address_note_id'] ?? $data->address_note_id;
+            $data->address = $input['address'] ?? $data->address;
+            $data->ward_id = $input['ward_id'] ?? $data->ward_id;
+            $data->district_id = $input['district_id'] ?? $data->district_id;
+            $data->province_id = $input['province_id'] ?? $data->province_id;
+            $data->phone = $input['phone'] ?? $data->phone;
+            $data->email = $input['email'] ?? $data->email;
             $data->coupon_id = $input['coupon_id'] ?? $data->coupon_id;
             $data->promotion_id = $input['promotion_id'] ?? $data->promotion_id;
             $data->discount = $input['discount'] ?? $data->discount;
             $data->fee_ship = $input['fee_ship'] ?? $data->fee_ship;
+            $data->shipping_method_id = $input['shipping_method_id'] ?? $data->shipping_method_id;
+            $data->payment_method_id = $input['payment_method_id'] ?? $data->payment_method_id;
             $data->updated_by = $user_id;
             $data->save();
 

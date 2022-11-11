@@ -21,7 +21,6 @@ class CartResource extends JsonResource
             if(!empty($this->details)){
                 foreach($this->details as $key => $detail){
                     $totalPrice += $detail->price * $detail->quantity;
-
                     $dataDetail[$key]['product_id'] = $detail->product_id;
                     $dataDetail[$key]['product_image'] = $detail->product->url_image ?? null;
                     $dataDetail[$key]['price'] = $detail->price;
@@ -36,14 +35,13 @@ class CartResource extends JsonResource
                 'user_name'     => $this->user->name,
                 'phone'         => $this->user->phone,
                 'email'         => $this->user->email,
-                'address_note_id' => $this->address_note_id,
-                'address'       => $this->addressNote->address,
-                'province_id'   => $this->addressNote->province_id,
-                'province'      => $this->addressNote->province->name,
-                'district_id'   => $this->addressNote->district_id,
-                'district'      => $this->addressNote->district->name,
-                'ward_id'       => $this->addressNote->ward_id,
-                'ward'          => $this->addressNote->ward->name,
+                'address'       => $this->address,
+                'province_id'   => $this->province_id,
+                'province'      => $this->province->name,
+                'district_id'   => $this->district_id,
+                'district'      => $this->district->name,
+                'ward_id'       => $this->ward_id,
+                'ward'          => $this->ward->name,
                 'total'         => $totalPrice,
                 'total_formatted' => number_format($totalPrice).'đ',
                 'coupon_id'     => $this->coupon_id,
@@ -52,6 +50,10 @@ class CartResource extends JsonResource
                 'discount_formatted' => number_format($this->discount ?? 0).'đ',
                 'fee_ship'      => $this->fee_ship,
                 'fee_ship_formatted' => number_format($this->fee_ship),
+                'shipping_method_id' => $this->shipping_method_id ?? null,
+                'shipping_method' => $this->shippingMethod->name ?? null,
+                'payment_method_id' => $this->payment_method_id ?? null,
+                'payment_method' => $this->paymentMethod->name ?? null,
                 'details'       => $dataDetail,
                 'created_at'    => $this->created_at->format('Y-m-d H:i:s'),
                 'updated_at'    => $this->updated_at->format('Y-m-d H:i:s'),
