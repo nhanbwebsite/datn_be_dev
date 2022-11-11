@@ -14,10 +14,13 @@ class OrderCreateValidator extends ValidatorBase
             'ward_id' => 'required|numeric|exists:wards,id',
             'district_id' => 'required|numeric|exists:districts,id',
             'province_id' => 'required|numeric|exists:provinces,id',
-            'email' => 'email',
+            'email' => 'nullable|email',
             'user_id' => 'numeric|exists:users,id',
             'payment_method_id' => 'required|numeric|exists:payment_methods,id',
             'shipping_method_id' => 'required|numeric|exists:shipping_methods,id',
+            'discount' => 'required|numeric',
+            'coupon_id' => 'nullable|numeric',
+            'promotion_id' => 'nullable|numeric',
             'details' => 'required',
         ];
     }
@@ -48,6 +51,12 @@ class OrderCreateValidator extends ValidatorBase
             'shipping_method_id.required' => ':attribute không được để trống !',
             'shipping_method_id.numeric' => ':attribute phải là số !',
             'shipping_method_id.exists' => ':attribute không tồn tại !',
+            'discount.required' => ':attribute không được để trống !',
+            'discount.numeric' => ':attribute chưa đúng !',
+            'fee_ship.required' => ':attribute không được để trống !',
+            'fee_ship.numeric' => ':attribute chưa đúng !',
+            'coupon_id.numeric' => ':attribute phải là số !',
+            'promotion_id.numeric' => ':attribute phải là số !',
             'details.required' => ':attribute không được để trống !',
         ];
     }
@@ -61,10 +70,13 @@ class OrderCreateValidator extends ValidatorBase
             'ward_id' => 'Xã/Phường/Thị trấn',
             'district_id' => 'Quận/Huyện',
             'province_id' => 'Tỉnh/Thành phố',
-
             'user_id' => 'Mã người dùng',
             'payment_method_id' => 'Phương thức thanh toán',
             'shipping_method_id' => 'Hình thức vận chuyển',
+            'discount' => 'Giảm giá',
+            'fee_ship' => 'Phí vận chuyển',
+            'coupon_id' => 'Mã giảm giá',
+            'promotion_id' => 'Mã chương trình khuyến mãi',
             'details' => 'Chi tiết đơn hàng',
         ];
     }

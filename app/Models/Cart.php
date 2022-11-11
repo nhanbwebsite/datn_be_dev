@@ -62,6 +62,13 @@ class Cart extends Model
         return $this->belongsTo(Province::class, 'province_id', 'id');
     }
 
+    public function shippingMethod(){
+        return $this->belongsTo(ShippingMethod::class, 'shipping_method_id', 'id');
+    }
+
+    public function paymentMethod(){
+        return $this->belongsTo(PaymentMethod::class, 'payment_method_id', 'id');
+    }
     // public function coupon(){
     //     return $this->hasOne(Product::class, 'id', 'address_note_id');
     // }
