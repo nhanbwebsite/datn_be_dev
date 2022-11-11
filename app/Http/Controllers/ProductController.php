@@ -32,8 +32,8 @@ class ProductController extends Controller
                 if(!empty($input['brand_id'])){
                     $query->where('brand_id', $input['brand_id']);
                 }
-                if(!empty($input['subcategories_id'])){
-                    $query->where('subcategories_id', $input['subcategories_id']);
+                if(!empty($input['subcategory_id'])){
+                    $query->where('subcategory_id', $input['subcategory_id']);
                 }
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
@@ -79,7 +79,7 @@ class ProductController extends Controller
                 'discount' => $input['discount'],
                 'specification_infomation' => $input['specification_infomation'] ?? null,
                 'brand_id' => $input['brand_id'],
-                'subcategories_id' => $input['subcategories_id'],
+                'subcategory_id' => $input['subcategory_id'],
                 'is_active' => $input['is_active'] ?? 1,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
@@ -166,7 +166,7 @@ class ProductController extends Controller
             $product->meta_title = $request->meta_title ?? $product->meta_title;
             $product->meta_keywords = $request->meta_keywords ?? $product->meta_keywords;
             $product->meta_description = $request->meta_description ?? $product->meta_description;
-            $product->subcategories_id = $request->subcategories_id ?? $product->subcategories_id;
+            $product->subcategory_id = $request->subcategory_id ?? $product->subcategory_id;
             $product->specification_infomation = $request->specification_infomation ?? $product->specification_infomation;
             $product->brand_id = $request->brand_id ?? $product->brand_id;
             $product->price = $request->price ?? $product->price;

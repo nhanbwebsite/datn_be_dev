@@ -15,7 +15,7 @@ class Branch extends Model
         'deleted_by',
         'brand_id',
         'branch_id',
-        'subcategories_id',
+        'subcategory_id',
         'is_active',
     ];
 

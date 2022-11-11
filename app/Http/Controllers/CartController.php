@@ -53,6 +53,7 @@ class CartController extends Controller
     public function addToCart(Request $request, CartDetailUpsertValidator $detailValidator){
         $user = $request->user();
         $input = $request->all();
+        $detailValidator->validate($input);
         try{
             DB::beginTransaction();
             $product = Product::find($input['product_id']);
@@ -62,11 +63,12 @@ class CartController extends Controller
                     'message' => 'Không tìm thấy sản phẩm !'
                 ], 404);
             }
-
+            $discountPrice = 0;
+            if(!empty($product->discount)){
+                $discountPrice += $product->discount * $input['quantity'];
+            }
             $cart = Cart::where('user_id', $user->id)->whereNull('deleted_at')->first();
             if(empty($cart)){
-                $detailValidator->validate($input);
-
                 $address = AddressNote::where('user_id', $user->id)->where('is_default', 1)->first();
                 $cartCreate = Cart::create([
                     'user_id' => $user->id,
@@ -77,7 +79,7 @@ class CartController extends Controller
                     'phone' => $address->phone,
                     'email' => $address->email,
                     'fee_ship' => 18000,
-                    'discount' => 0,
+                    'discount' => $discountPrice > 0 ? $discountPrice : 0,
                     'created_by' => $user->id,
                     'updated_by' => $user->id,
                 ]);
@@ -86,7 +88,7 @@ class CartController extends Controller
                     'cart_id' => $cartCreate->id,
                     'product_id' => $input['product_id'],
                     'price' => $product->discount == 0 ? $product->price : $product->price - $product->discount,
-                    'quantity' => $input['quantity'],
+                    'quantity' => $input['quantity'] ?? 1,
                     'created_by' => $user->id,
                     'updated_by' => $user->id,
                 ]);
@@ -150,6 +152,15 @@ class CartController extends Controller
         $validator->validate($input);
         try{
             DB::beginTransaction();
+            $discountPrice = 0;
+            if(!empty($input['details'])){
+                foreach($input['details'] as $d){
+                    $productFind = Product::find($d['product_id']);
+                    if(!empty($productFind->discount)){
+                        $discountPrice += $productFind->discount;
+                    }
+                }
+            }
 
             $data = Cart::where('user_id', $user_id)->whereNull('deleted_at')->first();
             if(empty($data)){
@@ -167,7 +178,7 @@ class CartController extends Controller
             $data->email = $input['email'] ?? $data->email;
             $data->coupon_id = $input['coupon_id'] ?? $data->coupon_id;
             $data->promotion_id = $input['promotion_id'] ?? $data->promotion_id;
-            $data->discount = $input['discount'] ?? $data->discount;
+            $data->discount = ($discountPrice == $input['discount'] ? $input['discount'] : $discountPrice) ?? $data->discount;
             $data->fee_ship = $input['fee_ship'] ?? $data->fee_ship;
             $data->shipping_method_id = $input['shipping_method_id'] ?? $data->shipping_method_id;
             $data->payment_method_id = $input['payment_method_id'] ?? $data->payment_method_id;

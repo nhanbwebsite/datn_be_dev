@@ -25,7 +25,7 @@ class CartResource extends JsonResource
                     $dataDetail[$key]['product_image'] = $detail->product->url_image ?? null;
                     $dataDetail[$key]['price'] = $detail->price;
                     $dataDetail[$key]['price_formatted'] = number_format($detail->price).'đ';
-                    $dataDetail[$key]['quantity'] = $detail->quantity;
+                    $dataDetail[$key]['quantity'] = $detail->quantity > 0 ? $detail->quantity : 0;
                 }
             }
 
@@ -42,12 +42,12 @@ class CartResource extends JsonResource
                 'district'      => $this->district->name,
                 'ward_id'       => $this->ward_id,
                 'ward'          => $this->ward->name,
-                'total'         => $totalPrice,
-                'total_formatted' => number_format($totalPrice).'đ',
+                'total'         => $totalPrice - $this->discount ?? 0,
+                'total_formatted' => number_format($totalPrice - $this->discount ?? 0).'đ',
                 'coupon_id'     => $this->coupon_id,
                 'promotion_id'  => $this->promotion_id,
                 'discount'      => $this->discount ?? 0,
-                'discount_formatted' => number_format($this->discount ?? 0).'đ',
+                'discount_formatted' => number_format($discountPrice ?? 0).'đ',
                 'fee_ship'      => $this->fee_ship,
                 'fee_ship_formatted' => number_format($this->fee_ship),
                 'shipping_method_id' => $this->shipping_method_id ?? null,

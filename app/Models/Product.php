@@ -22,7 +22,7 @@ class Product extends Model
         'price',
         'discount',
         'brand_id',
-        'subcategories_id',
+        'subcategory_id',
         'is_active',
         'created_at',
         'updated_at',
@@ -49,6 +49,6 @@ class Product extends Model
     }
 
     public function subcategory(){
-        return $this->belongsTo(Subcategory::class, 'subcategories_id', 'id');
+        return $this->belongsTo(Subcategory::class, 'subcategory_id', 'id');
     }
 }
