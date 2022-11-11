@@ -7,7 +7,6 @@ use App\Http\Resources\OrderResource;
 use App\Http\Validators\Order\OrderCreateValidator;
 use App\Http\Validators\Order\OrderDetailCreateValidator;
 use App\Http\Validators\Order\OrderUpdateValidator;
-use App\Models\AddressNote;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use Illuminate\Http\Request;
@@ -104,6 +103,7 @@ class OrderController extends Controller
                 'fee_ship' => $input['fee_ship'] ?? 0,
                 'payment_method_id' => $input['payment_method_id'],
                 'shipping_method_id' => $input['shipping_method_id'],
+                'type' => !empty($user) ? 'L' : 'N',
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
