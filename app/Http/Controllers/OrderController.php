@@ -88,13 +88,6 @@ class OrderController extends Controller
         $user = $request->user();
         try{
             DB::beginTransaction();
-            $checkAddress = AddressNote::where('is_active', 1)->where('id', $input['address_note_id'])->where('user_id', $user->id)->first();
-            if(empty($checkAddress)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Địa chỉ thanh toán không tồn tại !',
-                ], 400);
-            }
             $create = Order::create([
                 'code' => 'DH'.date('dmYHis', time()),
                 'user_id' => $user->id,
