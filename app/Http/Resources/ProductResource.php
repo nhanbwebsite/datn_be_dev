@@ -33,7 +33,7 @@ class ProductResource extends JsonResource
                 'specification_infomation' => $this->specification_infomation,
                 'brand_id'      => $this->brand_id,
                 'brand_name'    => $this->brand->brand_name,
-                'subcategory_id' => $this->subcategories_id,
+                'subcategory_id' => $this->subcategory_id,
                 'subcategory_name' => $this->subcategory->name,
                 'category'      => $this->subcategory->category_id,
                 'category_name' => $this->subcategory->category->name,

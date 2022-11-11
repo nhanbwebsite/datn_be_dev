@@ -11,12 +11,12 @@ class ProductUpdateValidator extends ValidatorBase
             'name' => 'required|min:6|max:255',
             'slug' => 'nullable|min:6|max:255',
             'description' => 'nullable',
-            'url_image' => 'required|url',
+            'url_image' => 'required',
             'price' => 'numeric|min:0',
             'discount' => 'numeric|min:0',
             'specification_infomation' => 'nullable',
             'brand_id' => 'required|numeric',
-            'subcategories_id' => 'required|numeric',
+            'subcategory_id' => 'required|numeric',
             'is_active' => 'numeric',
         ];
     }
@@ -30,15 +30,14 @@ class ProductUpdateValidator extends ValidatorBase
             'slug.min' => ':attribute tối thiểu 6 ký tự !',
             'slug.max' => ':attribute tối đa 255 ký tự !',
             'url_image.required' => ':attribute không được để trống !',
-            'url_image.url' => ':attribute chưa đúng định dạng URL !',
             'price.required' => ':attribute không được để trống !',
             'price.min' => ':attribute tối thiểu là 0 !',
             'discount.required' => ':attribute không được để trống !',
             'discount.min' => ':attribute tối thiểu là 0 !',
             'brand_id.required' => ':attribute không được để trống !',
             'brand_id.numeric' => ':attribute chưa đúng định dạng số !',
-            'subcategories_id.required' => ':attribute không được để trống !',
-            'subcategories_id.numeric' => ':attribute chưa đúng định dạng số !',
+            'subcategory_id.required' => ':attribute không được để trống !',
+            'subcategory_id.numeric' => ':attribute chưa đúng định dạng số !',
         ];
     }
 
@@ -52,7 +51,7 @@ class ProductUpdateValidator extends ValidatorBase
             'discount' => 'Giảm giá',
             'specification_infomation' => 'Thông số kỹ thuật',
             'brand_id' => 'Mã thương hiệu',
-            'subcategories_id' => 'Mã danh mục',
+            'subcategory_id' => 'Mã danh mục',
             'is_active' => 'Trạng thái',
         ];
     }
