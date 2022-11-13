@@ -66,29 +66,11 @@ class AuthController extends Controller
             }
             $token = $userData->createToken('authToken', $permission_code ?? null)->plainTextToken;
 
-<<<<<<< HEAD
-            if(!empty($userData->session)){
-                // if($userData->session->expired < date('Y-m-d H:i:s', time())){
-                //     return response()->json([
-                //         'status' => 'error',
-                //         'message' => 'Phiên đăng nhập đã hết hạn !',
-                //     ], 401);
-                // }
-                $oldSession = UserSession::where('user_id', $userData->id);
-                $oldSession->update([
-                    // 'is_delete' => 1,
-                    'updated_by' => $userData->id,
-                    'deleted_by' => $userData->id,
-                ]);
-                $oldSession->delete();
-            }
-=======
             $oldSession = UserSession::where('user_id', $userData->id);
             $oldSession->update([
                 'deleted_by' => $userData->id,
             ]);
             $oldSession->delete();
->>>>>>> 06923d042f6817bf5d6db431f7a73db5115b5a58
 
             $userSessionNew = UserSession::create([
                 'user_id' => $userData->id,
