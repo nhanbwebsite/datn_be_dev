@@ -41,6 +41,7 @@ class AuthController extends Controller
                     'message' => 'Số điện thoại hoặc mật khẩu không đúng !',
                 ], 401);
             }
+
             $userData = User::where('phone', $input['phone'])->first();
             if($userData->is_active == 0){
                 return response()->json([
@@ -48,6 +49,13 @@ class AuthController extends Controller
                     'message' => 'Người dùng đã bị khóa hoặc chưa kích hoạt !',
                 ], 401);
             }
+            if(empty($userData->session) || $userData->session->expired < date('Y-m-d H:i:s', time())){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Phiên đăng nhập đã hết hạn !',
+                ], 401);
+            }
+
             $data = RolePermission::where([
                 ['role_id', $userData->role_id],
                 ['is_active', 1],
@@ -58,6 +66,7 @@ class AuthController extends Controller
             }
             $token = $userData->createToken('authToken', $permission_code ?? null)->plainTextToken;
 
+<<<<<<< HEAD
             if(!empty($userData->session)){
                 // if($userData->session->expired < date('Y-m-d H:i:s', time())){
                 //     return response()->json([
@@ -73,6 +82,13 @@ class AuthController extends Controller
                 ]);
                 $oldSession->delete();
             }
+=======
+            $oldSession = UserSession::where('user_id', $userData->id);
+            $oldSession->update([
+                'deleted_by' => $userData->id,
+            ]);
+            $oldSession->delete();
+>>>>>>> 06923d042f6817bf5d6db431f7a73db5115b5a58
 
             $userSessionNew = UserSession::create([
                 'user_id' => $userData->id,
@@ -81,6 +97,7 @@ class AuthController extends Controller
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
                 'created_by' => $userData->id,
+                'updated_by' => $userData->id,
             ]);
             DB::commit();
         }
@@ -88,7 +105,11 @@ class AuthController extends Controller
             DB::rollback();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], $e->getStatusCode());
         }
 
@@ -131,7 +152,11 @@ class AuthController extends Controller
             DB::rollback();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], $e->getStatusCode());
         }
         return response()->json([
@@ -154,7 +179,11 @@ class AuthController extends Controller
         catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage()
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], $e->getStatusCode());
         }
         return response()->json([
@@ -195,11 +224,84 @@ class AuthController extends Controller
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
             ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
+        ]);
+    }
+
+    public function refresh(Request $request){
+        $user = $request->user();
+        if(empty($user)){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Chưa đăng nhập !',
+            ], 401);
+        }
+        try{
+            DB::beginTransaction();
+            $userData = User::find($user->id);
+            $user->currentAccessToken()->delete();
+
+            if(empty($userData->session) || $userData->session->expired < date('Y-m-d H:i:s', time())){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Phiên đăng nhập đã hết hạn !',
+                ], 401);
+            }
+
+            $data = RolePermission::where([
+                ['role_id', $userData->role_id],
+                ['is_active', 1],
+            ])->get();
+            $permission_code = [];
+            foreach($data as $item){
+                $permission_code[] = strtolower($item->permission->code);
+            }
+
+            $token = $userData->createToken('authToken', $permission_code ?? null)->plainTextToken;
+
+            $oldSession = UserSession::where('user_id', $userData->id);
+            $oldSession->update([
+                'deleted_by' => $userData->id,
+            ]);
+            $oldSession->delete();
+
+            $userSessionNew = UserSession::create([
+                'user_id' => $userData->id,
+                'token' => $token,
+                'expired' => date('Y-m-d H:i:s', time()+7*24*60*60),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'created_by' => $userData->id,
+                'updated_by' => $userData->id,
+            ]);
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new UserResource($userData),
+            'token' => [
+                'Bearer' => $token,
+                'expired_at' => $userSessionNew->expired,
+            ]
         ]);
     }
 }

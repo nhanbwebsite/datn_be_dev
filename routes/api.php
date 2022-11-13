@@ -71,8 +71,23 @@ require __DIR__ . '/OrderStatus/order_status.php';
 // PaymentMethod
 require __DIR__ . '/PaymentMethod/payment_method.php';
 
-//PostCate
-require __DIR__ . '/postCategories/postCategories.php';
+// productImportSlip
+require __DIR__ . '/ProductImportSlip/productImportSlip.php';
 
-//Post
-require __DIR__ . '/Post/post.php';
+// Warehouse
+require __DIR__ . '/Warehouse/warehouse.php';
+
+// Specification
+require __DIR__ . '/Specification/specification.php';
+
+// Order
+require __DIR__ . '/Order/order.php';
+
+// ShippingMethod
+require __DIR__. '/ShippingMethod/shipping_method.php';
+
+// Location
+require __DIR__. '/Location/location.php';
+
+// Cart
+require __DIR__ . '/Cart/cart.php';

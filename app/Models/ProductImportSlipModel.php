@@ -12,16 +12,31 @@ class ProductImportSlipModel extends Model
     protected $table = 'product_import_slip';
     protected $fillable = [
         'name',
-        'slug',
-        'user_id',
-        'product_id',
+        'code',
         'warehouse_id',
-        'product_amount',
-        'delete_by',
-        'update_by',
+        'status',
+        'note',
+        'deleted_by',
+        'updated_by',
         'created_at',
         'deleted_at',
         'created_by',
         'updated_at',
     ];
+
+    public function details(){
+        return $this->hasMany(ProductImportSlipDetail::class, 'product_import_slip_id', 'id');
+    }
+
+    public function warehouse(){
+        return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
+    }
+
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by', 'id');
+    }
 }

@@ -168,7 +168,7 @@ class GroupPermissionController extends Controller
                 ], 404);
             }
             $data->update([
-                'deleted_by' => $user->user()->id
+                'deleted_by' => $user->id
             ]);
             $data->delete();
             DB::commit();

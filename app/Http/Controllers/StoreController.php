@@ -73,6 +73,7 @@ class StoreController extends Controller
             $create = Store::create([
                 'name' => $request->name,
                 'slug' => $request->slug ?? Str::slug($request->name),
+                'warehouse_id' => $request->warehouse_id,
                 'address' => $request->address,
                 'ward_id' => $request->ward_id,
                 'district_id' => $request->district_id,
@@ -156,6 +157,7 @@ class StoreController extends Controller
             }
             $update->name = $request->name ?? $update->name;
             $update->slug = $request->slug ?? Str::slug($request->name) ?? $update->slug;
+            $update->warehouse_id = $request->warehouse_id ?? $update->warehouse_id;
             $update->address = $request->address ?? $update->address;
             $update->ward_id = $request->ward_id ?? $update->ward_id;
             $update->district_id = $request->district_id ?? $update->district_id;
