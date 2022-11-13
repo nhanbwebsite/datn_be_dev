@@ -91,4 +91,7 @@ require __DIR__. '/Location/location.php';
 
 // Cart
 require __DIR__ . '/Cart/cart.php';
+//Post Categories
+require __DIR__ . '/postCategories/postCategories.php';
 
+require __DIR__ . '/Post/post.php';
