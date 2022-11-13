@@ -67,10 +67,7 @@ class AuthController extends Controller
                 // }
                 $oldSession = UserSession::where('user_id', $userData->id);
                 $oldSession->update([
-<<<<<<< HEAD
-=======
                     // 'is_delete' => 1,
->>>>>>> dev_nha
                     'updated_by' => $userData->id,
                     'deleted_by' => $userData->id,
                 ]);

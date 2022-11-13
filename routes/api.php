@@ -70,3 +70,9 @@ require __DIR__ . '/OrderStatus/order_status.php';
 
 // PaymentMethod
 require __DIR__ . '/PaymentMethod/payment_method.php';
+
+//PostCate
+require __DIR__ . '/postCategories/postCategories.php';
+
+//Post
+require __DIR__ . '/Post/post.php';

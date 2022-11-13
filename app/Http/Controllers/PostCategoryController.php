@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PostCategoriesResource;
 use App\Models\PostCategories;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
@@ -9,6 +10,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PostCategoryController extends Controller
 {
@@ -20,9 +22,10 @@ class PostCategoryController extends Controller
     public function index()
     {
         try{
-            $dataCategories = PostCategories::all();
+            $data = PostCategories::all();
+            $resource =  PostCategoriesResource::collection($data);
             return response()->json([
-                'data' => $dataCategories
+                'data' => $resource
             ],200);
         } catch(Exception $e){
             return response()->json([
@@ -41,18 +44,19 @@ class PostCategoryController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'name_post_category' => 'required|max:255|unique:post_categories',
+            'name' => 'required|max:255',
         ];
         $messages = [
-            'name_post_category.required' => ':atribuite không được để trống !',
-            'name_post_category.max' => ':attribute tối đa 255 ký tự !',
+            'name.required' => ':atribuite không được để trống !',
+            'name.max' => ':attribute tối đa 255 ký tự !',
         ];
 
         $attributes = [
-            'name_post_category' => 'Tên danh mục không được để trống'
+            'name' => 'Tên danh mục bài viết'
         ];
 
         try {
+            $user = auth('sanctum')->user();
             DB::beginTransaction();
             $validator = Validator::make($request->all(), $rules, $messages, $attributes);
             if($validator->fails()){
@@ -63,22 +67,28 @@ class PostCategoryController extends Controller
             }
 
             $data = PostCategories::create([
-                'name_post_category' => mb_strtolower($request->name_post_category),
-                'slug' => Str::slug($request->name_post_category)
+                'name' => mb_strtoupper($request->name) ,
+                'slug' => Str::slug($request->name),
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+
             ]);
             DB::commit();
-        } catch(Exception $e) {
+
+
+        } catch(HttpException $e) {
             DB::rollback();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
+                'line' => $e->getLine()
             ], 400);
 
         }
 
         return response()->json([
             'status' => 'success',
-            'message' => $data->name_post_category . ' đã được tạo thành công !',
+            'message' => $data->name . ' đã được tạo thành công !',
         ]);
 
 
@@ -125,15 +135,15 @@ class PostCategoryController extends Controller
     public function update(Request $request, $id)
     {
         $rules = [
-            'name_post_category' => 'required|max:255',
+            'name' => 'required|max:255',
         ];
         $messages = [
-            'name_post_category.required' => ':atribuite không được để trống !',
-            'name_post_category.max' => ':attribute tối đa 255 ký tự !',
+            'name.required' => ':atribuite không được để trống !',
+            'name.max' => ':attribute tối đa 255 ký tự !',
         ];
 
         $attributes = [
-            'name_post_category' => 'Tên danh mục không được để trống'
+            'name' => 'Tên danh mục không được để trống'
         ];
 
         try {
@@ -147,11 +157,14 @@ class PostCategoryController extends Controller
             $data = PostCategories::find($id);
             if(!empty($data)){
                  $data->update([
-                    'name_post_category' => mb_strtolower($request->name_post_category),
-                    'slug' => Str::slug($request->name_post_category),
+                    'name' => mb_strtoupper($request->name) ,
+                    'slug' => Str::slug($request->name),
                     // 'updated_by' => auth('sanctum')->user()->id,
                 ]);
             }
+
+
+
         } catch(Exception $e) {
             DB::rollback();
             return response()->json([
@@ -162,7 +175,7 @@ class PostCategoryController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' =>'Danh mục đã được cập nhật thành !',
+            'message' =>'Danh mục đã được cập nhật thành '.$request->name.'!',
         ]);
     }
 
@@ -174,13 +187,6 @@ class PostCategoryController extends Controller
      */
     public function destroy($id)
     {
-        // $data= PostCategories::find($id);
-        // $data->delete($id);
-        // return response()->json([
-        //             'status' => 'success',
-        //             'message' => 'Đã xóa thành công danh mục ' . $data->name_post_category
-        //          ]);
-
         try {
             //DB::beginTransaction();
             $data = PostCategories::find($id);
@@ -194,19 +200,23 @@ class PostCategoryController extends Controller
            $data->delete();
             return response()->json([
                 'status' => 'success',
-                'message' => 'Đã xóa thành công danh mục ' . $data->name_post_category
+                'message' => 'Đã xóa thành công danh mục ' . $data->name
             ]);
+
             $data->update([
+                // 'is_delete' => 1,
+                'is_delete' => 1,
                 'deleted_at' => Carbon::now()
             ]);
             // DB::commit();
-        } catch(Exception $e) {
+        } catch(Exception $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
+                'message' => $e->getMessage()
+            ]);
         }
+
 
     }
 }
