@@ -95,3 +95,6 @@ require __DIR__ . '/Cart/cart.php';
 require __DIR__ . '/postCategories/postCategories.php';
 
 require __DIR__ . '/Post/post.php';
+
+// colors
+require __DIR__ . '/Colors/colors.php';
