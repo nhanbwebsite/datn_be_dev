@@ -22,9 +22,9 @@ Route::get('/', function () {
     ];
 });
 
-Route::get('/not-found', function() {
+Route::get('/unauthorization', function() {
     return response()->json([
-        'status' => 'error',
-        'message' => 'Không tìm thấy route !'
-    ], 404);
-})->name('page404');
+            'status' => 'error',
+            'message' => 'Token không đúng'
+        ], 401);
+})->name('unauthorization');
