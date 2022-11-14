@@ -1,3 +1,5 @@
+<style>
+
 body { background-color: #FF7F2E; font-family: 'Concert One', cursive; margin: 0; overflow: hidden; padding: 0; }
 
 
@@ -314,6 +316,7 @@ $color-wood-2:    #410A09;
 #link p {margin: 0; margin-left: 5px;}
 #link:hover {opacity: 1;}
 
+</style>
 
 <div class="text"><p>404</p></div>
 <div class="container">
