@@ -19,7 +19,6 @@ class Cart extends Model
         'phone',
         'email',
         'coupon_id',
-        'promotion_id',
         'discount',
         'fee_ship',
         'created_at',
