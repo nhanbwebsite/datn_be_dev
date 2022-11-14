@@ -99,7 +99,6 @@ class OrderController extends Controller
                 'total' => $input['total'],
                 'discount' => $input['discount'] ?? 0,
                 'coupon_id' => $input['coupon_id'] ?? null,
-                'promotion_id' => $input['promotion_id'] ?? null,
                 'fee_ship' => $input['fee_ship'] ?? 0,
                 'payment_method_id' => $input['payment_method_id'],
                 'shipping_method_id' => $input['shipping_method_id'],
