@@ -4,15 +4,15 @@ body { background-color: #FF7F2E; font-family: 'Concert One', cursive; margin: 0
 
 
 /*/////////////////// rules */
-$color-black:     #13242C;
+/* $color-black:     #13242C; */
 $color-white:     #fff;
-$color-red-1:     #D13433;
-$color-red-2:     #932422;
-$color-skin-1:    #EAB08C;
-$color-skin-2:    #D9766C;
-$color-skin-3:    #B2524D;
-$color-hair:      #13242C;
-$color-wood-1:    #601513;
+/* $color-red-1:     #D13433; */
+/* $color-red-2:     #932422; */
+/* $color-skin-1:    #EAB08C; */
+/* $color-skin-2:    #D9766C; */
+/* $color-skin-3:    #B2524D; */
+/* $color-hair:      #13242C; */
+/* $color-wood-1:    #601513; */
 $color-wood-2:    #410A09;
 
 @mixin position {
@@ -38,7 +38,7 @@ $color-wood-2:    #410A09;
 /*/////////////////// scene */
 .text {
   @include centered;
-  color: rgba($color-black, 0.1);
+  color: rgba(#13242C, 0.1);
   font-size: 30em;
   text-align: center;
   top: 40%;
@@ -50,7 +50,7 @@ $color-wood-2:    #410A09;
   &:after {
     @include position;
     content: "";
-    background-color: rgba($color-black, 0.1);
+    background-color: rgba(#13242C, 0.1);
     border-radius: 12px;
     bottom: 40px;
     height: 12px;
@@ -69,7 +69,7 @@ $color-wood-2:    #410A09;
 .caveman:nth-child(2) { left: 20px; transform: rotateY(180deg); }
 .head {
   @include position;
-  background-color: $color-hair;
+  background-color: #13242C;
   border-radius: 50px;
   height: 140px;
   left: 60px;
@@ -78,7 +78,7 @@ $color-wood-2:    #410A09;
   &:after, &:before {
     content: "";
     @include position;
-    background-color: $color-black;
+    background-color: #13242C;
     border-radius: 10px;
     height: 20px;
     width: 7px;
@@ -87,7 +87,7 @@ $color-wood-2:    #410A09;
   &:before  { left: 30px; top: -8px; transform:rotate(-20deg); }
   .eye {
     @include left50;
-    background-color: $color-skin-1;
+    background-color: #EAB08C;
     border-radius: 50px;
     height: 16px;
     left: 45%;
@@ -96,7 +96,7 @@ $color-wood-2:    #410A09;
     &:after, &:before {
       content: "";
       @include top50;
-      background-color: $color-black;
+      background-color: #13242C;
       border-radius: 50%;
       height: 5px;
       width: 5px;
@@ -109,8 +109,8 @@ $color-wood-2:    #410A09;
     }
     .nose {
       @include centered;
-      background-color: $color-skin-2;
-      border-left: 8px solid rgba($color-black, 0.1);
+      background-color: #D9766C;
+      border-left: 8px solid rgba(#13242C, 0.1);
       border-radius: 10px;
       box-sizing: border-box;
       height: 35px;
@@ -152,22 +152,22 @@ $color-wood-2:    #410A09;
   }
 }
 .caveman:nth-child(1) .shape {
-  background-color: $color-red-1;
+  background-color: #D13433;
   .circle {
-    background-color: $color-red-2;
-    &:after, &:before { background-color: $color-red-2; }
+    background-color: #932422;
+    &:after, &:before { background-color: #932422; }
   }
 }
 .caveman:nth-child(2) .shape {
-  background-color: $color-red-2;
-  .circle { background-color: $color-red-1;
-  &:after, &:before { background-color: $color-red-1; }
+  background-color: #932422;
+  .circle { background-color: #D13433;
+  &:after, &:before { background-color: #D13433; }
   }
 }
 .arm-right {
   @include position;
-  background-color: $color-skin-1;
-  border-left: 8px solid rgba($color-black, 0.1);
+  background-color: #EAB08C;
+  border-left: 8px solid rgba(#13242C, 0.1);
   border-radius: 50px;
   box-sizing: border-box;
   height: 180px;
@@ -178,7 +178,7 @@ $color-wood-2:    #410A09;
   z-index: 1;
   .club {
     @include position;
-	  border-bottom: 110px solid $color-wood-1;
+	  border-bottom: 110px solid #410A09;
     border-left:   10px solid transparent;
     border-right:  10px solid transparent;
     height: 0;
@@ -189,7 +189,7 @@ $color-wood-2:    #410A09;
     &:after, &:before {
       @include position;
       content:"";
-      background-color: $color-wood-1;
+      background-color: #410A09;
       border-radius: 50%;
       left: 0;
     }
@@ -221,7 +221,7 @@ $color-wood-2:    #410A09;
     width: 50px;
     &:after, &:before, .fingers, .fingers:after {
       @include position;
-      background-color: $color-skin-1;
+      background-color: #EAB08C;
       border-radius: 50%;
       bottom: 0px;
       height: 15px;
@@ -235,19 +235,19 @@ $color-wood-2:    #410A09;
   }
 }
 .leg:nth-child(1)   {
-  background-color: $color-skin-3;
+  background-color: #B2524D;
   left: 95px;
-  &:after { background-color: $color-skin-3; }
-  .foot   { background-color: $color-skin-3;
-    &:after { background-color: $color-skin-3;}
+  &:after { background-color: #B2524D; }
+  .foot   { background-color: #B2524D;
+    &:after { background-color: #B2524D;}
     &:before {display: none;}
   }
 }
 .leg:nth-child(2)   {
-  background-color: $color-skin-2;
+  background-color: #D9766C;
   left: 115px;
-  &:after { background-color: $color-skin-2; }
-  .foot   { background-color: $color-skin-2; }
+  &:after { background-color: #D9766C; }
+  .foot   { background-color: #D9766C; }
 }
 /*/////////////////// animation */
 .caveman:nth-child(1) .arm-right {
