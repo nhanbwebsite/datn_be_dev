@@ -21,3 +21,7 @@ Route::get('/', function () {
         'Name' =>'Du an tot nghiep'
     ];
 });
+
+Route::get('not-found', function() {
+    return view('page404');
+})->name('page404');
