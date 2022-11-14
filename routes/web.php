@@ -14,5 +14,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    // return view('welcome');
+    return [
+        'Laravel'=> app()->version(),
+        'PHP' => phpversion(),
+        'Name' =>'Du an tot nghiep'
+    ];
 });
