@@ -23,8 +23,8 @@ Route::get('/', function () {
 });
 
 Route::get('/not-found', function() {
-    return [
-        'status_code' => '404',
-        'message' => 'Page not found',
-    ];
+    return response()->json([
+        'status' => 'error',
+        'message' => 'Không tìm thấy route !'
+    ], 404);
 })->name('page404');
