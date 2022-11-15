@@ -98,3 +98,9 @@ require __DIR__ . '/Post/post.php';
 
 // colors
 require __DIR__ . '/Colors/colors.php';
+
+// Promotion
+require __DIR__ . '/Promotion/promotion.php';
+
+// Coupon
+require __DIR__ . '/Coupon/coupon.php';

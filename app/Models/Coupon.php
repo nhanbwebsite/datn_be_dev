@@ -37,4 +37,8 @@ class Coupon extends Model
     public function promotion(){
         return $this->belongsTo(Promotion::class, 'promotion_id', 'id');
     }
+
+    public function used(){
+        return $this->hasMany(CouponOrder::class, 'coupon_id', 'id');
+    }
 }
