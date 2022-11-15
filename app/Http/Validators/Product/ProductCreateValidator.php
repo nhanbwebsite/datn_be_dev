@@ -43,6 +43,7 @@ class ProductCreateValidator extends ValidatorBase
             'brand_id.numeric' => ':attribute chưa đúng định dạng số !',
             'subcategory_id.required' => ':attribute không được để trống !',
             'subcategory_id.numeric' => ':attribute chưa đúng định dạng số !',
+            'product_variant_name.required' => ':attribute không không được để trống'
         ];
     }
 
@@ -59,6 +60,7 @@ class ProductCreateValidator extends ValidatorBase
             'brand_id' => 'Mã thương hiệu',
             'subcategory_id' => 'Mã danh mục',
             'is_active' => 'Trạng thái',
+            'product_variant_name' => 'Biến thể'
         ];
     }
 }
