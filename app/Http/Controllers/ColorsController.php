@@ -174,7 +174,7 @@ class ColorsController extends Controller
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Không tìm thấy màu !'
+                    'message' => 'Không tìm thấy màu !!'
                 ], 404);
             }
 
