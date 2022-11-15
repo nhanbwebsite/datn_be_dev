@@ -8,7 +8,6 @@ class CommentCreateValidator extends ValidatorBase{
     protected function rules(){
         return [
             'user_id' => 'numeric|exists:users,id',
-            // 'post_id' => 'required|numeric|exists:posts,id',
             'post_id' => 'required|numeric',
             'content' => 'required',
         ];
