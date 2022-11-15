@@ -11,7 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
+use App\Models\ProductVariantDetail;
+use App\Models\ProductVariant;
 class ProductController extends Controller
 {
     /**
@@ -84,6 +85,17 @@ class ProductController extends Controller
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
+
+            if(isset($request->variant_ids) && isset($color_ids) && isset($quantities) && isset($prices) ){
+                foreach($request->variant_ids as $key => $variant_id){
+                    ProductVariantDetail::create([
+                        'product_variant_id' => $variant_id,
+                        'color_id' => $color_ids[$key],
+                        'quantity' => $quantities[$key],
+                        'price' => $prices[$key]
+                    ]);
+                }
+            }
 
             DB::commit();
         } catch (HttpException $e) {

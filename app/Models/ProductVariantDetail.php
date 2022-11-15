@@ -5,14 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
-class ProductVariant extends Model
+class ProductVariantDetail extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $table = "ProductVariants";
+    protected $table = "ProductVariantDetails";
     protected $fillable = [
-        "variant_name",
-        'slug',
+        'product_variant_id',
+        'color_id',
+        'quantity',
+        'price',
         'is_active',
         'created_at',
         'updated_at',

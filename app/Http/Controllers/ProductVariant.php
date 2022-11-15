@@ -32,22 +32,24 @@ class ProductVariant extends Controller
      */
     public function store(Request $request)
     {
+
         $rules = [
-            'name' => 'required',
+            'variant_name' => 'required',
+
         ];
 
         $messages = [
-            'name.required' => ':attribute không được bỏ trống'
+            'variant_name.required' => ':attribute không được bỏ trống',
         ];
 
         $attributes = [
-            'name' => 'Tên biến thể'
+            'variant_name' => 'Tên biến thể',
         ];
 
         try {
             DB::beginTransaction();
-            $user = auth('sanctum')->use();
-            $validator = Validator::make($request->only('name'), $rules, $messages, $attributes);
+            $user = auth('sanctum')->user();
+            $validator = Validator::make($request->only('variant_name'), $rules, $messages, $attributes);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -56,8 +58,8 @@ class ProductVariant extends Controller
             }
 
           $create =   ProductVariantModel::create([
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
+                'variant_name' => $request->variant_name,
+                'slug' => Str::slug($request->variant_name),
                 'created_by' => $user->id
             ]);
             DB::commit();
@@ -119,17 +121,17 @@ class ProductVariant extends Controller
     {
         $user = auth('sanctum')->user();
         $rules = [
-            'name' => 'required',
+            'variant_name' => 'required',
         ];
 
         $messages = [
-            'name.required' => ':attribute không được để trống !'
+            'variant_name.required' => ':attribute không được để trống !'
         ];
 
         $attributes = [
-            'name' => 'Tên biến thể'
+            'variant_name' => 'Tên biến thể'
         ];
-        $validator = Validator::make($request->only('name'), $rules, $messages, $attributes);
+        $validator = Validator::make($request->only('variant_name'), $rules, $messages, $attributes);
         if($validator->fails()){
             return response()->json([
                 'status' => 'error',
@@ -139,8 +141,8 @@ class ProductVariant extends Controller
         try {
             DB::beginTransaction();
             $data = ProductVariantModel::find($id);
-            $data->name = $request->name;
-            $data->slug = Str::slug($request->name);
+            $data->variant_name = $request->variant_name;
+            $data->slug = Str::slug($request->variant_name);
             $data->is_active = $request->is_active;
             $data->updated_by = $user->id;
             $data->save();
@@ -192,7 +194,7 @@ class ProductVariant extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Đã xóa ['.$data->name.'] !',
+            'message' => 'Đã xóa ['.$data->variant_name.'] !',
         ]);
     }
 }
