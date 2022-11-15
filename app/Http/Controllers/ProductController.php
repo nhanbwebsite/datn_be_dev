@@ -64,6 +64,7 @@ class ProductController extends Controller
      */
     public function store(Request $request, ProductCreateValidator $validator)
     {
+        dd($request->all());
         $input= $request->all();
         $user = $request->user();
         $validator->validate($input);
