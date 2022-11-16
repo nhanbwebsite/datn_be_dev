@@ -68,11 +68,7 @@ class Cart extends Model
     public function paymentMethod(){
         return $this->belongsTo(PaymentMethod::class, 'payment_method_id', 'id');
     }
-    // public function coupon(){
-    //     return $this->hasOne(Product::class, 'id', 'address_note_id');
-    // }
-
-    // public function promotion(){
-    //     return $this->hasOne(Product::class, 'id', 'address_note_id');
-    // }
+    public function coupon(){
+        return $this->belongsTo(Product::class, 'coupon_id', 'id');
+    }
 }
