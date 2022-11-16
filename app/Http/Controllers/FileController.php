@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\FileCollection;
+use App\Http\Resources\FileResource;
 use App\Http\Validators\File\FileCreateValidator;
 use App\Http\Validators\File\FileUploadValidator;
 use App\Models\File;
@@ -21,7 +23,20 @@ class FileController extends Controller
      */
     public function index()
     {
-        //
+        try{
+            $data = File::whereNull('deleted_at')->orderBy('created_at')->paginate(20);
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new FileCollection($data));
     }
 
     /**
@@ -30,30 +45,24 @@ class FileController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, FileCreateValidator $validator, FileUploadValidator $uploadValidator)
+    public function store(Request $request, FileUploadValidator $uploadValidator)
     {
         $input = $request->all();
-        if($uploadValidator->validate($input)){
-            $input['slug'] = Str::slug($request->file('files')->getClientOriginalName());
-            $input['name'] = $request->file('files')->getClientOriginalName();
-            $input['extension'] = $request->file('files')->getClientOriginalExtension();
-        }
-        $validator->validate($input);
+        $uploadValidator->validate($input);
         $user = $request->user();
         try{
             DB::beginTransaction();
 
-            $create = File::create([
-                'slug' => Str::slug($input['file_name']),
-                'name' => $input['name'],
-                'extension' => $input['extension'],
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
-            ]);
-
-            if($create){
-                if(count($input['files']) == 1){
-                    dd($input['files']);
+            foreach($input as $file){
+                $upload = $this->uploadFile($file);
+                if(!empty($upload)){
+                    File::create([
+                        'slug' => Str::slug($upload['name']),
+                        'name' => $upload['name'],
+                        'extension' => $upload['extension'],
+                        'created_by' => $user->id,
+                        'updated_by' => $user->id,
+                    ]);
                 }
             }
 
@@ -84,7 +93,29 @@ class FileController extends Controller
      */
     public function show($id)
     {
-        //
+        try{
+            $data = File::find($id);
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Không tìm thấy file !'
+                ], 404);
+            }
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new FileResource($data),
+        ]);
     }
 
     /**
@@ -105,8 +136,73 @@ class FileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
-        //
+        $user = $request->user();
+        try{
+            DB::beginTransaction();
+
+            $data = File::find($id);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'File không tồn tại !'
+            ], 404);
+            $data->deleted_by = $user->id;
+            $data->save();
+            $data->delete();
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xóa ['.$data->name.'] !',
+        ]);
+    }
+
+    public function uploadFile($file){
+        try{
+            $fileOriginalName = $file->getClientOriginalName();
+            $fileOriginalExtension = $file->getClientOriginalExtension();
+            $allow_ext = ['jpg', 'png', 'gif', 'jpeg'];
+            if(!in_array($fileOriginalExtension, $allow_ext)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Chỉ hỗ trợ định dạng: !'.implode(",", $allow_ext),
+                ]);
+            }
+
+            $checkFileExists = File::where('name', $fileOriginalName)->first();
+            if(!empty($checkFileExists)){
+                $fileOriginalName = explode('.', $fileOriginalName)[0].'_'.time().'.'.$fileOriginalExtension;
+            }
+
+            if($file->move(public_path('images'), $fileOriginalName)){
+                $fileData['name'] = $fileOriginalName ?? null;
+                $fileData['extension'] = $fileOriginalExtension ?? null;
+            }
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+
+        return $fileData ?? null;
     }
 }
