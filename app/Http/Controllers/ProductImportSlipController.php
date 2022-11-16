@@ -62,8 +62,7 @@ class ProductImportSlipController extends Controller
     public function store(Request $request, ProductImportSlipCreateValidator $validator, ProductImportSlipDetailCreateValidator $validatorDetail)
     {
         $input = $request->all();
-        $validator->validate($input);
-
+        // $validator->validate($input);
         foreach($input['details'] as $key => $value){
             $validatorDetail->validate($value);
         }
@@ -78,23 +77,26 @@ class ProductImportSlipController extends Controller
                 'created_by'=> $request->user()->id,
                 'updated_by' => $request->user()->id,
             ]);
-
             $details = $input['details'];
-
+//  chi tiết phiếu nhập
             foreach($details as $key => $detail) {
                 ProductImportSlipDetail::create([
                     'product_import_slip_id' => $ProductImportSlip->id,
                     'product_id' => $detail['product_id'],
+                    'variant_id' => $detail['variant_id'],
+                    'color_id' => $detail['color_id'],
                     'quantity_import' => $detail['quantity_import'],
                     'price_import' => $detail['price_import'],
                     'created_by' => $request->user()->id,
                     'updated_by' => $request->user()->id,
                 ]);
 
-                $check = productAmountByWarehouse::where('product_id', $detail['product_id'])->where('warehouse_id', $request->warehouse_id)->first();
+                $check = productAmountByWarehouse::where('product_id', $detail['product_id'])
+                ->where('color_id', $detail['color_id'])
+                ->where('variant_id', $detail['variant_id'])
+                ->where('warehouse_id', $request->warehouse_id)->first();
 
                 if(!empty($check)){
-
                     $check->product_amount += $detail['quantity_import'];
                     $check->updated_by = $request->user()->id;
                     $check->save();
@@ -102,6 +104,8 @@ class ProductImportSlipController extends Controller
                 else{
                     productAmountByWarehouse::create([
                         'product_id' => $detail['product_id'],
+                        'color_id' => $detail['color_id'],
+                        'variant_id' => $detail['variant_id'],
                         'product_amount' => $detail['quantity_import'],
                         'warehouse_id' => $request->warehouse_id,
                         'created_by' => $request->user()->id,
@@ -109,7 +113,6 @@ class ProductImportSlipController extends Controller
                     ]);
                 }
             }
-
             DB::commit();
         } catch(HttpException $e) {
             DB::rollBack();
@@ -174,18 +177,18 @@ class ProductImportSlipController extends Controller
         $rules = [
             'name' => 'required|min:6|max:255',
             'product_id' => 'required',
-            'store_id' => 'required',
+            'warehouse_id' => 'required',
             'product_amount' => 'required'
         ];
         $messages = [
             'name.required' => ':attribute không được để trống !',
-            'store_id.required' => ':attribute không được để trống !',
+            'warehouse_id.required' => ':attribute không được để trống !',
             'product_id.required' => ':attribute không được để trống !',
             'product_amount.required' => ':attribute không được để trống'
         ];
         $attributes = [
             'name' => 'Tên sản phẩm',
-            'store_id' => 'Kho sản phẩm',
+            'warehouse_id' => 'Kho sản phẩm',
             'product_id' => 'Tên Sản phẩm',
             'product_amount' => 'Số lượng sản phẩm'
         ];
@@ -193,7 +196,7 @@ class ProductImportSlipController extends Controller
         try {
             DB::beginTransaction();
 
-            $validator = Validator::make($request->only(['name','store_id','product_id','product_amount']), $rules, $messages, $attributes);
+            $validator = Validator::make($request->only(['name','warehouse_id','product_id','product_amount']), $rules, $messages, $attributes);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -206,7 +209,7 @@ class ProductImportSlipController extends Controller
                 'name' =>$request->name,
                 'slug'=> Str::slug($request->name),
                 'product_id' => $request->product_id,
-                'store_id'=> $request->store_id,
+                'warehouse_id'=> $request->warehouse_id,
                 'product_amount'=> $request->product_amount,
                 'import_price' => $request->import_price,
                 'update_by' => auth('sanctum')->user()->id,

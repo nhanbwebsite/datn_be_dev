@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Color;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
-class ColorsController extends Controller
+use App\Models\ProductVariant as ProductVariantModel;
+class ProductVariant extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,10 +16,11 @@ class ColorsController extends Controller
      */
     public function index()
     {
-        $data = Color::all();
+        // không phân trang
+        $data = ProductVariantModel::all();
         return response()->json([
             'status' => 'success',
-            'data'  => $data,
+            'data' => $data
         ],200);
     }
 
@@ -32,22 +32,24 @@ class ColorsController extends Controller
      */
     public function store(Request $request)
     {
-        $user = auth('sanctum')->user();
+
         $rules = [
-            'name' => 'required',
+            'variant_name' => 'required',
+
         ];
 
         $messages = [
-            'name.required' => 'Tên màu không được để trống'
+            'variant_name.required' => ':attribute không được bỏ trống',
         ];
 
         $attributes = [
-            'name' => 'Tên màu'
+            'variant_name' => 'Tên biến thể',
         ];
 
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->only('name'), $rules, $messages, $attributes);
+            $user = auth('sanctum')->user();
+            $validator = Validator::make($request->only('variant_name'), $rules, $messages, $attributes);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -55,13 +57,11 @@ class ColorsController extends Controller
                 ], 422);
             }
 
-          $create =   Color::create([
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
+          $create =   ProductVariantModel::create([
+                'variant_name' => $request->variant_name,
+                'slug' => Str::slug($request->variant_name),
                 'created_by' => $user->id
             ]);
-
-
             DB::commit();
         } catch(HttpException $e) {
             DB::rollBack();
@@ -86,11 +86,11 @@ class ColorsController extends Controller
     public function show($id)
     {
         try{
-            $data = Color::find($id);
+            $data = ProductVariantModel::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Màu không tồn tại !',
+                    'message' => 'Biến thể không tồn tại !',
                 ], 404);
             }
         }
@@ -121,17 +121,17 @@ class ColorsController extends Controller
     {
         $user = auth('sanctum')->user();
         $rules = [
-            'name' => 'required',
+            'variant_name' => 'required',
         ];
 
         $messages = [
-            'name.required' => 'Tên màu không được để trống'
+            'variant_name.required' => ':attribute không được để trống !'
         ];
 
         $attributes = [
-            'name' => 'Tên màu'
+            'variant_name' => 'Tên biến thể'
         ];
-        $validator = Validator::make($request->only('name'), $rules, $messages, $attributes);
+        $validator = Validator::make($request->only('variant_name'), $rules, $messages, $attributes);
         if($validator->fails()){
             return response()->json([
                 'status' => 'error',
@@ -140,9 +140,9 @@ class ColorsController extends Controller
         }
         try {
             DB::beginTransaction();
-            $data = Color::find($id);
-            $data->name = $request->name;
-            $data->slug = Str::slug($request->name);
+            $data = ProductVariantModel::find($id);
+            $data->variant_name = $request->variant_name;
+            $data->slug = Str::slug($request->variant_name);
             $data->is_active = $request->is_active;
             $data->updated_by = $user->id;
             $data->save();
@@ -155,7 +155,6 @@ class ColorsController extends Controller
                 'line' => $e->getLine(),
             ],$e->getStatusCode()); //
         }
-
     }
 
     /**
@@ -164,17 +163,17 @@ class ColorsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id, Request $request)
+    public function destroy($id)
     {
         $user = auth('sanctum')->user();
         try {
             DB::beginTransaction();
-            $data = Color::find($id);
+            $data = ProductVariantModel::find($id);
 
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Không tìm thấy màu !!'
+                    'message' => 'Không tìm thấy biến thể !'
                 ], 404);
             }
 
@@ -195,7 +194,7 @@ class ColorsController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Đã xóa ['.$data->name.'] !',
+            'message' => 'Đã xóa ['.$data->variant_name.'] !',
         ]);
     }
 }
