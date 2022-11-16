@@ -13,6 +13,8 @@ class ProductImportSlipDetail extends Model
     protected $fillable = [
         'product_import_slip_id',
         'product_id',
+        'variant_id',
+        'color_id',
         'quantity_import',
         'price_import',
         'created_at',

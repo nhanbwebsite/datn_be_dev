@@ -64,7 +64,7 @@ class ProductController extends Controller
      */
     public function store(Request $request, ProductCreateValidator $validator)
     {
-        dd($request->all());
+
         $input= $request->all();
         $user = $request->user();
         $validator->validate($input);
@@ -72,7 +72,7 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $create = Product::create([
-                'code' => strtoupper($input['code']),
+                'code' => 'SP'.date('YmdHis', time()),
                 'meta_title'=>$input['meta_title'],
                 'meta_keywords'=>$input['meta_keywords'],
                 'meta_keywords'=>$input['meta_keywords'],
@@ -81,8 +81,8 @@ class ProductController extends Controller
                 'slug' => !empty($input['slug']) ? Str::slug($input['slug']) : Str::slug($input['name']),
                 'description' => $input['description'] ?? null,
                 'url_image' => $input['url_image'],
-                'price' => $input['price'],
-                'discount' => $input['discount'],
+                // 'price' => $input['price'],
+                // 'discount' => $input['discount'],
                 'specification_infomation' => $input['specification_infomation'] ?? null,
                 'brand_id' => $input['brand_id'],
                 'subcategory_id' => $input['subcategory_id'],
@@ -90,15 +90,15 @@ class ProductController extends Controller
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
-           $productInfo = Product::where('code',$create['code'])->first();
+        //    $productInfo = Product::where('code',$create['code'])->first();
             if(isset($request->variant_ids) && isset($request->color_ids) && isset($request->quantities) && isset($request->prices) ){
-
                 foreach($request->variant_ids as $key => $variant_id){
                     ProductVariantDetail::create([
-                        'product_variant_id' => $variant_id,
+                        'variant_id' => $variant_id,
                         'color_id' => $request->color_ids[$key],
-                        'product_id' => $productInfo->id,
-                        'quantity' => $request->quantities[$key],
+                        'product_id' => $create->id,
+                        // 'quantity' => $request->quantities[$key],
+
                         'price' => $request->prices[$key]
                     ]);
                 }
@@ -188,8 +188,8 @@ class ProductController extends Controller
             $product->subcategory_id = $request->subcategory_id ?? $product->subcategory_id;
             $product->specification_infomation = $request->specification_infomation ?? $product->specification_infomation;
             $product->brand_id = $request->brand_id ?? $product->brand_id;
-            $product->price = $request->price ?? $product->price;
-            $product->discount = $request->discount ?? $product->discount;
+            // $product->price = $request->price ?? $product->price;
+            // $product->discount = $request->discount ?? $product->discount;
             $product->is_active = $request->is_active ?? $product->is_active;
             $product->updated_by = $user->id;
             $product->save();
