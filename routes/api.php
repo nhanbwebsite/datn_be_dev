@@ -104,3 +104,6 @@ require __DIR__ . '/Promotion/promotion.php';
 
 // Coupon
 require __DIR__ . '/Coupon/coupon.php';
+
+// File
+require __DIR__ . '/File/file.php';
