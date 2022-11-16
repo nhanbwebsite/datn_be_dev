@@ -73,6 +73,10 @@ class ProductController extends Controller
 
             $create = Product::create([
                 'code' => strtoupper($input['code']),
+                'meta_title'=>$input['meta_title'],
+                'meta_keywords'=>$input['meta_keywords'],
+                'meta_keywords'=>$input['meta_keywords'],
+                'meta_description'=>$input['meta_description'],
                 'name' => $input['name'],
                 'slug' => !empty($input['slug']) ? Str::slug($input['slug']) : Str::slug($input['name']),
                 'description' => $input['description'] ?? null,
@@ -86,14 +90,16 @@ class ProductController extends Controller
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
+           $productInfo = Product::where('code',$create['code'])->first();
+            if(isset($request->variant_ids) && isset($request->color_ids) && isset($request->quantities) && isset($request->prices) ){
 
-            if(isset($request->variant_ids) && isset($color_ids) && isset($quantities) && isset($prices) ){
                 foreach($request->variant_ids as $key => $variant_id){
                     ProductVariantDetail::create([
                         'product_variant_id' => $variant_id,
-                        'color_id' => $color_ids[$key],
-                        'quantity' => $quantities[$key],
-                        'price' => $prices[$key]
+                        'color_id' => $request->color_ids[$key],
+                        'product_id' => $productInfo->id,
+                        'quantity' => $request->quantities[$key],
+                        'price' => $request->prices[$key]
                     ]);
                 }
             }
