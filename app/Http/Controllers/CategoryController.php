@@ -8,6 +8,7 @@ use App\Models\Category;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\SubCategory;
 class CategoryController extends Controller
 {
     /**
@@ -20,9 +21,21 @@ class CategoryController extends Controller
         try{
             //  không phân trang vì trả ra clinets
             $dataCategories = Category::all();
-            return response()->json([
-                'data' => $dataCategories
-            ],200);
+            // $dataSub = SubCategory::AllSubByCate(1);
+            $dataReturn = [];
+       foreach($dataCategories as $key => $value){
+                array_push($dataReturn,[
+                    "Categogy" =>  $value,
+                    "SubcatByCateId-" =>  subCategory::AllSubByCate($value->id)
+                ]);
+       }
+       return response()->json([
+        'data' => $dataReturn
+       ]);
+
+            // return response()->json([
+            //     'data' => $dataCategories
+            // ],200);
         } catch(Exception $e){
             return response()->json([
                'status' => 'Error',

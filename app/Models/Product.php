@@ -65,4 +65,12 @@ class Product extends Model
         ;
         // return $this->belongsToMany(ProductVariantDetail::class, 'productVariant', 'product_id', 'variant_id');
     }
+
+    public static function productsBySubCate($id){
+        $proBySub = DB::table(('products'))
+        ->join('sub_categories', 'products.subcategory_id', '=', 'sub_categories.id')
+        ->where('sub_categories.id',$id)
+        ->get();
+        return $proBySub;
+    }
 }

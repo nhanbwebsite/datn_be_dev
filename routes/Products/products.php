@@ -13,3 +13,4 @@ Route::prefix('products')->middleware('auth:sanctum')->group(function (){
 
 
 Route::get('findProductByStore',[ProductController::class,'productByStore']);
+Route::get('productsBySubcate/{subId}',[ProductController::class,'producstBySubcategoryId']);
