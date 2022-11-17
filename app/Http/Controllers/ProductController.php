@@ -30,10 +30,12 @@ class ProductController extends Controller
        foreach($dataProducts as $key => $value){
                 array_push($dataReturn,[
                     "product" =>  $value,
-                    "variantsByProduct-". $value->id  =>  Product::productVariants($value->id)
+                    "variantsByProduct" =>  Product::productVariants($value->id)
                 ]);
        }
-       return $dataReturn;
+       return response()->json([
+        'data' => $dataReturn
+       ]);
         // $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
 
         // try {
@@ -319,6 +321,14 @@ class ProductController extends Controller
         return response()->json([
             'data' => $data
         ],200);
+    }
+    //  product by subcategory id
+
+    public function producstBySubcategoryId($SubId) {
+        $data = Product:: productsBySubCate($SubId);
+        return response()->json([
+            "data" => $data
+        ]);
     }
 
 }
