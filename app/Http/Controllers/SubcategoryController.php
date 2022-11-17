@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-// use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 class SubcategoryController extends Controller
 {
     /**
@@ -71,16 +71,11 @@ class SubcategoryController extends Controller
                 ],400);
             }
 
-            $create = Category::create([
+            $create = SubCategory::create([
                 'category_id' => $request->category_id,
                 'name' => $request->name,
                 'slug' => Str::slug($request->name)
             ]);
-
-            return response()-> json([
-                'status' => 'error',
-                'message' => 'Categories created ' . $create->name
-            ],200);
 
             DB::commit();
         } catch(Exception $e) {
@@ -92,7 +87,10 @@ class SubcategoryController extends Controller
             ],400);
 
         }
-
+        return response()-> json([
+            'status' => 'error',
+            'message' => 'Subcategory created ' . $create->name
+        ],200);
     }
 
     /**

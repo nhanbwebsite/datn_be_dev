@@ -24,6 +24,17 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $input = $request->all();
+       $dataProducts = Product::all();
+
+       $dataReturn = [];
+       foreach($dataProducts as $key => $value){
+
+                array_push($dataReturn,[
+                    "product" =>  $value,
+                    "variantsByProduct-". $value->id  =>  Product::productVariants($value->id)
+                ]);
+       }
+       return $dataReturn;
         $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
 
         try {
