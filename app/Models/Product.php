@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 // use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 class Product extends Model
 {
@@ -50,5 +51,18 @@ class Product extends Model
 
     public function subcategory(){
         return $this->belongsTo(SubCategory::class, 'subcategory_id', 'id');
+    }
+
+    public static function productVariants($id){
+        // return $this->hasMany(ProductVariantDetail::class, 'product_id', 'id');
+        $variantByProducts = DB::table(('productVariant'))
+        ->join('products', 'productVariant.product_id', '=', 'products.id')
+        ->join('variants', 'productVariant.variant_id', '=', 'variants.id')
+        ->where('products.id',$id)
+        ->get();
+        return $variantByProducts;
+
+        ;
+        // return $this->belongsToMany(ProductVariantDetail::class, 'productVariant', 'product_id', 'variant_id');
     }
 }
