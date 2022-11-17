@@ -24,37 +24,47 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $input = $request->all();
-        $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
+       $dataProducts = Product::all();
 
-        try {
-            $data = Product::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input) {
-                if(!empty($input['code'])){
-                    $query->where('code', $input['code']);
-                }
-                if(!empty($input['brand_id'])){
-                    $query->where('brand_id', $input['brand_id']);
-                }
-                if(!empty($input['subcategory_id'])){
-                    $query->where('subcategory_id', $input['subcategory_id']);
-                }
-                if(!empty($input['name'])){
-                    $query->where('name', 'like', '%'.$input['name'].'%');
-                }
-                if(!empty($input['slug'])){
-                    $query->where('slug', 'like', '%'.$input['slug'].'%');
-                }
-            })->orderBy('created_at', 'desc')->paginate($input['limit']);
-        } catch(HttpException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
-        }
-        return response()->json(new ProductCollection($data));
+       $dataReturn = [];
+       foreach($dataProducts as $key => $value){
+                array_push($dataReturn,[
+                    "product" =>  $value,
+                    "variantsByProduct-". $value->id  =>  Product::productVariants($value->id)
+                ]);
+       }
+       return $dataReturn;
+        // $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
+
+        // try {
+        //     $data = Product::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input) {
+        //         if(!empty($input['code'])){
+        //             $query->where('code', $input['code']);
+        //         }
+        //         if(!empty($input['brand_id'])){
+        //             $query->where('brand_id', $input['brand_id']);
+        //         }
+        //         if(!empty($input['subcategory_id'])){
+        //             $query->where('subcategory_id', $input['subcategory_id']);
+        //         }
+        //         if(!empty($input['name'])){
+        //             $query->where('name', 'like', '%'.$input['name'].'%');
+        //         }
+        //         if(!empty($input['slug'])){
+        //             $query->where('slug', 'like', '%'.$input['slug'].'%');
+        //         }
+        //     })->orderBy('created_at', 'desc')->paginate($input['limit']);
+        // } catch(HttpException $e) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => [
+        //             'error' => $e->getMessage(),
+        //             'file' => $e->getFile(),
+        //             'line' => $e->getLine(),
+        //         ],
+        //     ], $e->getStatusCode());
+        // }
+        // return response()->json(new ProductCollection($data));
     }
 
     /**

@@ -18,7 +18,8 @@ class CategoryController extends Controller
     public function index()
     {
         try{
-            $dataCategories = Category::paginate(9);
+            //  không phân trang vì trả ra clinets
+            $dataCategories = Category::all();
             return response()->json([
                 'data' => $dataCategories
             ],200);
