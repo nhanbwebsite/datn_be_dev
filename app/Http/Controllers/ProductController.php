@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\VariantResource;
 use App\Http\Validators\Product\ProductCreateValidator;
 use App\Http\Validators\Product\ProductUpdateValidator;
 use App\Models\Product;
@@ -132,8 +133,10 @@ class ProductController extends Controller
     public function show($id)
     {
         try{
-            $data = Product::find($id);
-            if(empty($data)){
+            $dataByproduct = Product::find($id);
+            $dataVariants = Product::productVariants($id);
+
+            if(empty($dataByproduct)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Không tìm thấy sản phẩm !',
@@ -151,7 +154,8 @@ class ProductController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data' => new ProductResource($data),
+            'data' => new ProductResource($dataByproduct),
+            'variants' => $dataVariants
         ]);
     }
 
