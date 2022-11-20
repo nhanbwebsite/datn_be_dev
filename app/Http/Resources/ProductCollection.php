@@ -39,6 +39,7 @@ class ProductCollection extends ResourceCollection
                     'subcategory_name' => $value->subcategory->name,
                     'category' => $value->subcategory->category_id,
                     'category_name' => $value->subcategory->category->name,
+                    // 'variantsByProduct' => $value->variantsByProduct,
                     'is_active'     => $value->is_active,
                     'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),

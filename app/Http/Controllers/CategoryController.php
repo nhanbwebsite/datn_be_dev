@@ -24,9 +24,9 @@ class CategoryController extends Controller
             // $dataSub = SubCategory::AllSubByCate(1);
             $dataReturn = [];
        foreach($dataCategories as $key => $value){
+        $value->SubcategoriesByCategory = subCategory::AllSubByCate($value->id);
                 array_push($dataReturn,[
-                    "Categogy" =>  $value,
-                    "SubcatByCateId-" =>  subCategory::AllSubByCate($value->id)
+                    "Category" =>  $value,
                 ]);
        }
        return response()->json([

@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Models\ProductVariantDetail;
 use App\Models\ProductVariant;
+
 class ProductController extends Controller
 {
     /**
@@ -28,9 +29,10 @@ class ProductController extends Controller
 
        $dataReturn = [];
        foreach($dataProducts as $key => $value){
+                $value->variantsByProduct = Product::productVariants($value->id);
                 array_push($dataReturn,[
                     "product" =>  $value,
-                    "variantsByProduct" =>  Product::productVariants($value->id)
+
                 ]);
        }
        return response()->json([
@@ -164,10 +166,10 @@ class ProductController extends Controller
                 ],
             ], $e->getStatusCode());
         }
+        $dataByproduct->variants = $dataVariants;
         return response()->json([
             'status' => 'success',
             'data' => new ProductResource($dataByproduct),
-            'variants' => $dataVariants
         ]);
     }
 
@@ -273,6 +275,7 @@ class ProductController extends Controller
     }
 
 // tìm sản phẩm còn hàng
+//  nối nhiều bảng dùng Query Builder cho đỡ rối ^^
     public function productByStore(Request $request){
         // dd($request->all());
         //  sản phẩm theo địa chỉ tỉnh thành và quận huyện của cửa hàng
