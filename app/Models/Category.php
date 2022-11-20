@@ -23,7 +23,7 @@ class Category extends Model
         "deleted_at" ,
     ];
 
-    public function subcategory(){
+    public function subs(){
         return $this->hasMany(SubCategory::class, 'category_id', 'id');
     }
 }
