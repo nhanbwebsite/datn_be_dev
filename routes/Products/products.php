@@ -10,7 +10,7 @@ Route::prefix('products')->middleware('auth:sanctum')->group(function (){
     Route::put('/{id}',[ProductController::class,'update']);
     Route::delete('/{id}',[ProductController::class,'destroy']);
 });
-// public
+// public route products
 
 Route::get('/',[ProductController::class,'index']);
 
