@@ -10,4 +10,6 @@ Route::controller(ShippingMethodController::class)->middleware('auth:sanctum')->
     Route::delete('/{id}', 'destroy')->middleware('checkAction:all,delete-shipping-method');
 });
 
+Route::get('/client/shipping-methods', [ShippingMethodController::class, 'getClientShippingMethods']);
+
 ?>
