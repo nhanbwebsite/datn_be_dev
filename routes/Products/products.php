@@ -12,7 +12,7 @@ Route::prefix('products')->middleware('auth:sanctum')->group(function (){
 });
 // public route products
 
-Route::get('/',[ProductController::class,'index']);
+Route::get('/client/products',[ProductController::class,'index']);
 
 Route::get('findProductByStore',[ProductController::class,'productByStore']);
 Route::get('productsBySubcate/{subId}',[ProductController::class,'producstBySubcategoryId']);
