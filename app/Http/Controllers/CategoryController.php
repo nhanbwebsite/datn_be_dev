@@ -227,7 +227,7 @@ class CategoryController extends Controller
 
     public function getClientCategory(){
         try{
-            $data = Category::where('is_active', 1)->orderBy('created_at', 'desc')->get();
+            $data = Category::where('is_active', 1)->get();
         } catch(Exception $e){
             return response()->json([
                 'status' => 'error',

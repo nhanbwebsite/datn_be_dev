@@ -15,6 +15,7 @@ class ProductVariantDetail extends Model
         'product_id',
         'quantity',
         'price',
+        'discount',
         'is_active',
         'created_at',
         'updated_at',

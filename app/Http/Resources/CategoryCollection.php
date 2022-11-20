@@ -20,6 +20,7 @@ class CategoryCollection extends ResourceCollection
             foreach($this->collection as $value){
                 foreach($value->subs as $key => $item){
                     $subcategoryData[$key]['id'] = $item->id;
+                    $subcategoryData[$key]['category_id'] = $value->id;
                     $subcategoryData[$key]['name'] = $item->name;
                     $subcategoryData[$key]['slug'] = $item->slug;
                     $subcategoryData[$key]['url_img'] = $item->url_img ?? null;

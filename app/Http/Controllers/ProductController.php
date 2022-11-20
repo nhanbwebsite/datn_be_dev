@@ -85,7 +85,6 @@ class ProductController extends Controller
         $validator->validate($input);
         try {
             DB::beginTransaction();
-
             $create = Product::create([
                 'code' => 'SP'.date('YmdHis', time()),
                 'meta_title'=>$input['meta_title'],
@@ -114,7 +113,8 @@ class ProductController extends Controller
                         'product_id' => $create->id,
                         // 'quantity' => $request->quantities[$key],
 
-                        'price' => $request->prices[$key]
+                        'price' => $request->prices[$key],
+                        'discount' => $request->discounts[$key]
                     ]);
                 }
             }
