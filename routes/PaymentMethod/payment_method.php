@@ -10,4 +10,6 @@ Route::controller(PaymentMethodController::class)->middleware(['auth:sanctum'])-
     Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-payment-method']);
 });
 
+Route::get('/client/payment-methods', [PaymentMethodController::class, 'getClientPaymentMethods']);
+
 ?>

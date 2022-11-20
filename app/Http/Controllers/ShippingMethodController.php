@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ShippingMethodClientCollection;
 use App\Http\Resources\ShippingMethodCollection;
 use App\Http\Resources\ShippingMethodResource;
 use App\Http\Validators\ShippingMethod\ShippingMethodCreateValidator;
@@ -204,5 +205,23 @@ class ShippingMethodController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa hình thức vận chuyển ['.$delete->name.'] !',
         ]);
+    }
+
+    public function getClientShippingMethods()
+    {
+        try{
+            $data = ShippingMethod::where('is_active', 1)->orderBy('created_at', 'desc')->get();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new ShippingMethodClientCollection($data));
     }
 }

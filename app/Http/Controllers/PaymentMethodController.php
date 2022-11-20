@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PaymentMethodClientCollection;
 use App\Http\Resources\PaymentMethodCollection;
 use App\Http\Resources\PaymentMethodResource;
 use App\Http\Validators\PaymentMethod\PaymentMethodUpsertValidator;
@@ -206,5 +207,22 @@ class PaymentMethodController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa ['.$data->name.']',
         ]);
+    }
+
+    public function getClientPaymentMethods(){
+        try{
+            $data = PaymentMethod::where('is_active', 1)->orderBy('created_at', 'desc')->get();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new PaymentMethodClientCollection($data));
     }
 }
