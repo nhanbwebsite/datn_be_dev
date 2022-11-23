@@ -30,7 +30,7 @@ class AuthController extends Controller
         try{
             DB::beginTransaction();
             $remmemberMe = false;
-            if(!empty($input['remember'])){
+            if(!empty($input['remember']) && $input['remember'] == 1){
                 $remmemberMe = true;
             }
             $data = $request->only(['phone', 'password']);
