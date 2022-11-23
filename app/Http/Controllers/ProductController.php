@@ -41,6 +41,7 @@ class ProductController extends Controller
 
         return response()->json([
             "data" => $dataProducts
+
         ]);
 
         // $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
