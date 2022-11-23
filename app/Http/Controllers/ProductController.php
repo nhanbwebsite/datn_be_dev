@@ -29,7 +29,7 @@ class ProductController extends Controller
 
        $dataReturn = [];
        foreach($dataProducts as $key => $value){
-                $value->variantsByProduct = Product::variantProductByProId($value->id);
+                $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
                 array_push($dataReturn,[
                     "product" =>  $value,
 
