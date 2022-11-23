@@ -31,7 +31,7 @@ class ProductController extends Controller
        foreach($dataProducts as $key => $value){
 
                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
-=======
+
                 $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
 
                 $value->variants = Product::productVariants($value->id);
