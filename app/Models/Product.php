@@ -55,7 +55,7 @@ class Product extends Model
 
     public static function productVariants($id){
         // return $this->hasMany(ProductVariantDetail::class, 'product_id', 'id');
-        $variantByProducts = DB::table(('productVariant'))
+        $variantByProducts = DB::table(('productVariant'))->select('variants.id','variants.variant_name')
         ->join('products', 'productVariant.product_id', '=', 'products.id')
         ->join('variants', 'productVariant.variant_id', '=', 'variants.id')
         ->where('products.id',$id)
@@ -72,5 +72,25 @@ class Product extends Model
         ->where('sub_categories.id',$id)
         ->get();
         return $proBySub;
+    }
+
+    public static function variantDetailsProductByProId($id){
+        $data = DB::table('products')->select('products.id as product_id','productVariantDetails.color_id','productVariantDetails.price','productVariantDetails.discount','colors.name as color_name','variants.variant_name','productVariant.variant_id')
+        ->join('productVariant','products.id', 'productVariant.product_id')
+        ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
+        ->join('variants','productVariant.variant_id','variants.id')
+        ->join('colors','productVariantDetails.color_id','colors.id')
+        ->where('products.id',$id)->get();
+        return $data;
+    }
+
+    public static function variantProducAll(){
+        $data = DB::table('products')->select('products.id as','productVariantDetails.color_id','productVariantDetails.price','productVariantDetails.discount','colors.name as color_name','variants.variant_name','productVariant.variant_id')
+        ->join('productVariant','products.id', 'productVariant.product_id')
+        ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
+        ->join('variants','productVariant.variant_id','variants.id')
+        ->join('colors','productVariantDetails.color_id','colors.id')
+        ->get();
+        return $data;
     }
 }

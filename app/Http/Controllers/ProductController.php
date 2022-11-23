@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Models\ProductVariantDetail;
 use App\Models\ProductVariant;
-
+use App\Models\ProductVariantDetailById;
 class ProductController extends Controller
 {
     /**
@@ -24,20 +24,25 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $input = $request->all();
+        // $input = $request->all();
        $dataProducts = Product::all();
 
        $dataReturn = [];
        foreach($dataProducts as $key => $value){
-                $value->variantsByProduct = Product::productVariants($value->id);
+                $value->variantsByProduct = Product::variantProductByProId($value->id);
                 array_push($dataReturn,[
                     "product" =>  $value,
 
                 ]);
        }
-       return response()->json([
-        'data' => $dataReturn
-       ]);
+    //    return response()->json([
+    //     'data' => $dataReturn
+    //    ]);
+
+        return response()->json([
+            "data" => $dataProducts
+        ]);
+
         // $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
 
         // try {
@@ -105,17 +110,20 @@ class ProductController extends Controller
                 'updated_by' => $user->id,
             ]);
         //    $productInfo = Product::where('code',$create['code'])->first();
-            if(isset($request->variant_ids) && isset($request->color_ids) && isset($request->quantities) && isset($request->prices) ){
+            if(isset($request->variant_ids)){
                 foreach($request->variant_ids as $key => $variant_id){
-                    ProductVariantDetail::create([
+                   $proVariant = ProductVariantDetail::create([
                         'variant_id' => $variant_id,
-                        'color_id' => $request->color_ids[$key],
                         'product_id' => $create->id,
-                        // 'quantity' => $request->quantities[$key],
-
-                        'price' => $request->prices[$key],
-                        'discount' => $request->discounts[$key]
                     ]);
+                    foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
+                        ProductVariantDetailById::create([
+                            "pro_variant_id" => $proVariant->id,
+                            "color_id" => $valueColor,
+                            "price" => $request->prices_by_variant_id[$key][$keyColors],
+                            "discounts" => $request->discount_by_variant_id[$key][$keyColors],
+                        ]);
+                    }
                 }
             }
 
@@ -131,6 +139,7 @@ class ProductController extends Controller
                 ],
             ], $e->getStatusCode());
         }
+
 
         return response()->json([
             'status' => 'success',
@@ -148,8 +157,15 @@ class ProductController extends Controller
     {
         try{
             $dataByproduct = Product::find($id);
-            $dataVariants = Product::productVariants($id);
+            // $dataVariants = Product::productVariants($id);
 
+
+            $dataTest = Product::variantDetailsProductByProId($id);
+            // $dataByproduct->variantsssssss = Product::productVariants($id);
+            $dataByproduct->variants = Product::productVariants($id);
+
+            $dataByproduct->dataVariants = $dataTest;
+            // array_push($dataVariants,$dataTest);
             if(empty($dataByproduct)){
                 return response()->json([
                     'status' => 'error',
@@ -166,10 +182,11 @@ class ProductController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        $dataByproduct->variants = $dataVariants;
+
         return response()->json([
             'status' => 'success',
             'data' => new ProductResource($dataByproduct),
+
         ]);
     }
 
