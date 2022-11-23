@@ -11,7 +11,7 @@ Route::prefix('products')->middleware('auth:sanctum')->group(function (){
     Route::delete('/{id}',[ProductController::class,'destroy']);
 });
 // public route products
-
+Route::get('/client/products/{id}',[ProductController::class,'show']);
 Route::get('/client/products',[ProductController::class,'index']);
 
 Route::get('findProductByStore',[ProductController::class,'productByStore']);
