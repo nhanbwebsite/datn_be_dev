@@ -33,7 +33,6 @@ class ProductController extends Controller
                 $value->variants = Product::productVariants($value->id);
                 array_push($dataReturn,[
                     "product" =>  $value,
-
                 ]);
        }
     //    return response()->json([
