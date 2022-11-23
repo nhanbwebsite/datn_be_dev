@@ -32,7 +32,7 @@ class ProductController extends Controller
 
                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
 
-                $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
+                // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
 
                 $value->variants = Product::productVariants($value->id);
                 array_push($dataReturn,[
