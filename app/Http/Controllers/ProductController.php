@@ -29,11 +29,10 @@ class ProductController extends Controller
 
        $dataReturn = [];
        foreach($dataProducts as $key => $value){
-                $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
+                $value->variantDetailsByProduct = Product::variantDetailsProductByProId($value->id);
                 $value->variants = Product::productVariants($value->id);
                 array_push($dataReturn,[
                     "product" =>  $value,
-
                 ]);
        }
     //    return response()->json([
@@ -42,6 +41,7 @@ class ProductController extends Controller
 
         return response()->json([
             "data" => $dataProducts
+
         ]);
 
         // $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
