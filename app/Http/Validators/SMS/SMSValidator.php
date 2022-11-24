@@ -9,7 +9,7 @@ class SMSValidator extends ValidatorBase
     protected function rules(){
         return [
             'phone' => 'required|string',
-            'message' => 'required|string',
+            // 'message' => 'required|string',
         ];
     }
 
@@ -17,15 +17,15 @@ class SMSValidator extends ValidatorBase
         return [
             'phone.required' => ':attribute không được để trống !',
             'phone.string' => ':attribute phải là chuỗi !',
-            'message.required' => ':attribute không được để trống !',
-            'message.string' => ':attribute phải là chuỗi !',
+            // 'message.required' => ':attribute không được để trống !',
+            // 'message.string' => ':attribute phải là chuỗi !',
         ];
     }
 
     protected function attributes(){
         return [
             'phone' => 'Số điện thoại',
-            'message' => 'Nội dung tin nhắn',
+            // 'message' => 'Nội dung tin nhắn',
         ];
     }
 }
