@@ -87,6 +87,7 @@ class OrderController extends Controller
         $user = $request->user();
         try{
             DB::beginTransaction();
+
             $create = Order::create([
                 'code' => 'DH'.date('dmYHis', time()),
                 'user_id' => $user->id,
@@ -99,7 +100,6 @@ class OrderController extends Controller
                 'total' => $input['total'],
                 'discount' => $input['discount'] ?? 0,
                 'coupon_id' => $input['coupon_id'] ?? null,
-                'promotion_id' => $input['promotion_id'] ?? null,
                 'fee_ship' => $input['fee_ship'] ?? 0,
                 'payment_method_id' => $input['payment_method_id'],
                 'shipping_method_id' => $input['shipping_method_id'],
@@ -117,6 +117,13 @@ class OrderController extends Controller
                     'updated_by' => $user->id,
                 ]);
             }
+
+            CouponOrder::create([
+                'coupon_id' => $input['coupon_id'],
+                'order_id' => $create->id,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+            ]);
 
             DB::commit();
         }

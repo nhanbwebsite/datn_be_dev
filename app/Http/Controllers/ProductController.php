@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\VariantResource;
 use App\Http\Validators\Product\ProductCreateValidator;
 use App\Http\Validators\Product\ProductUpdateValidator;
 use App\Models\Product;
@@ -11,7 +12,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
+use App\Models\ProductVariantDetail;
+use App\Models\ProductVariant;
+use App\Models\ProductVariantDetailById;
 class ProductController extends Controller
 {
     /**
@@ -21,38 +24,61 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $input = $request->all();
-        $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
+        // $input = $request->all();
+       $dataProducts = Product::all();
 
-        try {
-            $data = Product::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input) {
-                if(!empty($input['code'])){
-                    $query->where('code', $input['code']);
-                }
-                if(!empty($input['brand_id'])){
-                    $query->where('brand_id', $input['brand_id']);
-                }
-                if(!empty($input['subcategory_id'])){
-                    $query->where('subcategory_id', $input['subcategory_id']);
-                }
-                if(!empty($input['name'])){
-                    $query->where('name', 'like', '%'.$input['name'].'%');
-                }
-                if(!empty($input['slug'])){
-                    $query->where('slug', 'like', '%'.$input['slug'].'%');
-                }
-            })->orderBy('created_at', 'desc')->paginate($input['limit']);
-        } catch(HttpException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
-        }
-        return response()->json(new ProductCollection($data));
+       $dataReturn = [];
+       foreach($dataProducts as $key => $value){
+
+                $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
+
+                // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
+
+                $value->variants = Product::productVariants($value->id);
+                array_push($dataReturn,[
+                    "product" =>  $value,
+                ]);
+       }
+    //    return response()->json([
+    //     'data' => $dataReturn
+    //    ]);
+
+        return response()->json([
+            "data" => $dataProducts
+
+        ]);
+
+        // $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
+
+        // try {
+        //     $data = Product::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input) {
+        //         if(!empty($input['code'])){
+        //             $query->where('code', $input['code']);
+        //         }
+        //         if(!empty($input['brand_id'])){
+        //             $query->where('brand_id', $input['brand_id']);
+        //         }
+        //         if(!empty($input['subcategory_id'])){
+        //             $query->where('subcategory_id', $input['subcategory_id']);
+        //         }
+        //         if(!empty($input['name'])){
+        //             $query->where('name', 'like', '%'.$input['name'].'%');
+        //         }
+        //         if(!empty($input['slug'])){
+        //             $query->where('slug', 'like', '%'.$input['slug'].'%');
+        //         }
+        //     })->orderBy('created_at', 'desc')->paginate($input['limit']);
+        // } catch(HttpException $e) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => [
+        //             'error' => $e->getMessage(),
+        //             'file' => $e->getFile(),
+        //             'line' => $e->getLine(),
+        //         ],
+        //     ], $e->getStatusCode());
+        // }
+        // return response()->json(new ProductCollection($data));
     }
 
     /**
@@ -63,20 +89,24 @@ class ProductController extends Controller
      */
     public function store(Request $request, ProductCreateValidator $validator)
     {
+
         $input= $request->all();
         $user = $request->user();
         $validator->validate($input);
         try {
             DB::beginTransaction();
-
             $create = Product::create([
-                'code' => strtoupper($input['code']),
+                'code' => 'SP'.date('YmdHis', time()),
+                'meta_title'=>$input['meta_title'],
+                'meta_keywords'=>$input['meta_keywords'],
+                'meta_keywords'=>$input['meta_keywords'],
+                'meta_description'=>$input['meta_description'],
                 'name' => $input['name'],
                 'slug' => !empty($input['slug']) ? Str::slug($input['slug']) : Str::slug($input['name']),
                 'description' => $input['description'] ?? null,
                 'url_image' => $input['url_image'],
-                'price' => $input['price'],
-                'discount' => $input['discount'],
+                // 'price' => $input['price'],
+                // 'discount' => $input['discount'],
                 'specification_infomation' => $input['specification_infomation'] ?? null,
                 'brand_id' => $input['brand_id'],
                 'subcategory_id' => $input['subcategory_id'],
@@ -84,6 +114,23 @@ class ProductController extends Controller
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
+        //    $productInfo = Product::where('code',$create['code'])->first();
+            if(isset($request->variant_ids)){
+                foreach($request->variant_ids as $key => $variant_id){
+                   $proVariant = ProductVariantDetail::create([
+                        'variant_id' => $variant_id,
+                        'product_id' => $create->id,
+                    ]);
+                    foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
+                        ProductVariantDetailById::create([
+                            "pro_variant_id" => $proVariant->id,
+                            "color_id" => $valueColor,
+                            "price" => $request->prices_by_variant_id[$key][$keyColors],
+                            "discounts" => $request->discount_by_variant_id[$key][$keyColors],
+                        ]);
+                    }
+                }
+            }
 
             DB::commit();
         } catch (HttpException $e) {
@@ -97,6 +144,7 @@ class ProductController extends Controller
                 ],
             ], $e->getStatusCode());
         }
+
 
         return response()->json([
             'status' => 'success',
@@ -113,8 +161,17 @@ class ProductController extends Controller
     public function show($id)
     {
         try{
-            $data = Product::find($id);
-            if(empty($data)){
+            $dataByproduct = Product::find($id);
+            // $dataVariants = Product::productVariants($id);
+
+
+            $dataTest = Product::variantDetailsProductByProId($id);
+            // $dataByproduct->variantsssssss = Product::productVariants($id);
+            $dataByproduct->variants = Product::productVariants($id);
+
+            $dataByproduct->dataVariants = $dataTest;
+            // array_push($dataVariants,$dataTest);
+            if(empty($dataByproduct)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Không tìm thấy sản phẩm !',
@@ -130,9 +187,11 @@ class ProductController extends Controller
                 ],
             ], $e->getStatusCode());
         }
+
         return response()->json([
             'status' => 'success',
-            'data' => new ProductResource($data),
+            'data' => new ProductResource($dataByproduct),
+
         ]);
     }
 
@@ -169,8 +228,8 @@ class ProductController extends Controller
             $product->subcategory_id = $request->subcategory_id ?? $product->subcategory_id;
             $product->specification_infomation = $request->specification_infomation ?? $product->specification_infomation;
             $product->brand_id = $request->brand_id ?? $product->brand_id;
-            $product->price = $request->price ?? $product->price;
-            $product->discount = $request->discount ?? $product->discount;
+            // $product->price = $request->price ?? $product->price;
+            // $product->discount = $request->discount ?? $product->discount;
             $product->is_active = $request->is_active ?? $product->is_active;
             $product->updated_by = $user->id;
             $product->save();
@@ -238,6 +297,7 @@ class ProductController extends Controller
     }
 
 // tìm sản phẩm còn hàng
+//  nối nhiều bảng dùng Query Builder cho đỡ rối ^^
     public function productByStore(Request $request){
         // dd($request->all());
         //  sản phẩm theo địa chỉ tỉnh thành và quận huyện của cửa hàng
@@ -286,6 +346,14 @@ class ProductController extends Controller
         return response()->json([
             'data' => $data
         ],200);
+    }
+    //  product by subcategory id
+
+    public function producstBySubcategoryId($SubId) {
+        $data = Product:: productsBySubCate($SubId);
+        return response()->json([
+            "data" => $data
+        ]);
     }
 
 }

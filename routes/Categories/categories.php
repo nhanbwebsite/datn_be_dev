@@ -3,13 +3,16 @@ use App\Http\Controllers\CategoryController;
 
 
 Route::prefix('admin')->group(function(){
-    Route::get('/v1/categories',[CategoryController::class,'index']);
+    // Route::get('/v1/categories',[CategoryController::class,'index']);
+    Route::get('/categories',[CategoryController::class,'index']);
 
-    Route::post('/v1/categories',[CategoryController::class,'store']);
+    Route::post('/categories',[CategoryController::class,'store']);
 
-    Route::get('/v1/categories/{id}',[CategoryController::class,'show']);
+    Route::get('/categories/{id}',[CategoryController::class,'show']);
 
-    Route::patch('/v1/categories/{id}',[CategoryController::class,'update']);
+    Route::patch('/categories/{id}',[CategoryController::class,'update']);
 
-    Route::delete('/v1/categories/{id}',[CategoryController::class,'destroy']);
+    Route::delete('/categories/{id}',[CategoryController::class,'destroy']);
 });
+
+Route::get('/client/categories',[CategoryController::class,'getClientCategory']);

@@ -20,7 +20,6 @@ class OrderCreateValidator extends ValidatorBase
             'shipping_method_id' => 'required|numeric|exists:shipping_methods,id',
             'discount' => 'required|numeric',
             'coupon_id' => 'nullable|numeric',
-            'promotion_id' => 'nullable|numeric',
             'details' => 'required',
         ];
     }
@@ -56,7 +55,6 @@ class OrderCreateValidator extends ValidatorBase
             'fee_ship.required' => ':attribute không được để trống !',
             'fee_ship.numeric' => ':attribute chưa đúng !',
             'coupon_id.numeric' => ':attribute phải là số !',
-            'promotion_id.numeric' => ':attribute phải là số !',
             'details.required' => ':attribute không được để trống !',
         ];
     }
@@ -76,7 +74,6 @@ class OrderCreateValidator extends ValidatorBase
             'discount' => 'Giảm giá',
             'fee_ship' => 'Phí vận chuyển',
             'coupon_id' => 'Mã giảm giá',
-            'promotion_id' => 'Mã chương trình khuyến mãi',
             'details' => 'Chi tiết đơn hàng',
         ];
     }

@@ -95,3 +95,18 @@ require __DIR__ . '/Cart/cart.php';
 require __DIR__ . '/postCategories/postCategories.php';
 
 require __DIR__ . '/Post/post.php';
+
+// colors
+require __DIR__ . '/Colors/colors.php';
+
+// Promotion
+require __DIR__ . '/Promotion/promotion.php';
+
+// Coupon
+require __DIR__ . '/Coupon/coupon.php';
+
+// File
+require __DIR__ . '/File/file.php';
+
+// Biến thể
+require __DIR__ . '/ProductVariants/productVariants.php';

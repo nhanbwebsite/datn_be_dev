@@ -23,7 +23,6 @@ class Order extends Model
         'total',
         'discount',
         'coupon_id',
-        'promotion_id',
         'fee_ship',
         'payment_method_id',
         'shipping_method_id',
@@ -57,17 +56,13 @@ class Order extends Model
         return $this->belongsTo(PaymentMethod::class, 'payment_method_id', 'id');
     }
 
-    public function shippingMethod(){
+    public function getShippingMethod(){
         return $this->belongsTo(ShippingMethod::class, 'shipping_method_id', 'id');
     }
 
-    // public function coupon(){
-    //     return $this->hasOne(AddressNote::class, 'id', 'address_note_id');
-    // }
-
-    // public function promotion(){
-    //     return $this->hasOne(AddressNote::class, 'id', 'address_note_id');
-    // }
+    public function coupon(){
+        return $this->belongsTo(Coupon::class, 'coupon_id', 'id');
+    }
 
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by', 'id');

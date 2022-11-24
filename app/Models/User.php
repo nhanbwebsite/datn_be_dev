@@ -94,4 +94,8 @@ class User extends Authenticatable
     public function addressNote(){
         return $this->hasMany(AddressNote::class, 'user_id', 'id');
     }
+
+    public function order(){
+        return $this->hasMany(Order::class, 'user_id', 'id');
+    }
 }

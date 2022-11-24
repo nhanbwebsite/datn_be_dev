@@ -30,7 +30,7 @@ class AuthController extends Controller
         try{
             DB::beginTransaction();
             $remmemberMe = false;
-            if(!empty($input['remember'])){
+            if(!empty($input['remember']) && $input['remember'] == 1){
                 $remmemberMe = true;
             }
             $data = $request->only(['phone', 'password']);
@@ -49,12 +49,12 @@ class AuthController extends Controller
                     'message' => 'Người dùng đã bị khóa hoặc chưa kích hoạt !',
                 ], 401);
             }
-            if(empty($userData->session) || $userData->session->expired < date('Y-m-d H:i:s', time())){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Phiên đăng nhập đã hết hạn !',
-                ], 401);
-            }
+            // if(empty($userData->session) || $userData->session->expired < date('Y-m-d H:i:s', time())){
+            //     return response()->json([
+            //         'status' => 'error',
+            //         'message' => 'Phiên đăng nhập đã hết hạn !',
+            //     ], 401);
+            // }
 
             $data = RolePermission::where([
                 ['role_id', $userData->role_id],
@@ -231,12 +231,12 @@ class AuthController extends Controller
             $userData = User::find($user->id);
             $user->currentAccessToken()->delete();
 
-            if(empty($userData->session) || $userData->session->expired < date('Y-m-d H:i:s', time())){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Phiên đăng nhập đã hết hạn !',
-                ], 401);
-            }
+            // if(empty($userData->session) || $userData->session->expired < date('Y-m-d H:i:s', time())){
+            //     return response()->json([
+            //         'status' => 'error',
+            //         'message' => 'Phiên đăng nhập đã hết hạn !',
+            //     ], 401);
+            // }
 
             $data = RolePermission::where([
                 ['role_id', $userData->role_id],

@@ -1,15 +1,15 @@
 <?php
 // subcategories routes
 use App\Http\Controllers\SubcategoryController;
-
+Route::get('subcategories',[SubcategoryController::class,'index']);
 Route::prefix('admin')->group(function (){
-    Route::get('/v1/subcategories',[SubcategoryController::class,'index']);
+    Route::get('/subcategories',[SubcategoryController::class,'index']);
 
-    Route::post('/v1/subcategories',[SubcategoryController::class,'store']);
+    Route::post('/subcategories',[SubcategoryController::class,'store']);
 
-    Route::get('/v1/subcategories/{id}',[SubcategoryController::class,'show']);
+    Route::get('/subcategories/{id}',[SubcategoryController::class,'show']);
 
-    Route::patch('/v1/subcategories/{id}',[SubcategoryController::class,'update']);
+    Route::patch('/subcategories/{id}',[SubcategoryController::class,'update']);
 
-    Route::delete('/v1/subcategories/{id}',[SubcategoryController::class,'destroy']);
+    Route::delete('/subcategories/{id}',[SubcategoryController::class,'destroy']);
 });

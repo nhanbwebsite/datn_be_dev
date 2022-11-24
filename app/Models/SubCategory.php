@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 class SubCategory extends Model
 {
     use HasFactory, SoftDeletes;
@@ -26,4 +27,16 @@ class SubCategory extends Model
     public function category(){
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
+
+    public static function AllSubByCate($id){
+        // return $this->hasMany(ProductVariantDetail::class, 'product_id', 'id');
+        $sybByCateId = DB::table(('categories'))
+        ->join('sub_categories', 'categories.id', '=', 'sub_categories.category_id')
+        ->where('categories.id',$id)
+        ->get();
+        return $sybByCateId; ;
+        // return $this->belongsToMany(ProductVariantDetail::class, 'productVariant', 'product_id', 'variant_id');
+    }
 }
+
+

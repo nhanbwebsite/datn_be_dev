@@ -21,3 +21,10 @@ Route::get('/', function () {
         'Name' =>'Du an tot nghiep'
     ];
 });
+
+Route::get('/unauthorization', function() {
+    return response()->json([
+            'status' => 'error',
+            'message' => 'Token không đúng'
+        ], 401);
+})->name('unauthorization');

@@ -8,6 +8,8 @@ use App\Http\Validators\Cart\CartUpdateValidator;
 use App\Models\AddressNote;
 use App\Models\Cart;
 use App\Models\CartDetail;
+use App\Models\Coupon;
+use App\Models\CouponOrder;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -99,6 +101,8 @@ class CartController extends Controller
                 if(empty($check)){
                     $detailValidator->validate($input);
 
+                    $cart->discount += $discountPrice;
+                    $cart->save();
                     CartDetail::create([
                         'cart_id' => $cart->id,
                         'product_id' => $input['product_id'],
@@ -148,7 +152,7 @@ class CartController extends Controller
     public function update(Request $request, CartUpdateValidator $validator, CartDetailUpsertValidator $detailValidator)
     {
         $input = $request->all();
-        $user_id = $request->user()->id;
+        $user = $request->user();
         $validator->validate($input);
         try{
             DB::beginTransaction();
@@ -156,13 +160,42 @@ class CartController extends Controller
             if(!empty($input['details'])){
                 foreach($input['details'] as $d){
                     $productFind = Product::find($d['product_id']);
-                    if(!empty($productFind->discount)){
-                        $discountPrice += $productFind->discount;
+                    if($productFind->discount > 0){
+                        $discountPrice += $productFind->discount * $d['quantity'];
                     }
                 }
             }
 
-            $data = Cart::where('user_id', $user_id)->whereNull('deleted_at')->first();
+            if(!empty($input['coupon_id'])){
+                $checkIsset = Coupon::where('id', $input['coupon_id'])->where('is_active', 1)->first();
+                if(!empty($checkIsset)){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Mã giảm giá không tồn tại !',
+                    ], 404);
+                }
+                $checkMaxUse = CouponOrder::where('coupon_id', $input['coupon_id'])->count();
+                if($checkIsset->max_use < $checkMaxUse){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Mã giảm giá đã hết lượt sử dụng !',
+                    ], 400);
+                }
+
+                foreach($user->order as $ord){
+                    $checkUsed = CouponOrder::where('order_id', $ord->id)->first();
+                    if(empty($checkUsed)){
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Bạn đã hết lượt sử dụng mã giảm giá !',
+                        ], 400);
+                    }
+                }
+
+                $discountPrice += $checkIsset->discount_value;
+            }
+
+            $data = Cart::where('user_id', $user->id)->whereNull('deleted_at')->first();
             if(empty($data)){
                 return response()->json([
                     'status' => 'success',
@@ -177,12 +210,11 @@ class CartController extends Controller
             $data->phone = $input['phone'] ?? $data->phone;
             $data->email = $input['email'] ?? $data->email;
             $data->coupon_id = $input['coupon_id'] ?? $data->coupon_id;
-            $data->promotion_id = $input['promotion_id'] ?? $data->promotion_id;
             $data->discount = ($discountPrice == $input['discount'] ? $input['discount'] : $discountPrice) ?? $data->discount;
             $data->fee_ship = $input['fee_ship'] ?? $data->fee_ship;
             $data->shipping_method_id = $input['shipping_method_id'] ?? $data->shipping_method_id;
             $data->payment_method_id = $input['payment_method_id'] ?? $data->payment_method_id;
-            $data->updated_by = $user_id;
+            $data->updated_by = $user->id;
             $data->save();
 
             if(!empty($input['details'])){

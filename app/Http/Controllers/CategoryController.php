@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CategoryClientCollection;
+use App\Http\Resources\CategoryCollection;
 use Illuminate\Http\Request;
 use App\Models\Category;
 // use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Models\SubCategory;
 class CategoryController extends Controller
 {
     /**
@@ -15,19 +18,30 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $input = $request->all();
+        $input['limit'] = !empty($input['limit']) ? $input['limit'] : 10;
         try{
-            $dataCategories = Category::paginate(9);
-            return response()->json([
-                'data' => $dataCategories
-            ],200);
+            $data = Category::where('is_active', $input['is_active'] ?? 1)->where(function($query) use ($input){
+                if(!empty($input['name'])){
+                    $query->where('name', 'like', '%'.$input['name'].'%');
+                }
+                if(!empty($input['slug'])){
+                    $query->where('slug', $input['slug']);
+                }
+            })->orderBy('created_at', 'desc')->paginate($input['limit']);
         } catch(Exception $e){
             return response()->json([
-               'status' => 'Error',
-               'message' => $e->getMessage()
-            ],400);
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
+        return response()->json(new CategoryCollection($data));
     }
 
     /**
@@ -210,5 +224,21 @@ class CategoryController extends Controller
         }
     }
 
+
+    public function getClientCategory(){
+        try{
+            $data = Category::where('is_active', 1)->get();
+        } catch(Exception $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new CategoryClientCollection($data));
+    }
 
 }

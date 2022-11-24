@@ -37,6 +37,7 @@ class ProductCollection extends ResourceCollection
                     'brand_name' => $value->brand->brand_name,
                     'subcategory_id' => $value->subcategory_id,
                     'subcategory_name' => $value->subcategory->name,
+                    'variants' => $value->variants,
                     'category' => $value->subcategory->category_id,
                     'category_name' => $value->subcategory->category->name,
                     'is_active'     => $value->is_active,
