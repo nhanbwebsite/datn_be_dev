@@ -17,4 +17,4 @@ Route::get('/client/products',[ProductController::class,'index']);
 Route::get('findProductByStore',[ProductController::class,'productByStore']);
 Route::get('productsBySubcate/{subId}',[ProductController::class,'producstBySubcategoryId']);
 
-Route::get('client/products/caregory/{id}',[ProductController::class,'productsByCategoryId']);
+Route::get('client/products/category/{id}',[ProductController::class,'productsByCategoryId']);
