@@ -7,6 +7,7 @@ Route::prefix('admin')->group(function (){
     Route::patch('/post/{id}',[PostController::class,'update']);
     Route::delete('/post/{id}',[PostController::class,'destroy']);
     Route::get('/v1/postByViews/',[PostController::class,'loadByViews']);
+    Route::get('/v1/postByCate/',[PostController::class,'loadByViews']);
 
 });
 Route::get('posts/{id}',[PostController::class,'show']);

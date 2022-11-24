@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PostController extends Controller
 {
@@ -22,13 +23,13 @@ class PostController extends Controller
     public function index()
     {
        try{
-         $data= Post::paginate(10);
+         $data= Post::orderBy('created_at','desc')->simplePaginate(10);
          $resource = PostResource::collection($data);
          return response()->json([
             'data'=>$resource,
          ],200);
 
-       } catch(Exception $e){
+       } catch(HttpException $e){
         return response()->json([
             'status' => 'Error',
             'message' => $e->getMessage()
@@ -47,7 +48,7 @@ class PostController extends Controller
         $rules=[
             'category_id'=>'required',
             // 'user_id'=>'required',
-            'title'=>'required|max:255',
+            'title'=>'required|max:255|unique:posts',
             'short_des'=>'required|max:255',
             'content_post'=>'required',
             // 'image'=>'required|image',
@@ -235,7 +236,6 @@ class PostController extends Controller
     public function destroy($id)
     {
         try {
-            //DB::beginTransaction();
             $data = Post::find($id);
             if(empty($data)){
                 return response()->json([
