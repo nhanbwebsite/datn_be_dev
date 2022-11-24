@@ -144,7 +144,7 @@ class FileController extends Controller
             DB::beginTransaction();
 
             $data = File::find($id);
-            if(empty($file)){
+            if(empty($data)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'File không tồn tại !'
