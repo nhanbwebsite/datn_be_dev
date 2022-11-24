@@ -356,4 +356,26 @@ class ProductController extends Controller
         ]);
     }
 
+    public function productsByCategoryId($category_id){
+        $product = new Product();
+
+        $dataProducts = $product->productByCategory($category_id);
+        $dataReturn = [];
+        foreach($dataProducts as $key => $value){
+
+                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
+
+                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
+
+                 $value->variants = Product::productVariants($value->id);
+                 array_push($dataReturn,[
+                     "product" =>  $value,
+                 ]);
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => $value
+        ],200);
+    }
+
 }
