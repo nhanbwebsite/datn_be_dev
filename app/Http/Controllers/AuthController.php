@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Resources\UserResource;
 use App\Http\Validators\Auth\LoginValidator;
 use App\Http\Validators\Auth\RegisterValidator;
+use App\Http\Validators\SMS\SMSValidator;
 use App\Models\RolePermission;
 use App\Models\User;
 use App\Models\UserSession;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -285,5 +287,46 @@ class AuthController extends Controller
                 'expired_at' => $userSessionNew->expired,
             ]
         ]);
+    }
+
+    public function sendSMS($phone, $msg, SMSValidator $validator){
+        $input['phone'] = $phone;
+        $input['message'] = $msg;
+        $validator->validate($input);
+
+        try{
+            $code = str_shuffle(''.mt_rand(10000000,99999999));
+            // $message = $input['message'].$code;
+            $message = $code.' la ma xac minh dang ky Baotrixemay cua ban';
+            $params = [
+                "ApiKey" => env('SMS_KEY'),
+                "SecretKey" => env('SMS_SECRET'),
+                "Phone"=> $input['phone'],
+                "Content" => $message,
+                "SmsType" => 2,
+                "Brandname" => env('SMS_BRAND_NAME', 'Baotrixemay'),
+            ];
+            $client = new Client();
+            if(env('SMS_ENABLE') == 1){
+                $smsResponse = $client->get(env('SMS_URL'), ['query' => $params])->getBody();
+            }
+            else{
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Đã tắt gửi SMS !'
+                ], 400);
+            }
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return $smsResponse ?? null;
     }
 }
