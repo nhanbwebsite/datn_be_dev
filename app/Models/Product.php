@@ -93,4 +93,25 @@ class Product extends Model
         ->get();
         return $data;
     }
+
+    // public static function variantDetailsProductByCategories($category_id){
+    //     $data = DB::table('products')->select('products.id as product_id','productVariantDetails.color_id','productVariantDetails.price','productVariantDetails.discount','colors.name as color_name','variants.variant_name','productVariant.variant_id','categories.id as category_id','categories.name as categoryName')
+    //     ->join('productVariant','products.id', 'productVariant.product_id')
+    //     ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
+    //     ->join('variants','productVariant.variant_id','variants.id')
+    //     ->join('colors','productVariantDetails.color_id','colors.id')
+    //     ->join('sub_categories','products.subcategory_id','sub_categories.id')
+    //     ->join('categories','sub_categories.category_id','categories.id')
+    //     ->where('categories.id',$category_id)->get();
+    //     return $data;
+    // }
+
+    public function productByCategory($category_id){
+        $data = DB::table('categories')
+        ->join('sub_categories','categories.id','sub_categories.category_id')
+        ->join('products','sub_categories.id','products.subcategory_id')
+        ->where('categories.id',$category_id)
+        ->get();
+        return $data;
+    }
 }
