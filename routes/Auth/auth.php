@@ -12,4 +12,8 @@ Route::controller(AuthController::class)->middleware(['auth:sanctum'])->group(fu
     Route::post('/logout', 'logout');
     Route::post('/refresh', 'refresh');
 });
+
+// Route::controller(AuthController::class)->group(function () {
+//     Route::get('/sms', 'sendSMS');
+// });
 ?>
