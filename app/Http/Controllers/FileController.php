@@ -144,10 +144,12 @@ class FileController extends Controller
             DB::beginTransaction();
 
             $data = File::find($id);
-            return response()->json([
-                'status' => 'error',
-                'message' => 'File không tồn tại !'
-            ], 404);
+            if(empty($file)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'File không tồn tại !'
+                ], 404);
+            }
             if(FacadesFile::exists('images/'.$data->name)){
                 FacadesFile::delete('images/'.$data->name);
             }
