@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 
 Route::controller(AuthController::class)->prefix('auth')->group(function (){
+    Route::get('/sms/{phone}', 'sendSMS');
     Route::post('/login', 'login');
     Route::post('/register', 'register');
 });
@@ -12,8 +13,4 @@ Route::controller(AuthController::class)->middleware(['auth:sanctum'])->group(fu
     Route::post('/logout', 'logout');
     Route::post('/refresh', 'refresh');
 });
-
-// Route::controller(AuthController::class)->group(function () {
-//     Route::get('/sms/{phone}/{msg}', 'sendSMS');
-// });
 ?>

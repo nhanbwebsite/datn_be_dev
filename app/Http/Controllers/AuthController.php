@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class AuthController extends Controller
 {
     /**
-     * Login function
+     * Login with phone and code (SMS)
      *
      * @param \Illuminate\Http\Request $request
      * @param \App\Http\Validators\Auth\LoginValidator $validator
@@ -35,28 +35,29 @@ class AuthController extends Controller
             if(!empty($input['remember']) && $input['remember'] == 1){
                 $remmemberMe = true;
             }
+
             $data = $request->only(['phone', 'password']);
             $user = Auth::attempt($data, $remmemberMe);
             if(!$user){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Số điện thoại hoặc mật khẩu không đúng !',
+                    'message' => 'Số điện thoại không đúng !',
                 ], 401);
             }
 
             $userData = User::where('phone', $input['phone'])->first();
+            if(!empty($userData->request_code_at) && (date('Y-m-d H:i:s', time()-60) > $userData->request_code_at)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Mã đã hết hiệu lực !'
+                ], 400);
+            }
             if($userData->is_active == 0){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Người dùng đã bị khóa hoặc chưa kích hoạt !',
                 ], 401);
             }
-            // if(empty($userData->session) || $userData->session->expired < date('Y-m-d H:i:s', time())){
-            //     return response()->json([
-            //         'status' => 'error',
-            //         'message' => 'Phiên đăng nhập đã hết hạn !',
-            //     ], 401);
-            // }
 
             $data = RolePermission::where([
                 ['role_id', $userData->role_id],
@@ -129,6 +130,7 @@ class AuthController extends Controller
                 'province_id' => $input['province_id'],
                 'phone' => $input['phone'],
                 'password' => Hash::make($input['password']),
+                'request_code_at' => date('Y-m-d H:i:s', time()),
             ]);
             DB::commit();
         }
@@ -233,12 +235,12 @@ class AuthController extends Controller
             $userData = User::find($user->id);
             $user->currentAccessToken()->delete();
 
-            // if(empty($userData->session) || $userData->session->expired < date('Y-m-d H:i:s', time())){
-            //     return response()->json([
-            //         'status' => 'error',
-            //         'message' => 'Phiên đăng nhập đã hết hạn !',
-            //     ], 401);
-            // }
+            if(empty($userData->session) || $userData->session->expired < date('Y-m-d H:i:s', time())){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Phiên đăng nhập đã hết hạn !',
+                ], 401);
+            }
 
             $data = RolePermission::where([
                 ['role_id', $userData->role_id],
@@ -289,14 +291,23 @@ class AuthController extends Controller
         ]);
     }
 
-    public function sendSMS($phone, $msg, SMSValidator $validator){
+    /**
+     * Send code (SMS) to phone number
+     *
+     * @param string $phone
+     * @param \App\Http\Validators\SMS\SMSValidator $validator
+     * @return \Psr\Http\Message\StreamInterface $smsResponse or  null
+     */
+    public function sendSMS($phone, SMSValidator $validator){
+    // public function sendSMS(string $phone, $msg, SMSValidator $validator){
         $input['phone'] = $phone;
-        $input['message'] = $msg;
+        // $input['message'] = $msg;
         $validator->validate($input);
 
         try{
-            $code = str_shuffle(''.mt_rand(10000000,99999999));
-            // $message = $input['message'].$code;
+            DB::beginTransaction();
+            $code = env('SMS_ENABLE') == 1 ? str_shuffle(''.mt_rand(10000000,99999999)) : '12345678';
+            // $message = $code.$input['message'];
             $message = $code.' la ma xac minh dang ky Baotrixemay cua ban';
             $params = [
                 "ApiKey" => env('SMS_KEY'),
@@ -306,18 +317,34 @@ class AuthController extends Controller
                 "SmsType" => 2,
                 "Brandname" => env('SMS_BRAND_NAME', 'Baotrixemay'),
             ];
+
+            $user = User::where('phone', $input['phone'])->where('is_active', 1)->first();
+            if(empty($user)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Người dùng không tồn tại !',
+                ], 404);
+            }
+
+            if($user->request_code_at > date('Y-m-d H:i:s', time()-60)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Vui lòng đợi 1 phút để yêu cầu mã mới !',
+                ], 400);
+            }
+            $user->password = Hash::make($code);
+            $user->request_code_at = date('Y-m-d H:i:s', time());
+            $user->save();
+
             $client = new Client();
             if(env('SMS_ENABLE') == 1){
                 $smsResponse = $client->get(env('SMS_URL'), ['query' => $params])->getBody();
             }
-            else{
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Đã tắt gửi SMS !'
-                ], 400);
-            }
+
+            DB::commit();
         }
         catch(HttpException $e){
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
                 'message' => [
