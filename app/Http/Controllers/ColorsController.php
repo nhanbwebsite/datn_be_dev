@@ -35,14 +35,17 @@ class ColorsController extends Controller
         $user = auth('sanctum')->user();
         $rules = [
             'name' => 'required',
+            'color_code' => 'required',
         ];
 
         $messages = [
-            'name.required' => 'Tên màu không được để trống'
+            'name.required' => ':attribute tên màu không được để trống',
+            'color_code.required' => 'attribute không được để trống'
         ];
 
         $attributes = [
-            'name' => 'Tên màu'
+            'name' => 'Tên màu',
+            'color_code' => 'Mã màu'
         ];
 
         try {
@@ -58,6 +61,7 @@ class ColorsController extends Controller
           $create =   Color::create([
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
+                "color_code" => $request->color,
                 'created_by' => $user->id
             ]);
 
@@ -122,16 +126,20 @@ class ColorsController extends Controller
         $user = auth('sanctum')->user();
         $rules = [
             'name' => 'required',
+            'color_code' => 'required',
         ];
 
         $messages = [
-            'name.required' => 'Tên màu không được để trống'
+            'name.required' => ':attribute tên màu không được để trống',
+            'color_code.required' => 'attribute không được để trống'
         ];
 
         $attributes = [
-            'name' => 'Tên màu'
+            'name' => 'Tên màu',
+            'color_code' => 'Mã màu'
         ];
-        $validator = Validator::make($request->only('name'), $rules, $messages, $attributes);
+
+        $validator = Validator::make($request->only('name','color_code'), $rules, $messages, $attributes);
         if($validator->fails()){
             return response()->json([
                 'status' => 'error',
@@ -143,6 +151,7 @@ class ColorsController extends Controller
             $data = Color::find($id);
             $data->name = $request->name;
             $data->slug = Str::slug($request->name);
+            $data->color_code = $request->color_code;
             $data->is_active = $request->is_active;
             $data->updated_by = $user->id;
             $data->save();
@@ -156,6 +165,10 @@ class ColorsController extends Controller
             ],$e->getStatusCode()); //
         }
 
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cập nhật màu thành công !',
+        ]);
     }
 
     /**
