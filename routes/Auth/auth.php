@@ -14,6 +14,6 @@ Route::controller(AuthController::class)->middleware(['auth:sanctum'])->group(fu
 });
 
 // Route::controller(AuthController::class)->group(function () {
-//     Route::get('/sms', 'sendSMS');
+//     Route::get('/sms/{phone}/{msg}', 'sendSMS');
 // });
 ?>
