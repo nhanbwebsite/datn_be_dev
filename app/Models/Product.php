@@ -75,7 +75,7 @@ class Product extends Model
     }
 
     public static function variantDetailsProductByProId($id){
-        $data = DB::table('products')->select('products.id as product_id','productVariantDetails.color_id','productVariantDetails.price','productVariantDetails.discount','colors.name as color_name','variants.variant_name','productVariant.variant_id')
+        $data = DB::table('products')->select('products.id as product_id','productVariantDetails.color_id','productVariantDetails.price','productVariantDetails.discount','colors.name as color_name','colors.color_code','variants.variant_name','productVariant.variant_id')
         ->join('productVariant','products.id', 'productVariant.product_id')
         ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
         ->join('variants','productVariant.variant_id','variants.id')
@@ -85,7 +85,7 @@ class Product extends Model
     }
 
     public static function variantProducAll(){
-        $data = DB::table('products')->select('products.id as','productVariantDetails.color_id','productVariantDetails.price','productVariantDetails.discount','colors.name as color_name','variants.variant_name','productVariant.variant_id')
+        $data = DB::table('products')->select('products.id as','productVariantDetails.color_id','productVariantDetails.price','productVariantDetails.discount','colors.name as color_name','colors.color_code','variants.variant_name','productVariant.variant_id')
         ->join('productVariant','products.id', 'productVariant.product_id')
         ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
         ->join('variants','productVariant.variant_id','variants.id')
