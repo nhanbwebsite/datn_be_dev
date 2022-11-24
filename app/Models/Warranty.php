@@ -13,7 +13,6 @@ class Warranty extends Model
     protected $fillable = [
         'title',
         'content',
-        'note',
         'slug',
         'is_active',
         'created_by',

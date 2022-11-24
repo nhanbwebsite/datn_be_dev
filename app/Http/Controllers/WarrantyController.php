@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PostCategoriesCollection;
-use App\Http\Resources\PostCategoriesResource;
-use App\Models\PostCategories;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Warranty;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class PostCategoryController extends Controller
+class WarrantyController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,19 +20,19 @@ class PostCategoryController extends Controller
      */
     public function index()
     {
-        try{
-            $data = PostCategories::all();
-            // $resource =  new PostCategoriesCollection($data);
-            $resource = PostCategoriesResource::collection($data);
-            return response()->json([
-                'data' => $resource
-            ],200);
-        } catch(Exception $e){
-            return response()->json([
-               'status' => 'Error',
-               'message' => $e->getMessage()
-            ],400);
-        }
+       try{
+         $data= Warranty::paginate(10);
+         //$resource = PostResource::collection($data);
+         return response()->json([
+            'data'=>$data,
+         ],200);
+
+       } catch(HttpException $e){
+        return response()->json([
+            'status' => 'Error',
+            'message' => $e->getMessage()
+         ],400);
+       }
     }
 
     /**
@@ -46,17 +44,18 @@ class PostCategoryController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'name' => 'required|max:255',
+            'title' => 'required|max:50',
+            'content'=> 'required',
         ];
         $messages = [
-            'name.required' => ':atribuite không được để trống !',
-            'name.max' => ':attribute tối đa 255 ký tự !',
+            'title.required' => ':atribuite không được để trống !',
+            'name.required' => ':attribute không được để trống!',
         ];
-
-        $attributes = [
-            'name' => 'Tên danh mục bài viết'
+        $attributes=[
+            'title'=>'Tiêu đề chính sách',
+            'slug'=>'Slug',
+            'content'=>'Nội dung chính sách',
         ];
-
         try {
             $user = auth('sanctum')->user();
             DB::beginTransaction();
@@ -68,12 +67,12 @@ class PostCategoryController extends Controller
                 ], 422);
             }
 
-            $data = PostCategories::create([
-                'name' => mb_strtoupper($request->name) ,
-                'slug' => Str::slug($request->name),
+            $data = Warranty::create([
+                'title' => mb_strtoupper($request->title) ,
+                'slug' => Str::slug($request->title),
+                'content'=>$request->content,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
-
             ]);
             DB::commit();
 
@@ -90,27 +89,26 @@ class PostCategoryController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => $data->name . ' đã được tạo thành công !',
+            'message' => $data->title. ' đã được tạo thành công !',
         ]);
-
 
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\post_category  $post_category
+     * @param  \App\Models\Warranty  $warranty
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
         try{
-            $data = PostCategories::find($id);
+            $data = Warranty::find($id);
 
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
+                    'message' => ' Không tồn tại, vui lòng kiểm tra lại'
 
                 ],400);
             }
@@ -132,24 +130,27 @@ class PostCategoryController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\post_category  $post_category
+     * @param  \App\Models\Warranty  $warranty
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         $rules = [
-            'name' => 'required|max:255',
+            'title' => 'required|max:50',
+            'content'=> 'required',
         ];
         $messages = [
-            'name.required' => ':atribuite không được để trống !',
-            'name.max' => ':attribute tối đa 255 ký tự !',
+            'title.required' => ':atribuite không được để trống !',
+            'name.required' => ':attribute không được để trống!',
         ];
-
-        $attributes = [
-            'name' => 'Tên danh mục không được để trống'
+        $attributes=[
+            'title'=>'Tiêu đề chính sách',
+            'slug'=>'Slug',
+            'content'=>'Nội dung chính sách',
         ];
-
         try {
+            $user = auth('sanctum')->user();
+            DB::beginTransaction();
             $validator = Validator::make($request->all(), $rules, $messages, $attributes);
             if($validator->fails()){
                 return response()->json([
@@ -157,16 +158,15 @@ class PostCategoryController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $data = PostCategories::find($id);
+            $data = Warranty::find($id);
             if(!empty($data)){
                  $data->update([
-                    'name' => mb_strtoupper($request->name) ,
-                    'slug' => Str::slug($request->name),
-                    // 'updated_by' => auth('sanctum')->user()->id,
+                    'title' => mb_strtoupper($request->title) ,
+                    'slug' => Str::slug($request->title),
+                    'content'=>$request->content,
+                    'updated_by' => $user->id,
                 ]);
             }
-
-
 
         } catch(Exception $e) {
             DB::rollback();
@@ -178,32 +178,32 @@ class PostCategoryController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' =>'Danh mục đã được cập nhật thành '.$request->name.'!',
+            'message' =>'Chính sách bảo hành đã được cập nhật thành !',
         ]);
     }
+
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\PostCategories  $post_category
+     * @param  \App\Models\Warranty  $warranty
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
         try {
-            //DB::beginTransaction();
-            $data = PostCategories::find($id);
+            $data = Warranty::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Danh mục không tồn tại !',
+                    'message' => 'Bài viết không tồn tại !',
                 ], 404);
 
             }
            $data->delete();
             return response()->json([
                 'status' => 'success',
-                'message' => 'Đã xóa thành công danh mục ' . $data->name
+                'message' => 'Đã xóa thành công ' . $data->title .'!'
             ]);
 
             $data->update([
@@ -220,32 +220,5 @@ class PostCategoryController extends Controller
             ]);
         }
 
-
     }
-    public function loadPostByCate($id)
-    {
-        try{
-            $data = PostCategories::find($id);
-
-            if(empty($data)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
-
-                ],400);
-            }
-
-            return response()->json([
-                 'data' => $data->post,
-                 'data' => $data
-            ],200);
-
-        } catch(Exception $e){
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
-        }
-    }
-
 }

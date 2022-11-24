@@ -8,5 +8,6 @@ Route::prefix('admin')->group(function (){
     Route::delete('/v1/post/{id}',[PostController::class,'destroy']);
     Route::get('/v1/post/{id}',[PostController::class,'show']);
     Route::get('/v1/postByViews/',[PostController::class,'loadByViews']);
+    Route::get('/v1/postByCate/',[PostController::class,'loadByViews']);
 
 });
