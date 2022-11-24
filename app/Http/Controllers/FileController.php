@@ -10,6 +10,7 @@ use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File as FacadesFile;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Support\Str;
@@ -147,6 +148,9 @@ class FileController extends Controller
                 'status' => 'error',
                 'message' => 'File không tồn tại !'
             ], 404);
+            if(FacadesFile::exists('images/'.$data->name)){
+                FacadesFile::delete('images/'.$data->name);
+            }
             $data->deleted_by = $user->id;
             $data->save();
             $data->delete();
