@@ -53,6 +53,15 @@ class Product extends Model
         return $this->belongsTo(SubCategory::class, 'subcategory_id', 'id');
     }
 
+    public static function category($iPro){
+        $data = DB::table('products')->select('categories.id as cartegory_id')
+        ->join('sub_categories','products.subcategory_id','sub_categories.id')
+        ->join('categories','sub_categories.category_id','categories.id')
+        ->where('products.id',$iPro)
+        ->first();
+        return $data;
+    }
+
     public static function productVariants($id){
         // return $this->hasMany(ProductVariantDetail::class, 'product_id', 'id');
         $variantByProducts = DB::table(('productVariant'))->select('variants.id','variants.variant_name')
