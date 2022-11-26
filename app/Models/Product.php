@@ -54,7 +54,7 @@ class Product extends Model
     }
 
     public static function category($iPro){
-        $data = DB::table('products')->select('categories.id as cartegory_id')
+        $data = DB::table('products')->select('categories.id as cartegory_id','categories.name as category_name')
         ->join('sub_categories','products.subcategory_id','sub_categories.id')
         ->join('categories','sub_categories.category_id','categories.id')
         ->where('products.id',$iPro)
@@ -67,10 +67,10 @@ class Product extends Model
         $variantByProducts = DB::table(('productVariant'))->select('variants.id','variants.variant_name')
         ->join('products', 'productVariant.product_id', '=', 'products.id')
         ->join('variants', 'productVariant.variant_id', '=', 'variants.id')
+        ->where('productVariant.is_active',1)
         ->where('products.id',$id)
         ->get();
         return $variantByProducts;
-
         ;
         // return $this->belongsToMany(ProductVariantDetail::class, 'productVariant', 'product_id', 'variant_id');
     }
@@ -84,11 +84,12 @@ class Product extends Model
     }
 
     public static function variantDetailsProductByProId($id){
-        $data = DB::table('products')->select('products.id as product_id','productVariantDetails.color_id','productVariantDetails.price','productVariantDetails.discount','colors.name as color_name','colors.color_code','variants.variant_name','productVariant.variant_id')
+        $data = DB::table('products')->select('products.id as product_id','productVariantDetails.color_id','productVariantDetails.price','productVariantDetails.discount','productVariantDetails.quantity','colors.name as color_name','colors.color_code','variants.variant_name','productVariant.variant_id')
         ->join('productVariant','products.id', 'productVariant.product_id')
         ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
         ->join('variants','productVariant.variant_id','variants.id')
         ->join('colors','productVariantDetails.color_id','colors.id')
+        ->where('productVariantDetails.is_active',"=",1)
         ->where('products.id',$id)->get();
         return $data;
     }
@@ -99,6 +100,7 @@ class Product extends Model
         ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
         ->join('variants','productVariant.variant_id','variants.id')
         ->join('colors','productVariantDetails.color_id','colors.id')
+        ->where('productVariant.is_active',"=",'NULL')
         ->get();
         return $data;
     }
