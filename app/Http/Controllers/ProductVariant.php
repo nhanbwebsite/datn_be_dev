@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ProductVariant as ProductVariantModel;
+use App\Models\ProductVariantDetailById;
 class ProductVariant extends Controller
 {
     /**
@@ -169,7 +170,7 @@ class ProductVariant extends Controller
         try {
             DB::beginTransaction();
             $data = ProductVariantModel::find($id);
-
+            dd($data);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
