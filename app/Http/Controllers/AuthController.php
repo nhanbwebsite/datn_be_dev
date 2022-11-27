@@ -122,6 +122,7 @@ class AuthController extends Controller
         $validator->validate($input);
         try{
             DB::beginTransaction();
+
             $userCreate = User::create([
                 'name' => $input['name'],
                 'address' => $input['address'],
@@ -129,9 +130,9 @@ class AuthController extends Controller
                 'district_id' => $input['district_id'],
                 'province_id' => $input['province_id'],
                 'phone' => $input['phone'],
-                'password' => Hash::make($input['password']),
-                'request_code_at' => date('Y-m-d H:i:s', time()),
+                // 'password' => Hash::make($input['password']),
             ]);
+
             DB::commit();
         }
         catch(HttpException $e){
@@ -298,17 +299,28 @@ class AuthController extends Controller
      * @param \App\Http\Validators\SMS\SMSValidator $validator
      * @return \Psr\Http\Message\StreamInterface $smsResponse or  null
      */
-    public function sendSMS($phone, SMSValidator $validator){
+    public function sendSMS(Request $request, SMSValidator $validator){
     // public function sendSMS(string $phone, $msg, SMSValidator $validator){
-        $input['phone'] = $phone;
-        // $input['message'] = $msg;
+        $input = $request->all();
         $validator->validate($input);
 
         try{
             DB::beginTransaction();
+
             $code = env('SMS_ENABLE') == 1 ? str_shuffle(''.mt_rand(10000000,99999999)) : '12345678';
             // $message = $code.$input['message'];
-            $message = $code.' la ma xac minh dang ky Baotrixemay cua ban';
+            switch($input['action']){
+                case ACTION_SMS['register']:
+                    $message = $code.' la ma xac minh dang ky Baotrixemay cua ban';
+                    break;
+                case ACTION_SMS['reset_password']:
+                    $message = $code.' la ma dat lai mat khau Baotrixemay cua ban';
+                    break;
+
+                default:
+                    $message = $code.' la ma xac minh dang ky Baotrixemay cua ban';
+            }
+
             $params = [
                 "ApiKey" => env('SMS_KEY'),
                 "SecretKey" => env('SMS_SECRET'),
