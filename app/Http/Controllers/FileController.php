@@ -4,14 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\FileCollection;
 use App\Http\Resources\FileResource;
-use App\Http\Validators\File\FileCreateValidator;
 use App\Http\Validators\File\FileUploadValidator;
 use App\Models\File;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File as FacadesFile;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Support\Str;
 
@@ -102,6 +99,7 @@ class FileController extends Controller
                     'message' => 'Không tìm thấy file !'
                 ], 404);
             }
+            $path = asset('/images/'.$data->name);
         }
         catch(HttpException $e){
             return response()->json([
@@ -115,6 +113,7 @@ class FileController extends Controller
         }
         return response()->json([
             'status' => 'success',
+            'path' => $path,
             'data' => new FileResource($data),
         ]);
     }
