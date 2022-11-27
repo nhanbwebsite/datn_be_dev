@@ -38,6 +38,7 @@ class ProductResource extends JsonResource
                 'category'      => $this->subcategory->category_id,
                 'category_name' => $this->subcategory->category->name,
                 'variants'      => $this->variants ?? null,
+                'variantsDetailsByProduct' => $this->variantsDetailsByProduct ?? null,
                 'dataVariants' => $this->dataVariants ?? null,
                 'is_active'     => $this->is_active,
                 'created_at'    => $this->created_at->format('Y-m-d H:i:s'),

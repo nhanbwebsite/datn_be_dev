@@ -29,7 +29,9 @@ class ProductController extends Controller
 
        $dataReturn = [];
        foreach($dataProducts as $key => $value){
+                $value->brand_name = $value->brand->brand_name;
                 $value-> cartegory_id = product::category($value->id)->cartegory_id;
+
                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
 
                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
@@ -47,6 +49,8 @@ class ProductController extends Controller
         return response()->json([
             "data" => $dataProducts
         ]);
+
+
 
         // $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
 
@@ -127,6 +131,7 @@ class ProductController extends Controller
                             "color_id" => $valueColor,
                             "price" => $request->prices_by_variant_id[$key][$keyColors],
                             "discount" => $request->discount_by_variant_id[$key][$keyColors],
+                            "images"
                         ]);
                     }
                 }
