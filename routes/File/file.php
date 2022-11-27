@@ -7,7 +7,7 @@ Route::controller(FileController::class)->middleware('auth:sanctum')->prefix('fi
     Route::delete('/{id}', 'destroy')->middleware('checkAction::all,delete-file');
 });
 
-Route::get('/', [FileController::class, 'index']);
+Route::get('files/', [FileController::class, 'index']);
 Route::get('view/{id}', [FileController::class, 'show']);
 
 ?>
