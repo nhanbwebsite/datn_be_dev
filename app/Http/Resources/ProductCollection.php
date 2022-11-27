@@ -38,6 +38,7 @@ class ProductCollection extends ResourceCollection
                     'subcategory_id' => $value->subcategory_id,
                     'subcategory_name' => $value->subcategory->name,
                     'variants' => $value->variants,
+                     'variantsDetailsByProduct' => $this->variantsDetailsByProduct ?? null,
                     'category' => $value->subcategory->category_id,
                     'category_name' => $value->subcategory->category->name,
                     'is_active'     => $value->is_active,
@@ -48,7 +49,7 @@ class ProductCollection extends ResourceCollection
                 ];
             }
             $result['paginator'] = [
-                'currentPage' => $this->currentPage(),
+                'currentPage' => !empty($this->currentPage()) ? $this->currentPage() : null,
                 'totalPages' => $this->lastPage(),
                 'perPage' => $this->perPage(),
                 'count' => $this->count(),

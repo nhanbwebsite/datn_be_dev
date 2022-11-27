@@ -84,6 +84,7 @@ class ProductImportSlipController extends Controller
                 ProductImportSlipDetail::create([
                     'product_import_slip_id' => $ProductImportSlip->id,
                     'product_id' => $detail['product_id'],
+                    'variant_id' => $detail['variant_id'],
                     'pro_variant_id' => $detail['pro_variant_id'],
                     'quantity_import' => $detail['quantity_import'],
                     'price_import' => $detail['price_import'],
@@ -93,6 +94,7 @@ class ProductImportSlipController extends Controller
                 //  Thêm vào số lượng sản phẩm ở kho tổng
                 $check = productAmountByWarehouse::where('product_id', $detail['product_id'])
                 ->where('pro_variant_id', $detail['pro_variant_id'])
+                ->where('variant_id', $detail['variant_id'])
                 ->where('warehouse_id', $request->warehouse_id)->first();
 //  kiểm tra điều kiện để cộng thêm số lượng hoặc tạo mới nếu sản phẩm đó chưa từng thêm thì sẽ tạo mới
                 if(!empty($check)){
@@ -103,6 +105,7 @@ class ProductImportSlipController extends Controller
                 else{
                     productAmountByWarehouse::create([
                         'product_id' => $detail['product_id'],
+                        'variant_id' => $detail['variant_id'],
                         'pro_variant_id' => $detail['pro_variant_id'],
                         'product_amount' => $detail['quantity_import'],
                         'warehouse_id' => $request->warehouse_id,
@@ -263,5 +266,23 @@ class ProductImportSlipController extends Controller
             'message' => 'Đã xóa phiếu nhập ['.$data->name.']',
         ]);
 
+    }
+
+    public function getproductImportSlipDetails(){
+        // không phân trang
+        $data = ProductImportSlipDetail::all();
+        return response()->json([
+            'status'=> 'success',
+            'data' => $data
+        ],200);
+    }
+
+    public function getproductImportSlipDetailsByID($id){
+        // không phân trang
+        $data = ProductImportSlipDetail::find($id);
+        return response()->json([
+            'status'=> 'success',
+            'data' => $data
+        ],200);
     }
 }
