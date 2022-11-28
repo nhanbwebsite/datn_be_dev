@@ -8,6 +8,6 @@ Route::controller(FileController::class)->middleware('auth:sanctum')->prefix('fi
 });
 
 Route::get('files/', [FileController::class, 'index']);
-Route::get('view/{id}', [FileController::class, 'show']);
+Route::get('files/{id}', [FileController::class, 'show']);
 
 ?>
