@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Warranty;
+use App\Models\WarrantyPolicy;
+
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -21,7 +22,7 @@ class WarrantyController extends Controller
     public function index()
     {
        try{
-         $data= Warranty::paginate(10);
+         $data= WarrantyPolicy::paginate(10);
          //$resource = PostResource::collection($data);
          return response()->json([
             'data'=>$data,
@@ -67,7 +68,7 @@ class WarrantyController extends Controller
                 ], 422);
             }
 
-            $data = Warranty::create([
+            $data = WarrantyPolicy::create([
                 'title' => mb_strtoupper($request->title) ,
                 'slug' => Str::slug($request->title),
                 'content'=>$request->content,
@@ -97,13 +98,13 @@ class WarrantyController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Warranty  $warranty
+     * @param  \App\Models\WarrantyPolicy  $WarrantyPolicy
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
         try{
-            $data = Warranty::find($id);
+            $data = WarrantyPolicy::find($id);
 
             if(empty($data)){
                 return response()->json([
@@ -130,7 +131,7 @@ class WarrantyController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Warranty  $warranty
+     * @param  \App\Models\WarrantyPolicy  $WarrantyPolicy
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -158,7 +159,7 @@ class WarrantyController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $data = Warranty::find($id);
+            $data = WarrantyPolicy::find($id);
             if(!empty($data)){
                  $data->update([
                     'title' => mb_strtoupper($request->title) ,
@@ -186,13 +187,13 @@ class WarrantyController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Warranty  $warranty
+     * @param  \App\Models\WarrantyPolicy  $WarrantyPolicy
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
         try {
-            $data = Warranty::find($id);
+            $data = WarrantyPolicy::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',

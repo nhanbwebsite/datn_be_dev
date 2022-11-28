@@ -35,11 +35,11 @@ class Post extends Model
     public function catePost() {
         return $this->hasOne(PostCategories::class, 'id','category_id');
     }
-    public function createdBy($id){
-        return $this->find($id);
+    public function createdBy(){
+        return $this->hasOne(User::class, 'id', 'created_by');
     }
 
-    public function updatedBy($id){
-        return $this->find($id);
+    public function updatedBy(){
+        return $this->hasOne(User::class, 'id', 'updated_by');
     }
 }
