@@ -2,50 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PostCategoriesCollection;
-use App\Http\Resources\PostCategoriesResource;
-use App\Models\PostCategories;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Validator;
+use App\Models\StoreIntroduction;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 
-class PostCategoryController extends Controller
+class StoreIntroductionController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $input = $request->all();
-        $input['limit'] = $request->limit;
         try{
-            $data = PostCategories::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
-                if(!empty($input['name'])){
-                    $query->where('name', 'like', '%'.$input['name'].'%');
-                }
-                if(!empty($input['is_active'])){
-                    $query->where('is_active', $input['is_active']);
-                }
-            })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
-            $resource = new PostCategoriesCollection($data);
-        }
-        catch(HttpException $e){
+            $data= StoreIntroduction::all();
+            //$resource = PostResource::collection($data);
             return response()->json([
-                'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
-        }
-        return response()->json($resource);
+               'data'=>$data,
+            ],200);
+
+          } catch(HttpException $e){
+           return response()->json([
+               'status' => 'Error',
+               'message' => $e->getMessage()
+            ],400);
+          }
     }
 
     /**
@@ -57,17 +44,18 @@ class PostCategoryController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'name' => 'required|max:255',
+            'title' => 'required|max:50',
+            'content'=> 'required',
         ];
         $messages = [
-            'name.required' => ':atribuite không được để trống !',
-            'name.max' => ':attribute tối đa 255 ký tự !',
+            'title.required' => ':atribuite không được để trống !',
+            'name.required' => ':attribute không được để trống!',
         ];
-
-        $attributes = [
-            'name' => 'Tên danh mục bài viết'
+        $attributes=[
+            'title'=>'Tiêu đề chính sách',
+            'slug'=>'Slug',
+            'content'=>'Nội dung chính sách',
         ];
-
         try {
             $user = auth('sanctum')->user();
             DB::beginTransaction();
@@ -79,12 +67,12 @@ class PostCategoryController extends Controller
                 ], 422);
             }
 
-            $data = PostCategories::create([
-                'name' => mb_strtoupper($request->name) ,
-                'slug' => Str::slug($request->name),
+            $data = StoreIntroduction::create([
+                'title' => mb_strtoupper($request->title) ,
+                'slug' => StR::slug($request->title),
+                'content'=>$request->content,
                 'created_by' => $user->id,
-
-
+                'updated_by' => $user->id,
             ]);
             DB::commit();
 
@@ -101,27 +89,25 @@ class PostCategoryController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => $data->name . ' đã được tạo thành công !',
+            'message' => $data->title. ' đã được tạo thành công !',
         ]);
 
-
     }
-
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\post_category  $post_category
+     * @param  \App\Models\StoreIntroduction  $StoreIntroduction
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
         try{
-            $data = PostCategories::find($id);
+            $data = StoreIntroduction::find($id);
 
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
+                    'message' => ' Không tồn tại, vui lòng kiểm tra lại'
 
                 ],400);
             }
@@ -138,28 +124,28 @@ class PostCategoryController extends Controller
             ], 400);
         }
     }
-
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\post_category  $post_category
+     * @param  \App\Models\StoreIntroduction  $StoreIntroduction
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         $rules = [
-            'name' => 'required|max:255',
+            'title' => 'required|max:50',
+            'content'=> 'required',
         ];
         $messages = [
-            'name.required' => ':atribuite không được để trống !',
-            'name.max' => ':attribute tối đa 255 ký tự !',
+            'title.required' => ':atribuite không được để trống !',
+            'name.required' => ':attribute không được để trống!',
         ];
-
-        $attributes = [
-            'name' => 'Tên danh mục không được để trống'
+        $attributes=[
+            'title'=>'Tiêu đề chính sách',
+            'slug'=>'Slug',
+            'content'=>'Nội dung chính sách',
         ];
-
         try {
             $user = auth('sanctum')->user();
             DB::beginTransaction();
@@ -170,16 +156,15 @@ class PostCategoryController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-            $data = PostCategories::find($id);
+            $data = StoreIntroduction::find($id);
             if(!empty($data)){
                  $data->update([
-                    'name' => mb_strtoupper($request->name) ,
-                    'slug' => Str::slug($request->name),
+                    'title' => mb_strtoupper($request->title) ,
+                    'slug' => Str::slug($request->title),
+                    'content'=>$request->content,
                     'updated_by' => $user->id,
                 ]);
             }
-
-
 
         } catch(Exception $e) {
             DB::rollback();
@@ -191,32 +176,31 @@ class PostCategoryController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' =>'Danh mục đã được cập nhật thành '.$request->name.'!',
+            'message' =>'Nội dung cửa hàng đã được cập nhật thành !',
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\PostCategories  $post_category
+     * @param  \App\Models\StoreIntroduction  $StoreIntroduction
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
         try {
-            //DB::beginTransaction();
-            $data = PostCategories::find($id);
+            $data = StoreIntroduction::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Danh mục không tồn tại !',
+                    'message' => 'Không tồn tại !',
                 ], 404);
 
             }
            $data->delete();
             return response()->json([
                 'status' => 'success',
-                'message' => 'Đã xóa thành công danh mục ' . $data->name
+                'message' => 'Đã xóa thành công ' . $data->title .'!'
             ]);
 
             $data->update([
@@ -232,33 +216,5 @@ class PostCategoryController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
-
-
     }
-    public function loadPostByCate($id)
-    {
-        try{
-            $data = PostCategories::find($id);
-
-            if(empty($data)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
-
-                ],400);
-            }
-
-            return response()->json([
-                 'data' => $data->post,
-                 'data' => $data
-            ],200);
-
-        } catch(Exception $e){
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
-        }
-    }
-
 }

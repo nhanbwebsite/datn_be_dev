@@ -15,7 +15,7 @@ class PostResource extends JsonResource
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
+        if(!empty($request)){
         return[
             'id'=>$this->id,
             'category_id'=>$this->category_id,
@@ -31,12 +31,14 @@ class PostResource extends JsonResource
             'slug'=>$this->slug,
             'views'=>$this->views,
             'is_active'=>$this->is_active,
-            'created_by'=> $this->createdBy($this->created_by)->name ?? null,
-            'updated_by'=> $this->updatedBy($this->updated_by)->name ?? null,
+            'created_by'    => $this->createdBy->name ?? null,
+            'updated_by'    => $this->updatedBy->name ?? null,
             //'deleted_by'=>$this->title,
             'created_at' => $this->created_at->format('d-m-Y H:i:s'),
             'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
             // 'deleted_at'
         ];
     }
+    return [];
+}
 }

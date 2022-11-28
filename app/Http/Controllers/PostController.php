@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PostCollection;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Exception;
@@ -20,22 +21,47 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-       try{
-         $data= Post::orderBy('created_at','desc')->simplePaginate(10);
-         $resource = PostResource::collection($data);
-         return response()->json([
-            'data'=>$resource,
-         ],200);
+        $input = $request->all();
+        $input['limit'] = $request->limit;
+        try{
+            $data = Post::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
+                if(!empty($input['title'])){
+                    $query->where('title', 'like', '%'.$input['title'].'%');
+                }
+                if(!empty($input['is_active'])){
+                    $query->where('is_active', $input['is_active']);
+                }
+            })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 5);
+            $resource = new PostCollection($data);
+           //$resource = PostResource::collection($data);
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json($resource);
+    //    try{
+    //      $data= Post::orderBy('created_at','desc')->simplePaginate(10);
+    //      $resource = PostResource::collection($data);
+    //      return response()->json([
+    //         'data'=>$resource,
+    //      ],200);
 
-       } catch(HttpException $e){
-        return response()->json([
-            'status' => 'Error',
-            'message' => $e->getMessage()
-         ],400);
-       }
-    }
+    //    } catch(HttpException $e){
+    //     return response()->json([
+    //         'status' => 'Error',
+    //         'message' => $e->getMessage()
+    //      ],400);
+    //    }
+     }
 
     /**
      * Store a newly created resource in storage.
@@ -82,6 +108,7 @@ class PostController extends Controller
         ];
 
         try {
+            $user = auth('sanctum')->user();
             DB::beginTransaction();
             $validator = Validator::make($request->all(), $rules, $messages, $atribuite);
             if($validator->fails()){
@@ -99,7 +126,10 @@ class PostController extends Controller
                 //'image'=> $request->image,
                 'meta_title'=>$request->meta_title,
                 'meta_keywords'=>$request->meta_keywords,
+                'meta_description'=>$request->meta_description,
                 'slug' => Str::slug($request->title),
+                'created_by' => $user->id,
+
 
             ]);
             DB::commit();
@@ -125,7 +155,7 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $data = Post::find($id)->first();
+        $data = Post::find($id);
         $data->views = $data->views + 1;
         $data->save();
         // Event::fire('posts.view', $data);
@@ -210,6 +240,7 @@ class PostController extends Controller
                 'meta_title'=>$request->meta_title,
                 'meta_keywords'=>$request->meta_keywords,
                 'slug' => Str::slug($request->title),
+
                 ]);
             }
 
@@ -284,4 +315,33 @@ class PostController extends Controller
             }
          }
     }
+
+    // public function loadRelatedPost()
+    // {
+
+    //     try{
+    //         $data = Post::all();
+
+    //         if(empty($data)){
+    //             return response()->json([
+    //                 'status' => 'error',
+    //                 'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
+
+    //             ],400);
+    //         }
+
+    //         return response()->json([
+    //              'data' => $data->post,
+    //              'data' => $data
+    //         ],200);
+
+    //     } catch(Exception $e){
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => $e->getMessage(),
+    //         ], 400);
+    //     }
+    // }
+
+
 }

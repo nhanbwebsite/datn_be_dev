@@ -15,16 +15,21 @@ class PostCategoriesResource extends JsonResource
     public function toArray($request)
     {
        // return parent::toArray($request);
-       return[
-        'id'=>$this->id,
-        'name'=>$this->name,
-        'slug'=>$this->slug,
-        'is_active'=>$this->is_active,
-        'created_by'    => $this->createdBy->name ?? null,
-        'updated_by'    => $this->updatedBy->name ?? null,
-        'created_at' => $this->created_at->format('d-m-Y H:i:s'),
-        'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
-        // 'deleted_at'=>$this->id,
-       ];
+       if(!empty($request)){
+        return[
+            'id'=>$this->id,
+            'name'=>$this->name,
+            'slug'=>$this->slug,
+            'is_active'=>$this->is_active,
+            'created_by'    => $this->createdBy->name ?? null,
+            'updated_by'    => $this->updatedBy->name ?? null,
+            'created_at' => $this->created_at->format('d-m-Y H:i:s'),
+            'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
+
+           ];
+       }
+
+       return [];
+
     }
 }
