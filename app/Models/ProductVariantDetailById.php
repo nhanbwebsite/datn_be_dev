@@ -23,4 +23,8 @@ class ProductVariantDetailById extends Model
         'updated_by',
         'deleted_by',
     ];
+
+    public function product_variant(){
+        return $this->belongsTo(Warehouse::class, 'pro_variant_id', 'id');
+    }
 }

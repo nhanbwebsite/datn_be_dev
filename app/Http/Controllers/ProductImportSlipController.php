@@ -68,14 +68,15 @@ class ProductImportSlipController extends Controller
         }
         try {
             DB::beginTransaction();
-
+            // Phiếu nhập
             $ProductImportSlip = ProductImportSlipModel::create([
-                'name' => $input['name'],
+                'name' => $input['name'], // tên phiếu nhập
                 'code' => strtoupper('PN'.date('YmdHis', time())),
                 'warehouse_id' => $input['warehouse_id'],
                 'status' => $input['status'],
-                'created_by'=> $request->user()->id,
-                'updated_by' => $request->user()->id,
+                'note' => $input['note'],
+                'created_by'=> auth('sanctum')->user()->id,
+                'updated_by' => auth('sanctum')->user()->id,
             ]);
             $details = $input['details'];
 //  chi tiết phiếu nhập
@@ -84,34 +85,35 @@ class ProductImportSlipController extends Controller
                     'product_import_slip_id' => $ProductImportSlip->id,
                     'product_id' => $detail['product_id'],
                     'variant_id' => $detail['variant_id'],
-                    'color_id' => $detail['color_id'],
+                    'pro_variant_id' => $detail['pro_variant_id'],
                     'quantity_import' => $detail['quantity_import'],
                     'price_import' => $detail['price_import'],
-                    'created_by' => $request->user()->id,
-                    'updated_by' => $request->user()->id,
+                    'created_by' => auth('sanctum')->user()->id,
+                    'updated_by' => auth('sanctum')->user()->id,
                 ]);
-
+                //  Thêm vào số lượng sản phẩm ở kho tổng
                 $check = productAmountByWarehouse::where('product_id', $detail['product_id'])
-                ->where('color_id', $detail['color_id'])
+                ->where('pro_variant_id', $detail['pro_variant_id'])
                 ->where('variant_id', $detail['variant_id'])
                 ->where('warehouse_id', $request->warehouse_id)->first();
-
+//  kiểm tra điều kiện để cộng thêm số lượng hoặc tạo mới nếu sản phẩm đó chưa từng thêm thì sẽ tạo mới
                 if(!empty($check)){
                     $check->product_amount += $detail['quantity_import'];
-                    $check->updated_by = $request->user()->id;
+                    $check->updated_by = auth('sanctum')->user()->id;
                     $check->save();
                 }
                 else{
                     productAmountByWarehouse::create([
                         'product_id' => $detail['product_id'],
-                        'color_id' => $detail['color_id'],
                         'variant_id' => $detail['variant_id'],
+                        'pro_variant_id' => $detail['pro_variant_id'],
                         'product_amount' => $detail['quantity_import'],
                         'warehouse_id' => $request->warehouse_id,
-                        'created_by' => $request->user()->id,
-                        'updated_by' => $request->user()->id,
+                        'created_by' => auth('sanctum')->user()->id,
+                        'updated_by' => auth('sanctum')->user()->id,
                     ]);
                 }
+//kết thúc kiểm tra
             }
             DB::commit();
         } catch(HttpException $e) {
@@ -131,9 +133,7 @@ class ProductImportSlipController extends Controller
             'message' => '['.$ProductImportSlip->name.'] đã được tạo thành công !',
             'data' => $ProductImportSlip
         ]);
-    }
-
-    /**
+    }    /**
      * Display the specified resource.
      *
      * @param  int  $id
@@ -266,5 +266,23 @@ class ProductImportSlipController extends Controller
             'message' => 'Đã xóa phiếu nhập ['.$data->name.']',
         ]);
 
+    }
+
+    public function getproductImportSlipDetails(){
+        // không phân trang
+        $data = ProductImportSlipDetail::all();
+        return response()->json([
+            'status'=> 'success',
+            'data' => $data
+        ],200);
+    }
+
+    public function getproductImportSlipDetailsByID($id){
+        // không phân trang
+        $data = ProductImportSlipDetail::find($id);
+        return response()->json([
+            'status'=> 'success',
+            'data' => $data
+        ],200);
     }
 }

@@ -15,5 +15,12 @@ define('ORDER_STATUS_COMPLETED', 'COMPLETED');
 define('ORDER_STATUS_CANCELED', 'CANCELED');
 
 define('ORDER_STATUS_PROCESS', ['NEW', 'APPROVED', 'SHIPPING', 'SHIPPED', 'COMPLETED', 'CANCELED']);
-define('IMAGE_PATH', 'images');
+
+define('PATH_DROPBOX', '/DATN/');
+
+define('ACTION_SMS', [
+    'login' => 'LOGIN',
+    'register' => 'REGISTER',
+    'reset_password' => 'RESET_PASSWORD',
+])
 ?>

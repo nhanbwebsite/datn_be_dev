@@ -29,12 +29,15 @@ class ProductController extends Controller
 
        $dataReturn = [];
        foreach($dataProducts as $key => $value){
+                $value->brand_name = $value->brand->brand_name;
+                $value-> cartegory_id = product::category($value->id)->cartegory_id;
 
                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
 
                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
 
                 $value->variants = Product::productVariants($value->id);
+
                 array_push($dataReturn,[
                     "product" =>  $value,
                 ]);
@@ -45,8 +48,9 @@ class ProductController extends Controller
 
         return response()->json([
             "data" => $dataProducts
-
         ]);
+
+
 
         // $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
 
@@ -126,7 +130,8 @@ class ProductController extends Controller
                             "pro_variant_id" => $proVariant->id,
                             "color_id" => $valueColor,
                             "price" => $request->prices_by_variant_id[$key][$keyColors],
-                            "discounts" => $request->discount_by_variant_id[$key][$keyColors],
+                            "discount" => $request->discount_by_variant_id[$key][$keyColors],
+                            "images"
                         ]);
                     }
                 }
@@ -170,6 +175,7 @@ class ProductController extends Controller
             $dataByproduct->variants = Product::productVariants($id);
 
             $dataByproduct->dataVariants = $dataTest;
+            // dd($dataByproduct->variants);
             // array_push($dataVariants,$dataTest);
             if(empty($dataByproduct)){
                 return response()->json([
@@ -217,22 +223,52 @@ class ProductController extends Controller
                     'message' => 'Không tìm thấy sản phẩm !'
                 ], 404);
             }
-
+            $product->meta_title =  $request->meta_title ?? $product->meta_title;
+            $product->meta_keywords =  $request->meta_keywords ?? $product->meta_keywords;
+            $product->meta_description =  $request->meta_description ?? $product->meta_description;
             $product->name = $request->name ?? $product->name;
             $product->slug = Str::slug($request->slug) ?? Str::slug($request->name);
             $product->description = $request->description ?? $product->description;
             $product->url_image = $request->url_image ?? $product->url_image;
-            $product->meta_title = $request->meta_title ?? $product->meta_title;
-            $product->meta_keywords = $request->meta_keywords ?? $product->meta_keywords;
-            $product->meta_description = $request->meta_description ?? $product->meta_description;
-            $product->subcategory_id = $request->subcategory_id ?? $product->subcategory_id;
             $product->specification_infomation = $request->specification_infomation ?? $product->specification_infomation;
             $product->brand_id = $request->brand_id ?? $product->brand_id;
+            $product->subcategory_id = $request->subcategory_id ?? $product->subcategory_id;
             // $product->price = $request->price ?? $product->price;
             // $product->discount = $request->discount ?? $product->discount;
             $product->is_active = $request->is_active ?? $product->is_active;
             $product->updated_by = $user->id;
             $product->save();
+
+            if(isset($request->variant_ids)){
+
+                foreach($request->variant_ids as $key => $valueVariant) {
+
+                    $dataWaitUpdate = ProductVariantDetail::where('product_id',$product->id)
+                                                          ->where('variant_id',$valueVariant)->first();
+
+                    if($dataWaitUpdate){
+                        $dataWaitUpdate->update([
+                            "variant_id" => $valueVariant
+                        ]);
+                    } else{
+                        $proVariant = ProductVariantDetail::create([
+                            'variant_id' => $valueVariant,
+                            'product_id' => $product->id,
+                        ]);
+                        if(isset($request->colors_by_variant_id) && $request->discount_by_variant_id ) {
+                            foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
+                            $create = ProductVariantDetailById::create([
+                                    "pro_variant_id" => $proVariant->id,
+                                    "color_id" => $valueColor,
+                                    "price" => $request->prices_by_variant_id[$key][$keyColors],
+                                    "discount" => $request->discount_by_variant_id[$key][$keyColors],
+                                ]);
+
+                            }
+                        }
+                    }
+                }
+            }
 
             DB::commit();
 
@@ -265,18 +301,25 @@ class ProductController extends Controller
        $user = $request->user();
         try {
             DB::beginTransaction();
-            $data = Product::find($id);
+            $dataPro = Product::find($id);
 
-            if(empty($data)){
+            if(empty($dataPro)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Không tìm thấy sản phẩm !'
                 ], 404);
             }
+            $datavariant = ProductVariantDetail::where('product_id',$dataPro->id)->get();
+            foreach($datavariant as $key => $value){
+                              ProductVariantDetail::where('product_id',$dataPro->id)->where('variant_id',$value->variant_id)->update(['deleted_by' => auth('sanctum')->user()->id]);
+                              ProductVariantDetail::where('product_id',$dataPro->id)->where('variant_id',$value->variant_id)->delete();
+                              ProductVariantDetailById::where('pro_variant_id',$value->id)->update(['deleted_by' => auth('sanctum')->user()->id]);
+                              ProductVariantDetailById::where('pro_variant_id',$value->id)->delete();
+            }
 
-            $data->updated_by = $user->id;
-            $data->save();
-            $data->delete();
+            $dataPro->deleted_by = $user->id;
+            $dataPro->save();
+            $dataPro->delete();
 
             DB::commit();
         } catch(HttpException $e){
@@ -292,7 +335,7 @@ class ProductController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Đã xóa ['.$data->name.'] !',
+            'message' => 'Đã xóa ['.$dataPro->name.'] !',
         ]);
     }
 
@@ -354,6 +397,73 @@ class ProductController extends Controller
         return response()->json([
             "data" => $data
         ]);
+    }
+
+    public function productsByCategoryId($category_id){
+        $product = new Product();
+
+        $dataProducts = $product->productByCategory($category_id);
+        $dataReturn = [];
+        foreach($dataProducts as $key => $value){
+
+                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
+
+                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
+
+                 $value->variants = Product::productVariants($value->id);
+                 array_push($dataReturn,[
+                     "product" =>  $value,
+                 ]);
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => $dataProducts
+        ],200);
+    }
+
+    // delete variants of a product
+
+    public function deleteVariantOfproduct($variant_id, Request $request){
+        try {
+            DB::beginTransaction();
+            ProductVariantDetail::where('variant_id',$variant_id)->where('product_id',$request->product_id)->update(["deleted_by" => auth('sanctum')->user()->id]);
+            ProductVariantDetail::where('variant_id',$variant_id)->where('product_id',$request->product_id)->delete();
+            DB::commit();
+        } catch(HttpException $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xóa biến thể '. $variant_id . ' !'
+        ]);
+    }
+
+    public function getVariantById($variant_id, Request $request){
+
+        try {
+            DB::beginTransaction();
+
+            DB::commit();
+        } catch(HttpException $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+
     }
 
 }

@@ -8,4 +8,13 @@
         Route::patch('/{id}', 'update');
         Route::delete('/{id}', 'destroy');
     });
+
+    Route::prefix('product_import_slip_details')->middleware(['auth:sanctum'])->group(function (){
+        Route::get('/', [ProductImportSlipController::class,'getproductImportSlipDetails']);
+        Route::get('/{id}', [ProductImportSlipController::class,'getproductImportSlipDetailsByID']);
+        // Route::post('/', 'store');
+        // Route::patch('/{id}', 'update');
+        // Route::delete('/{id}', 'destroy');
+    });
+
     ?>

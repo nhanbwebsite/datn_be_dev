@@ -13,8 +13,8 @@ class productAmountByWarehouse extends Model
     public $timestamps = false;
     protected $fillable = [
         'product_id',
-        'color_id',
         'variant_id',
+        'pro_variant_id',
         'product_amount',
         'warehouse_id',
         'created_at',

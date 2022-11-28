@@ -14,6 +14,7 @@ class File extends Model
         'slug',
         'name',
         'extension',
+        'path',
         'created_at',
         'updated_at',
         'deleted_at',

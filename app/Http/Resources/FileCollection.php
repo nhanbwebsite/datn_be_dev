@@ -14,7 +14,7 @@ class FileCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
+        // return parent::toArray($request);\
         if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $value){
@@ -22,7 +22,7 @@ class FileCollection extends ResourceCollection
                     'id'            => $value->id,
                     'slug'          => $value->slug,
                     'name'          => $value->name,
-                    'path'          => IMAGE_PATH.'/'.$value->name,
+                    'path'          => $value->path,
                     'extension'     => $value->extension,
                     'created_at'    => $value->created_at->format('d-m-Y H:i:s'),
                     'updated_at'    => $value->updated_at->format('d-m-Y H:i:s'),
