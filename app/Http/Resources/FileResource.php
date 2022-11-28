@@ -14,13 +14,15 @@ class FileResource extends JsonResource
      */
     public function toArray($request)
     {
+
         // return parent::toArray($request);
         if(!empty($request)){
+
             return [
                 'id'            => $this->id,
                 'slug'          => $this->slug,
                 'name'          => $this->name,
-                'path'          => IMAGE_PATH.'/'.$this->name,
+                'path'          => $this->path,
                 'extension'     => $this->extension,
                 'created_at'    => $this->created_at->format('d-m-Y H:i:s'),
                 'updated_at'    => $this->updated_at->format('d-m-Y H:i:s'),

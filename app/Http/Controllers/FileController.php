@@ -9,9 +9,9 @@ use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File as FacadesFile;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Support\Str;
-
+use Spatie\Dropbox\Client;
 class FileController extends Controller
 {
     /**
@@ -50,17 +50,22 @@ class FileController extends Controller
         $user = $request->user();
         try{
             DB::beginTransaction();
-
+            $client = new Client(env('DROPBOX_ACCESS_TOKEN'));
             foreach($input as $file){
                 $upload = $this->uploadFile($file);
                 if(!empty($upload)){
+                    $path = $client->getTemporaryLink(PATH_DROPBOX.$upload['name']);
                     File::create([
-                        'slug' => Str::slug($upload['name']),
+                        'slug' => explode('.', $upload['name'])[0],
                         'name' => $upload['name'],
                         'extension' => $upload['extension'],
+                        'path' => $path,
                         'created_by' => $user->id,
                         'updated_by' => $user->id,
                     ]);
+                }
+                else{
+                    throw new HttpException(400, 'Lỗi upload file');
                 }
             }
 
@@ -99,7 +104,6 @@ class FileController extends Controller
                     'message' => 'Không tìm thấy file !'
                 ], 404);
             }
-            $path = asset('/images/'.$data->name);
         }
         catch(HttpException $e){
             return response()->json([
@@ -113,7 +117,6 @@ class FileController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'path' => $path,
             'data' => new FileResource($data),
         ]);
     }
@@ -178,6 +181,9 @@ class FileController extends Controller
     public function uploadFile($file){
         try{
             $fileOriginalName = $file->getClientOriginalName();
+            if(explode(' ', $fileOriginalName)){
+
+            }
             $fileOriginalExtension = $file->getClientOriginalExtension();
             $allow_ext = ['jpg', 'png', 'gif', 'jpeg'];
             if(!in_array($fileOriginalExtension, $allow_ext)){
@@ -192,7 +198,7 @@ class FileController extends Controller
                 $fileOriginalName = explode('.', $fileOriginalName)[0].'_'.time().'.'.$fileOriginalExtension;
             }
 
-            if($file->move(public_path('images'), $fileOriginalName)){
+            if(Storage::disk('dropbox')->putFileAs(PATH_DROPBOX, $file, $fileOriginalName)){
                 $fileData['name'] = $fileOriginalName ?? null;
                 $fileData['extension'] = $fileOriginalExtension ?? null;
             }
