@@ -29,15 +29,11 @@ class ProductController extends Controller
 
        $dataReturn = [];
        foreach($dataProducts as $key => $value){
-                $value->brand_name = $value->brand->brand_name;
+                 $brand_name = $value->brand->brand_name;
                 $value-> cartegory_id = product::category($value->id)->cartegory_id;
-
                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
-
                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
-
                 $value->variants = Product::productVariants($value->id);
-
                 array_push($dataReturn,[
                     "product" =>  $value,
                 ]);
@@ -345,7 +341,6 @@ class ProductController extends Controller
         // dd($request->all());
         //  sản phẩm theo địa chỉ tỉnh thành và quận huyện của cửa hàng
         if(!empty($request->province_id) && !empty($request->district_id)){
-
             $data = DB::table('productAmountByWarehouse')
             ->select('products.name','productAmountByWarehouse.product_amount','stores.name as Showroom')
             ->leftJoin('warehouses','productAmountByWarehouse.warehouse_id','warehouses.id')
@@ -360,7 +355,6 @@ class ProductController extends Controller
             ],200);
 
         }
-
         //  sảm phẩm  theo địa chỉ tỉnh thành cuửa hàng
         if(!empty($request->province_id)) {
             $data = DB::table('productAmountByWarehouse')
@@ -390,6 +384,13 @@ class ProductController extends Controller
             'data' => $data
         ],200);
     }
+
+    // get province store (all)
+        public function getProvincesByWarehouse(){
+            $data = DB::table('stores');
+
+        }
+
     //  product by subcategory id
 
     public function producstBySubcategoryId($SubId) {
@@ -464,6 +465,18 @@ class ProductController extends Controller
             ], $e->getStatusCode());
         }
 
+    }
+
+
+    // tìm sản phẩm
+
+    public function search($keywords){
+        $product = new Product();
+        $data = $product-> productByKeywords($keywords);
+        return response()->json([
+            'status' => 'success',
+            'data' => $data,
+        ]);
     }
 
 }

@@ -78,8 +78,9 @@ class Product extends Model
     public static function productsBySubCate($id){
         $proBySub = DB::table(('products'))
         ->join('sub_categories', 'products.subcategory_id', '=', 'sub_categories.id')
-        ->where('sub_categories.id',$id)
-        ->get();
+        ->where('products.subcategory_id',$id)
+        ->orderByDesc('products.id')->get();
+        // ->paginate(4);
         return $proBySub;
     }
 
@@ -125,4 +126,21 @@ class Product extends Model
         ->get();
         return $data;
     }
+
+    //  tìm sản phẩm
+
+    public function productByKeywords($keywords){
+        $data = DB::table('products')
+        ->select('products.id','products.name as product_name','productVariantDetails.price','products.slug','productVariantDetails.discount','products.description','products.url_image','products.subcategory_id','productVariantDetails.quantity','variants.variant_name','variants.slug as variant_slug ','colors.name as color_name','colors.slug as color_slug')
+        ->join('productAmountByWarehouse','products.id','productAmountByWarehouse.product_id')
+        ->join('productVariant','products.id','productVariant.product_id')
+        ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
+        ->join('variants','productVariant.variant_id','variants.id')
+        ->join('colors','productVariantDetails.color_id','colors.id')
+        ->where('products.name','like',"%$keywords%")
+        ->get();
+        return $data;
+    }
+
+
 }

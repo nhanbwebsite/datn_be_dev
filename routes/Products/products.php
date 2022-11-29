@@ -30,3 +30,6 @@ Route::get('findProductByStore',[ProductController::class,'productByStore']);
 Route::get('productsBySubcate/{subId}',[ProductController::class,'producstBySubcategoryId']);
 
 Route::get('client/products/category/{id}',[ProductController::class,'productsByCategoryId']);
+
+// tìm sản phẩm
+Route::get('client/products/search/{keywords}',[ProductController::class,'search']);
