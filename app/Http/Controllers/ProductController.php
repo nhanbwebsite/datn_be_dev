@@ -387,7 +387,21 @@ class ProductController extends Controller
 
     // get province store (all)
         public function getProvincesByWarehouse(){
-            $data = DB::table('stores');
+                $data = DB::table('products')
+                ->select('stores.name as store_name','provinces.id as province_id','provinces.name as province_name','districts.id as district_id','districts.name as district_name','wards.id as ward_id','wards.name as ward_name')
+                ->join('productAmountByWarehouse','products.id','productAmountByWarehouse.product_id')
+                ->join('warehouses','productAmountByWarehouse.warehouse_id','warehouses.id')
+                ->join('stores','warehouses.id','stores.warehouse_id')
+                ->join('provinces','stores.province_id','provinces.id')
+                ->join('districts','stores.district_id','districts.id')
+                ->join('wards','stores.ward_id','wards.id')
+                ->where('products.is_active',1)
+                ->where('productAmountByWarehouse.product_amount','>',0)
+                ->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $data
+                ]);
 
         }
 
