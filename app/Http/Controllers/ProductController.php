@@ -387,16 +387,85 @@ class ProductController extends Controller
 
     // get province store (all)
         public function getProvincesByWarehouse(Request $request){
-                $data = DB::table('products')
+
+            if(isset($request->province_id) && isset($request->district_id) && isset($request->ward_id)){
+                $data = DB::table('stores')
                 ->select('stores.name as store_name','provinces.id as province_id','provinces.name as province_name','districts.id as district_id','districts.name as district_name','wards.id as ward_id','wards.name as ward_name')
-                ->join('productAmountByWarehouse','products.id','productAmountByWarehouse.product_id')
-                ->join('warehouses','productAmountByWarehouse.warehouse_id','warehouses.id')
-                ->join('stores','warehouses.id','stores.warehouse_id')
+                ->join('warehouses','stores.warehouse_id','warehouses.id')
+                ->join('productAmountByWarehouse','warehouses.id','productAmountByWarehouse.warehouse_id')
+                ->join('products','productAmountByWarehouse.product_id','products.id')
                 ->join('provinces','stores.province_id','provinces.id')
                 ->join('districts','stores.district_id','districts.id')
                 ->join('wards','stores.ward_id','wards.id')
                 ->where('products.is_active',1)
                 ->where('products.id',$request->product_id)
+                ->where('productAmountByWarehouse.variant_id',$request->variant_id)
+                ->where('productAmountByWarehouse.product_amount','>',0)
+                ->where('stores.province_id',$request->province_id)
+                ->where('stores.district_id',$request->district_id)
+                ->where('stores.ward_id',$request->ward_id)
+                ->get();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => $data
+                ]);
+            }
+
+                if(isset($request->province_id ) && isset($request->district_id)){
+                    $data = DB::table('stores')
+                    ->select('stores.name as store_name','provinces.id as province_id','provinces.name as province_name','districts.id as district_id','districts.name as district_name','wards.id as ward_id','wards.name as ward_name')
+                    ->join('warehouses','stores.warehouse_id','warehouses.id')
+                    ->join('productAmountByWarehouse','warehouses.id','productAmountByWarehouse.warehouse_id')
+                    ->join('products','productAmountByWarehouse.product_id','products.id')
+                    ->join('provinces','stores.province_id','provinces.id')
+                    ->join('districts','stores.district_id','districts.id')
+                    ->join('wards','stores.ward_id','wards.id')
+                    ->where('products.is_active',1)
+                    ->where('products.id',$request->product_id)
+                    ->where('productAmountByWarehouse.variant_id',$request->variant_id)
+                    ->where('productAmountByWarehouse.product_amount','>',0)
+                    ->where('stores.province_id',$request->province_id)
+                    ->where('stores.district_id',$request->district_id)
+                    ->get();
+                    return response()->json([
+                        'status' => 'success',
+                        'data' => $data
+                    ]);
+                }
+
+                if(isset($request->province_id)){
+                    $data = DB::table('stores')
+                    ->select('stores.name as store_name','provinces.id as province_id','provinces.name as province_name','districts.id as district_id','districts.name as district_name','wards.id as ward_id','wards.name as ward_name')
+                    ->join('warehouses','stores.warehouse_id','warehouses.id')
+                    ->join('productAmountByWarehouse','warehouses.id','productAmountByWarehouse.warehouse_id')
+                    ->join('products','productAmountByWarehouse.product_id','products.id')
+                    ->join('provinces','stores.province_id','provinces.id')
+                    ->join('districts','stores.district_id','districts.id')
+                    ->join('wards','stores.ward_id','wards.id')
+                    ->where('products.is_active',1)
+                    ->where('products.id',$request->product_id)
+                    ->where('productAmountByWarehouse.variant_id',$request->variant_id)
+                    ->where('productAmountByWarehouse.product_amount','>',0)
+                    ->where('stores.province_id',$request->province_id)
+                    ->get();
+                    return response()->json([
+                        'status' => 'success',
+                        'data' => $data
+                    ]);
+                }
+
+
+                $data = DB::table('stores')
+                ->select('stores.name as store_name','provinces.id as province_id','provinces.name as province_name','districts.id as district_id','districts.name as district_name','wards.id as ward_id','wards.name as ward_name')
+                ->join('warehouses','stores.warehouse_id','warehouses.id')
+                ->join('productAmountByWarehouse','warehouses.id','productAmountByWarehouse.warehouse_id')
+                ->join('products','productAmountByWarehouse.product_id','products.id')
+                ->join('provinces','stores.province_id','provinces.id')
+                ->join('districts','stores.district_id','districts.id')
+                ->join('wards','stores.ward_id','wards.id')
+                ->where('products.is_active',1)
+                ->where('products.id',$request->product_id)
+                ->where('productAmountByWarehouse.variant_id',$request->variant_id)
                 ->where('productAmountByWarehouse.product_amount','>',0)
                 ->get();
                 return response()->json([
