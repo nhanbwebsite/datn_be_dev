@@ -4,13 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PostCollection;
 use App\Http\Resources\PostResource;
+use App\Http\Validators\Post\PostCreateValidator;
+use App\Http\Validators\Post\PostUpdateValidator;
 use App\Models\Post;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -26,16 +24,20 @@ class PostController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = Post::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
+            $data = Post::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input) {
                 if(!empty($input['title'])){
                     $query->where('title', 'like', '%'.$input['title'].'%');
                 }
-                if(!empty($input['is_active'])){
-                    $query->where('is_active', $input['is_active']);
+                if(!empty($input['slug'])){
+                    $query->where('slug', $input['slug']);
                 }
-            })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 5);
-            $resource = new PostCollection($data);
-           //$resource = PostResource::collection($data);
+                if(!empty($input['user_id'])){
+                    $query->where('user_id', $input['user_id']);
+                }
+                if(!empty($input['category_id'])){
+                    $query->where('category_id', $input['category_id']);
+                }
+            })->orderBy('created_at', 'desc')->paginate($input['limit'] ?? 5);
         }
         catch(HttpException $e){
             return response()->json([
@@ -47,101 +49,49 @@ class PostController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        return response()->json($resource);
-    //    try{
-    //      $data= Post::orderBy('created_at','desc')->simplePaginate(10);
-    //      $resource = PostResource::collection($data);
-    //      return response()->json([
-    //         'data'=>$resource,
-    //      ],200);
-
-    //    } catch(HttpException $e){
-    //     return response()->json([
-    //         'status' => 'Error',
-    //         'message' => $e->getMessage()
-    //      ],400);
-    //    }
-     }
-
+        return response()->json(new PostCollection($data));
+    }
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, PostCreateValidator $validator)
     {
-        $rules=[
-            'category_id'=>'required',
-            // 'user_id'=>'required',
-            'title'=>'required|max:255|unique:posts',
-            'short_des'=>'required|max:255',
-            'content_post'=>'required',
-            // 'image'=>'required|image',
-            'meta_title'=>'required|max:120',
-            'meta_keywords'=>'required|max:255',
-        ];
-        $messages = [
-            'category_id.required' => ':atribuite không được để trống !',
-            'user_id.required' => ':atribuite không được để trống !',
-            'title.required' => ':atribuite không được để trống !',
-            'title.max' => ':atribuite đã vượt qua độ dài cho phép !',
-            'short_des.required' => ':atribuite không được để trống !',
-            'short_des.max' => ':atribuite đã vượt qua độ dài cho phép !',
-            'content_post.required'=> ':atribuite không được để trống !',
-            'image..required' => ':atribuite không được để trống !',
-            'image.image' => 'atribuite phải là định dạng hình ảnh',
-            'meta_title.required' => ':atribuite không được để trống !',
-            'meta_title.max' => ':atribuite đã vượt qua độ dài cho phép !',
-            'meta_keywords.required'=> ':atribuite không được để trống !',
-            'meta_keywords.max'=> ':atribuite đã vượt qua độ dài cho phép !',
-        ];
-        $atribuite =[
-            'category_id'=>'Id danh mục bài viết',
-            'user_id'=>'Id người đăng bài',
-            'title'=>'Tiêu đề của bài viết',
-            'short_des'=>'Mô tả ngắn của bài viết',
-            'content_post'=>'Nội dung bài viết',
-            'image'=>'Ảnh đại diện bài viết',
-            'meta_title'=>'Thẻ tiêu đề bài viết',
-            'meta_keywords'=>'Thẻ từ khóa bài viết',
-        ];
-
+        $input = $request->all();
+        $input['slug'] = Str::slug($input['title']) ?? null;
+        $validator->validate($input);
+        $user = $request->user();
         try {
-            $user = auth('sanctum')->user();
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $atribuite);
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
             $data = Post::create([
-                'category_id'=>$request->category_id,
-                // 'user_id'=> $request->user_id,
-                'title'=> mb_strtoupper($request->title),
-                'short_des'=> mb_strtoupper(mb_substr($request->short_des, 0, 1)).mb_substr($request->short_des, 1),
-                'content_post'=> $request->content_post,
-                //'image'=> $request->image,
-                'meta_title'=>$request->meta_title,
-                'meta_keywords'=>$request->meta_keywords,
-                'meta_description'=>$request->meta_description,
-                'slug' => Str::slug($request->title),
+                'category_id'=>$input['category_id'],
+                'user_id'=> $user->id,
+                'title'=> $input['title'],
+                'short_des'=> $input['short_des'],
+                'content_post'=> $input['content_post'],
+                'image'=> $input['image'] ?? null,
+                'meta_title'=>$input['meta_title'] ?? null,
+                'meta_keywords'=>$input['meta_keywords'] ?? null,
+                'meta_description'=>$input['meta_description'] ?? null,
+                'slug' => empty($input['slug']) ? Str::slug($input['title']) : $input['slug'],
                 'created_by' => $user->id,
-
-
+                'updated_by' => $user->id,
             ]);
             DB::commit();
-        }catch(Exception $e){
+        }catch(HttpException $e){
             DB::rollback();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
         return response()->json([
-            'data'=>$data,
             'status' => 'success',
             'message' => $data->title . ' đã được tạo thành công !',
         ]);
@@ -155,24 +105,34 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $data = Post::find($id);
-        $data->views = $data->views + 1;
-        $data->save();
-        // Event::fire('posts.view', $data);
-        if($data) {
-            $resource = new PostResource($data);
-            return response()->json([
-                'data' => $resource,
-                'status' => true,
-                'message' => 'Get data success'
-            ]);
-        } else {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => 'id not found'
-            ]);
+        try{
+            DB::beginTransaction();
+            $data = Post::find($id);
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Bài viết không tồn tại !'
+                ], 404);
+            }
+            $data->views = $data->views + 1;
+            $data->save();
+            DB::commit();
         }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new PostResource($data),
+        ]);
     }
 
     /**
@@ -182,79 +142,50 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, PostUpdateValidator $validator)
     {
-        $rules=[
-            'category_id'=>'required',
-            'user_id'=>'required',
-            'title'=>'required|max:255',
-            'short_des'=>'required|max:255',
-            'content_post'=>'required',
-            'image'=>'required|image',
-            'meta_title'=>'required|max:120',
-            'meta_keywords'=>'required|max:255',
-        ];
-        $messages = [
-            'category_id.required' => ':atribuite không được để trống !',
-            'user_id.required' => ':atribuite không được để trống !',
-            'title.required' => ':atribuite không được để trống !',
-            'title.max' => ':atribuite đã vượt qua độ dài cho phép !',
-            'short_des.required' => ':atribuite không được để trống !',
-            'short_des.max' => ':atribuite đã vượt qua độ dài cho phép !',
-            'content_post.required'=> ':atribuite không được để trống !',
-            'image..required' => ':atribuite không được để trống !',
-            'image.image' => 'atribuite phải là định dạng hình ảnh',
-            'meta_title.required' => ':atribuite không được để trống !',
-            'meta_title.max' => ':atribuite đã vượt qua độ dài cho phép !',
-            'meta_keywords.required'=> ':atribuite không được để trống !',
-            'meta_keywords.max'=> ':atribuite đã vượt qua độ dài cho phép !',
-        ];
-        $attributes =[
-            'category_id'=>'Id danh mục bài viết',
-            'user_id'=>'Id người đăng bài',
-            'title'=>'Tiêu đề của bài viết',
-            'short_des'=>'Mô tả ngắn của bài viết',
-            'content_post'=>'Nội dung bài viết',
-            'image'=>'Ảnh đại diện bài viết',
-            'meta_title'=>'Thẻ tiêu đề bài viết',
-            'meta_keywords'=>'Thẻ từ khóa bài viết',
-        ];
-
+        $input = $request->all();
+        $validator->validate($input);
+        $user = $request->user();
         try {
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
-            if($validator->fails()){
+            DB::beginTransaction();
+
+            $data = Post::find($id);
+            if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
-            $data = Post::find($id);
-            if(!empty($data)){
-                 $data->update([
-                'category_id'=>$request->category_id,
-                'user_id'=> $request->user_id,
-                'title'=> mb_strtoupper($request->title),
-                'short_des'=> mb_strtoupper(mb_substr($request->short_des, 0, 1)).mb_substr($request->short_des, 1),
-                'content_post'=> $request->content_post,
-                'image'=> $request->image,
-                'meta_title'=>$request->meta_title,
-                'meta_keywords'=>$request->meta_keywords,
-                'slug' => Str::slug($request->title),
-
-                ]);
+                    'message' => 'Bài viết không tồn tại !'
+                ], 404);
             }
 
-        } catch(Exception $e) {
-            DB::rollback();
+            $data->category_id = $input['category_id'] ?? $data->category_id;
+            $data->title = $input['title'] ?? $data->title;
+            $data->short_des = $input['short_des'] ?? $data->short_des;
+            $data->content_post = $input['content_post'] ?? $data->content_post;
+            $data->image = $input['image'] ?? $data->image;
+            $data->meta_title = $input['meta_title'] ?? $data->meta_title;
+            $data->meta_keywords = $input['meta_keywords'] ?? $data->meta_keywords;
+            $data->meta_description = $input['meta_description'] ?? $data->meta_description;
+            $data->slug = Str::slug($input['title']);
+            $data->is_active = $input['is_active'] ?? $data->is_active;
+            $data->updated_by = $user->id;
+            $data->save();
+
+            DB::commit();
+        } catch(HttpException $e){
+            DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
-
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
-            'message' =>'Danh mục đã được cập nhật thành !',
+            'message' =>'Đã cập nhật bài viết ['.$data->title.'] !',
         ]);
     }
 
@@ -264,9 +195,12 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
+        $user = $request->user();
         try {
+            DB::beginTransaction();
+
             $data = Post::find($id);
             if(empty($data)){
                 return response()->json([
@@ -275,73 +209,41 @@ class PostController extends Controller
                 ], 404);
 
             }
-           $data->delete();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Đã xóa thành công bài viết' . $data->title .'!'
-            ]);
+            $data->deleted_by = $user->id;
+            $data->save();
+            $data->delete();
 
-            $data->update([
-                // 'is_delete' => 1,
-                'is_delete' => 1,
-                'deleted_at' => Carbon::now()
-            ]);
-            // DB::commit();
-        } catch(Exception $e){
+            DB::commit();
+        } catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage()
-            ]);
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
-
-
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xóa bài viết ['.$data->title.'] !'
+        ]);
     }
 
     public function loadByViews(){
-        {
-            try{
-              $data= Post::orderBy('views','desc')->paginate(9);
-              $resource = PostResource::collection($data);
-              return response()->json([
-                 'data'=>$resource,
-              ],200);
-
-            } catch(Exception $e){
-             return response()->json([
-                 'status' => 'Error',
-                 'message' => $e->getMessage()
-              ],400);
-            }
-         }
+        try{
+            $data = Post::orderBy('views','desc')->paginate(9);
+        } catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new PostCollection($data));
     }
-
-    // public function loadRelatedPost()
-    // {
-
-    //     try{
-    //         $data = Post::all();
-
-    //         if(empty($data)){
-    //             return response()->json([
-    //                 'status' => 'error',
-    //                 'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
-
-    //             ],400);
-    //         }
-
-    //         return response()->json([
-    //              'data' => $data->post,
-    //              'data' => $data
-    //         ],200);
-
-    //     } catch(Exception $e){
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => $e->getMessage(),
-    //         ], 400);
-    //     }
-    // }
-
-
 }

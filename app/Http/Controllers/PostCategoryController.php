@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PostCategoriesCollection;
-use App\Http\Resources\PostCategoriesResource;
+use App\Http\Resources\LoadPostResource;
+use App\Http\Resources\PostCategoryCollection;
+use App\Http\Resources\PostCategoryResource;
+use App\Http\Validators\PostCategory\PostCategoryCreateValidator;
+use App\Http\Validators\PostCategory\PostCategoryUpsertValidator;
 use App\Models\PostCategories;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
@@ -33,7 +36,6 @@ class PostCategoryController extends Controller
                     $query->where('is_active', $input['is_active']);
                 }
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
-            $resource = new PostCategoriesCollection($data);
         }
         catch(HttpException $e){
             return response()->json([
@@ -45,7 +47,7 @@ class PostCategoryController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        return response()->json($resource);
+        return response()->json(new PostCategoryCollection($data));
     }
 
     /**
@@ -54,54 +56,38 @@ class PostCategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, PostCategoryUpsertValidator $validator)
     {
-        $rules = [
-            'name' => 'required|max:255',
-        ];
-        $messages = [
-            'name.required' => ':atribuite không được để trống !',
-            'name.max' => ':attribute tối đa 255 ký tự !',
-        ];
-
-        $attributes = [
-            'name' => 'Tên danh mục bài viết'
-        ];
-
+        $input = $request->all();
+        $input['slug'] = Str::slug($input['name']) ?? null;
+        $validator->validate($input);
+        $user = $request->user();
         try {
-            $user = auth('sanctum')->user();
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
-            if($validator->fails()){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
-            }
 
             $data = PostCategories::create([
-                'name' => mb_strtoupper($request->name) ,
-                'slug' => Str::slug($request->name),
+                'name' => $input['name'],
+                'slug' => $input['slug'],
+                'is_active' => $input['is_active'] ?? 1,
                 'created_by' => $user->id,
-
-
+                'updated_by' => $user->id,
             ]);
+
             DB::commit();
-
-
         } catch(HttpException $e) {
             DB::rollback();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-                'line' => $e->getLine()
-            ], 400);
-
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
-
         return response()->json([
             'status' => 'success',
-            'message' => $data->name . ' đã được tạo thành công !',
+            'message' => '['.$data->name . '] đã được tạo thành công !',
         ]);
 
 
@@ -121,22 +107,19 @@ class PostCategoryController extends Controller
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
-
-                ],400);
+                    'message' => 'Danh mục không tồn tại !'
+                ],404);
             }
-
-            return response()->json([
-                //  'data' => $data->post,
-                 'data' => $data
-            ],200);
-
-        } catch(Exception $e){
+        } catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
             ], 400);
         }
+        return response()->json([
+            'status' => 'success',
+            'data' => new PostCategoryResource($data),
+        ]);
     }
 
     /**
@@ -146,52 +129,43 @@ class PostCategoryController extends Controller
      * @param  \App\Models\post_category  $post_category
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, PostCategoryUpsertValidator $validator)
     {
-        $rules = [
-            'name' => 'required|max:255',
-        ];
-        $messages = [
-            'name.required' => ':atribuite không được để trống !',
-            'name.max' => ':attribute tối đa 255 ký tự !',
-        ];
-
-        $attributes = [
-            'name' => 'Tên danh mục không được để trống'
-        ];
-
+        $input = $request->all();
+        $input['slug'] = Str::slug($input['name']) ?? null;
+        $validator->validate($input);
+        $user = $request->user();
         try {
-            $user = auth('sanctum')->user();
             DB::beginTransaction();
-            $validator = Validator::make($request->all(), $rules, $messages, $attributes);
-            if($validator->fails()){
+
+            $data = PostCategories::find($id);
+            if(empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => $validator->errors(),
-                ], 422);
+                    'message' => 'Danh mục bài viết không tồn tại !'
+                ], 404);
             }
-            $data = PostCategories::find($id);
-            if(!empty($data)){
-                 $data->update([
-                    'name' => mb_strtoupper($request->name) ,
-                    'slug' => Str::slug($request->name),
-                    'updated_by' => $user->id,
-                ]);
-            }
+            $data->update([
+                'name' => $input['name'],
+                'slug' => $input['slug'],
+                'updated_by' => $user->id,
+            ]);
 
-
-
-        } catch(Exception $e) {
+            DB::commit();
+        } catch(HttpException $e) {
             DB::rollback();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
-
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
         return response()->json([
             'status' => 'success',
-            'message' =>'Danh mục đã được cập nhật thành '.$request->name.'!',
+            'message' => 'Danh mục đã được cập nhật thành '.$data->name.'!',
         ]);
     }
 
@@ -201,10 +175,12 @@ class PostCategoryController extends Controller
      * @param  \App\Models\PostCategories  $post_category
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
+        $user = $request->user();
         try {
-            //DB::beginTransaction();
+            DB::beginTransaction();
+
             $data = PostCategories::find($id);
             if(empty($data)){
                 return response()->json([
@@ -213,52 +189,52 @@ class PostCategoryController extends Controller
                 ], 404);
 
             }
-           $data->delete();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Đã xóa thành công danh mục ' . $data->name
-            ]);
+            $data->deleted_by = $user->id;
+            $data->save();
+            $data->delete();
 
-            $data->update([
-                // 'is_delete' => 1,
-                'is_delete' => 1,
-                'deleted_at' => Carbon::now()
-            ]);
-            // DB::commit();
-        } catch(Exception $e){
+            DB::commit();
+        } catch(HttpException $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage()
-            ]);
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
-
-
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xóa thành công danh mục ' . $data->name
+        ]);
     }
+
     public function loadPostByCate($id)
     {
         try{
             $data = PostCategories::find($id);
-
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
-
-                ],400);
+                ], 404);
             }
-
-            return response()->json([
-                 'data' => $data->post,
-                 'data' => $data
-            ],200);
-
-        } catch(Exception $e){
+        } catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage(),
-            ], 400);
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
         }
+        return response()->json([
+            'status' => 'success',
+            'data' => new LoadPostResource($data),
+        ]);
     }
 
 }

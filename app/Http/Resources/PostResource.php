@@ -16,29 +16,26 @@ class PostResource extends JsonResource
     public function toArray($request)
     {
         if(!empty($request)){
-        return[
-            'id'=>$this->id,
-            'category_id'=>$this->category_id,
-            'name_category'=>$this->catePost->name,
-            // 'user_id'=>$this->Auth::user()->id,
-            'title'=>$this->title,
-            'short_des'=>$this->short_des,
-            'content_post'=>$this->content_post,
-            'image'=>$this->image,
-            'meta_title'=>$this->meta_title,
-            'meta_keywords'=>$this->meta_keywords,
-            'meta_description'=>$this->meta_descriptions,
-            'slug'=>$this->slug,
-            'views'=>$this->views,
-            'is_active'=>$this->is_active,
-            'created_by'    => $this->createdBy->name ?? null,
-            'updated_by'    => $this->updatedBy->name ?? null,
-            //'deleted_by'=>$this->title,
-            'created_at' => $this->created_at->format('d-m-Y H:i:s'),
-            'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
-            // 'deleted_at'
-        ];
+            return [
+                'id'            => $this->id,
+                'author'        => $this->createdBy->name ?? null,
+                'category_id'   => $this->category_id,
+                'category_name'   => $this->category->name,
+                'title'          => $this->title,
+                'short_des'          => $this->short_des,
+                'content_post'       => $this->content_post,
+                'image'       => $this->image ?? null,
+                'meta_title'          => $this->meta_title,
+                'meta_keywords'          => $this->meta_keywords,
+                'meta_description'          => $this->meta_description,
+                'slug'          => $this->slug,
+                'views'          => $this->views,
+                'is_active'     => $this->is_active,
+                'created_at'    => $this->created_at->format('Y-m-d H:i:s'),
+                'updated_at'    => $this->updated_at->format('Y-m-d H:i:s'),
+                'updated_by'    => $this->updatedBy->name ?? null,
+            ];
+        }
+        return [];
     }
-    return [];
-}
 }
