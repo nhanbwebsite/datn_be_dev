@@ -31,6 +31,16 @@ abstract class ValidatorBase {
             return true;
         });
 
+        Validator::extend('check_action_sms', function($attribute, $value, $parameters, $validator){
+            if(empty(ACTION_SMS[$value])){
+                $validator->addReplacer('unique_deleted_at_null', function($message, $attribute, $rule, $parameters){
+                    return str_replace(':attribute', $attribute, $message);
+                });
+                return false;
+            }
+            return true;
+        });
+
         $v = Validator::make($input, $this->rules(), $this->messages(), $this->attributes());
         if($v->fails()){
             throw new HttpResponseException(response()->json([

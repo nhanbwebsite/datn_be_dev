@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class FileCollection extends ResourceCollection
+class PostCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -14,19 +14,25 @@ class FileCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);\
         if(!$this->collection->isEmpty()){
-            // $request not empty
             foreach($this->collection as $value){
                 $result['data'][] = [
                     'id'            => $value->id,
+                    'author'        => $value->createdBy->name ?? null,
+                    'category_id'   => $value->category_id,
+                    'category_name'   => $value->category->name,
+                    'title'          => $value->title,
+                    'short_des'          => $value->short_des,
+                    'content_post'       => $value->content_post,
+                    'image'       => $value->image ?? null,
+                    'meta_title'          => $value->meta_title,
+                    'meta_keywords'          => $value->meta_keywords,
+                    'meta_description'          => $value->meta_description,
                     'slug'          => $value->slug,
-                    'name'          => $value->name,
-                    'path'          => $value->path,
-                    'extension'     => $value->extension,
-                    'created_at'    => $value->created_at->format('d-m-Y H:i:s'),
-                    'updated_at'    => $value->updated_at->format('d-m-Y H:i:s'),
-                    'created_by'    => $value->createdBy->name ?? null,
+                    'views'          => $value->views,
+                    'is_active'     => $value->is_active,
+                    'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
+                    'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
                     'updated_by'    => $value->updatedBy->name ?? null,
                 ];
             }

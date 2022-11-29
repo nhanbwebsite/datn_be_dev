@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
 {
-    use HasFactory,SoftDeletes;
-    // public $timestamps = false;
+    use HasFactory, SoftDeletes;
+    protected $table = 'posts';
     protected $fillable = [
         'category_id',
         'user_id',
@@ -23,6 +23,7 @@ class Post extends Model
         'slug',
         'views',
         'is_active',
+        'is_feature',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -30,16 +31,16 @@ class Post extends Model
         'updated_at',
         'deleted_at'
     ];
-    protected $table = 'posts';
 
-    public function catePost() {
-        return $this->hasOne(PostCategories::class, 'id','category_id');
-    }
-    public function createdBy($id){
-        return $this->find($id);
+    public function category() {
+        return $this->belongsTo(PostCategories::class, 'category_id','id');
     }
 
-    public function updatedBy($id){
-        return $this->find($id);
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by', 'id');
     }
 }

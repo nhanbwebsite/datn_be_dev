@@ -6,14 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Warranty extends Model
+class StoreRules extends Model
 {
     use HasFactory,SoftDeletes;
-    protected $table = 'warranty';
+    protected $table = 'store_rules';
     protected $fillable = [
         'title',
         'content',
-        'note',
         'slug',
         'is_active',
         'created_by',

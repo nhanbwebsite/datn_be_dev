@@ -29,7 +29,7 @@ class User extends Authenticatable
         'role_id',
         'store_id',
         'avatar',
-        'verified_at',
+        'request_code_at',
         'password',
         'created_at',
         'updated_at',
@@ -56,7 +56,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'verified_at' => 'datetime',
+        'request_code_at' => 'datetime',
     ];
 
     public function role(){
