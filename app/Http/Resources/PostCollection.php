@@ -18,11 +18,13 @@ class PostCollection extends ResourceCollection
             foreach($this->collection as $value){
                 $result['data'][] = [
                     'id'            => $value->id,
+                    'author'        => $value->createdBy->name ?? null,
                     'category_id'   => $value->category_id,
-                    // 'name_category' => $value->catePost->name,
+                    'category_name'   => $value->category->name,
                     'title'          => $value->title,
-                    'content_post'       => $value->content_post,
                     'short_des'          => $value->short_des,
+                    'content_post'       => $value->content_post,
+                    'image'       => $value->image ?? null,
                     'meta_title'          => $value->meta_title,
                     'meta_keywords'          => $value->meta_keywords,
                     'meta_description'          => $value->meta_description,
@@ -31,7 +33,6 @@ class PostCollection extends ResourceCollection
                     'is_active'     => $value->is_active,
                     'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
-                    'created_by'    => $value->createdBy->name ?? null,
                     'updated_by'    => $value->updatedBy->name ?? null,
                 ];
             }

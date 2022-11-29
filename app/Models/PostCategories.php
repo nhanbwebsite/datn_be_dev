@@ -19,18 +19,18 @@ class PostCategories extends Model
         'deleted_by',
         'created_at',
         'updated_at',
-        // 'deleted_at',
+        'deleted_at',
     ];
 
     public function createdBy(){
-        return $this->hasOne(User::class, 'id', 'created_by');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
-    public function post(){
-        return $this->hasMany(Post::class, 'category_id');
+    public function posts(){
+        return $this->hasMany(Post::class, 'category_id', 'id');
     }
 
     public function updatedBy(){
-        return $this->hasOne(User::class, 'id', 'updated_by');
+        return $this->belongsTo(User::class, 'updated_by', 'id');
     }
 }
