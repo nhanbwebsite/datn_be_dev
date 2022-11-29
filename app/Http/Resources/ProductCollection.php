@@ -18,6 +18,7 @@ class ProductCollection extends ResourceCollection
         if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $value){
+                dd($value);
                 $result['data'][] = [
                     'id'            => $value->id,
                     'code'          => $value->code,
@@ -38,7 +39,7 @@ class ProductCollection extends ResourceCollection
                     'subcategory_id' => $value->subcategory_id,
                     'subcategory_name' => $value->subcategory->name,
                     'variants' => $value->variants,
-                     'variantsDetailsByProduct' => $this->variantsDetailsByProduct ?? null,
+                    'variantsDetailsByProduct' => $this->variantsDetailsByProduct ?? null,
                     'category' => $value->subcategory->category_id,
                     'category_name' => $value->subcategory->category->name,
                     'is_active'     => $value->is_active,
@@ -57,6 +58,7 @@ class ProductCollection extends ResourceCollection
                 'nextPageUrl' => $this->nextPageUrl(),
                 'prevPageUrl' => $this->previousPageUrl(),
             ];
+             dd($this->collection);
             return $result;
         }
 
@@ -65,4 +67,5 @@ class ProductCollection extends ResourceCollection
         $result['paginator'] = [];
         return $result;
     }
+
 }
