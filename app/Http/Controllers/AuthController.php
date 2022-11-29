@@ -46,11 +46,13 @@ class AuthController extends Controller
             }
 
             $userData = User::where('phone', $input['phone'])->first();
-            if(!empty($userData->request_code_at) && (date('Y-m-d H:i:s', time()-60) > $userData->request_code_at)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Mã đã hết hiệu lực !'
-                ], 400);
+            if(env('SMS_ENABLE') == 1){
+                if(!empty($userData->request_code_at) && (date('Y-m-d H:i:s', time()-60) > $userData->request_code_at)){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Mã đã hết hiệu lực !'
+                    ], 400);
+                }
             }
             if($userData->is_active == 0){
                 return response()->json([
