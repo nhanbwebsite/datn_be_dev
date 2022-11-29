@@ -386,8 +386,38 @@ class ProductController extends Controller
     }
 
     // get province store (all)
-        public function getProvincesByWarehouse(){
-            $data = DB::table('stores');
+        public function getProvincesByWarehouse(Requests $request){
+
+          $input['limit'] = !empty($request->limit) && $request->limit > 0 ? $request->limit : 10;
+              try {
+            $data = Product::where('is_active', $input['is_active'] ?? 1)
+            ->where(function ($query) use ($input) {
+                if(!empty($input['product_id'])){
+                    $query->where('code', $input['code']);
+                }
+                if(!empty($input['brand_id'])){
+                    $query->where('brand_id', $input['brand_id']);
+                }
+                if(!empty($input['subcategory_id'])){
+                    $query->where('subcategory_id', $input['subcategory_id']);
+                }
+                // if(!empty($input['name'])){
+                //     $query->where('name', 'like', '%'.$input['name'].'%');
+                // }
+                // if(!empty($input['slug'])){
+                //     $query->where('slug', 'like', '%'.$input['slug'].'%');
+                // }
+            })->orderBy('created_at', 'desc')->paginate($input['limit']);
+        } catch(HttpException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
 
         }
 
