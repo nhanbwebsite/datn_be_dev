@@ -33,3 +33,7 @@ Route::get('client/products/category/{id}',[ProductController::class,'productsBy
 
 // tìm sản phẩm
 Route::get('client/products/search/{keywords}',[ProductController::class,'search']);
+
+// province by store, products < 0
+Route::get('client/productsfindbylocation',[ProductController::class,'getProvincesByWarehouse']);
+
