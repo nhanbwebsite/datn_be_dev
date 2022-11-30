@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\DropboxRefreshAccessToken;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Spatie\Dropbox\Client;
 
 class FileResource extends JsonResource
 {
@@ -17,12 +19,17 @@ class FileResource extends JsonResource
 
         // return parent::toArray($request);
         if(!empty($request)){
-
+            $token = new DropboxRefreshAccessToken();
+            $token->getToken();
+            if(empty($token)){
+                $path = null;
+            }
+            $client = new Client($token);
+            $path = $client->getTemporaryLink(PATH_DROPBOX.$this->name);
             return [
                 'id'            => $this->id,
-                'slug'          => $this->slug,
                 'name'          => $this->name,
-                'path'          => $this->path,
+                'path'          => $path ?? null,
                 'extension'     => $this->extension,
                 'created_at'    => $this->created_at->format('d-m-Y H:i:s'),
                 'updated_at'    => $this->updated_at->format('d-m-Y H:i:s'),
