@@ -41,7 +41,7 @@ class ColorsController extends Controller
 
         $messages = [
             'name.required' => ':attribute tên màu không được để trống',
-            'color_code.required' => 'attribute không được để trống'
+            'color_code.required' => ':attribute không được để trống'
         ];
 
         $attributes = [
@@ -131,7 +131,7 @@ class ColorsController extends Controller
 
         $messages = [
             'name.required' => ':attribute tên màu không được để trống',
-            'color_code.required' => 'attribute không được để trống'
+            'color_code.required' => ':attribute không được để trống'
         ];
 
         $attributes = [
