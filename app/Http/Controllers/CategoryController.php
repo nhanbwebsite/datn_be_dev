@@ -23,7 +23,9 @@ class CategoryController extends Controller
         $input = $request->all();
         $input['limit'] = !empty($input['limit']) ? $input['limit'] : 10;
         try{
-            $data = Category::where('is_active', $input['is_active'] ?? 1)->where(function($query) use ($input){
+            $data = Category::where('is_active', $input['is_active'] ?? 1)
+            ->where('')
+            ->where(function($query) use ($input){
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
                 }
@@ -228,6 +230,9 @@ class CategoryController extends Controller
     public function getClientCategory(){
         try{
             $data = Category::where('is_active', 1)->get();
+            foreach( $data as $value){
+                $value->subs = Category::subByCategoryID($value->id);
+            }
         } catch(Exception $e){
             return response()->json([
                 'status' => 'error',
@@ -238,7 +243,8 @@ class CategoryController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        return response()->json(new CategoryClientCollection($data));
+
+        return response()->json($data);
     }
 
 }

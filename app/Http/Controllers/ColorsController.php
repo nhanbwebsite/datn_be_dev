@@ -32,6 +32,7 @@ class ColorsController extends Controller
      */
     public function store(Request $request)
     {
+
         $user = auth('sanctum')->user();
         $rules = [
             'name' => 'required',
@@ -50,7 +51,7 @@ class ColorsController extends Controller
 
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->only('name'), $rules, $messages, $attributes);
+            $validator = Validator::make($request->only(['name','color_code']), $rules, $messages, $attributes);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -64,7 +65,6 @@ class ColorsController extends Controller
                 "color_code" => $request->color,
                 'created_by' => $user->id
             ]);
-
 
             DB::commit();
         } catch(HttpException $e) {
@@ -139,7 +139,7 @@ class ColorsController extends Controller
             'color_code' => 'Mã màu'
         ];
 
-        $validator = Validator::make($request->only('name','color_code'), $rules, $messages, $attributes);
+        $validator = Validator::make($request->only(['name','color_code']), $rules, $messages, $attributes);
         if($validator->fails()){
             return response()->json([
                 'status' => 'error',
