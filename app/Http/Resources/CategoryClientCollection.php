@@ -17,18 +17,20 @@ class CategoryClientCollection extends ResourceCollection
         // return parent::toArray($request);
         if(!$this->collection->isEmpty()){
             // $request not empty
-            foreach($this->collection as $value){
+            $dataTest = [];
+            foreach($this->collection as $key1 => $value){
+                dd($this->collection);
                 foreach($value->subs as $key => $item){
-                    $subcategoryData[$key]['id'] = $item->id;
-                    $subcategoryData[$key]['category_id'] = $value->id;
-                    $subcategoryData[$key]['name'] = $item->name;
-                    $subcategoryData[$key]['slug'] = $item->slug;
-                    $subcategoryData[$key]['url_img'] = $item->url_img ?? null;
-                    $subcategoryData[$key]['is_active'] = $item->is_active;
-                    $subcategoryData[$key]['created_at'] = $item->created_at->format('Y-m-d H:i:s');
-                    $subcategoryData[$key]['updated_at'] = $item->updated_at->format('Y-m-d H:i:s');
-                    $subcategoryData[$key]['created_by'] = $item->created_by;
-                    $subcategoryData[$key]['updated_by'] = $item->updated_by;
+                        $subcategoryData[$key]['id'] = $item->id;
+                        $subcategoryData[$key]['category_id'] = $value->id;
+                        $subcategoryData[$key]['name'] = $item->name;
+                        $subcategoryData[$key]['slug'] = $item->slug;
+                        $subcategoryData[$key]['url_img'] = $item->url_img ?? null;
+                        $subcategoryData[$key]['is_active'] = $item->is_active;
+                        $subcategoryData[$key]['created_at'] = $item->created_at->format('Y-m-d H:i:s');
+                        $subcategoryData[$key]['updated_at'] = $item->updated_at->format('Y-m-d H:i:s');
+                        $subcategoryData[$key]['created_by'] = $item->created_by;
+                        $subcategoryData[$key]['updated_by'] = $item->updated_by;
                 }
 
                 $result['data'][] = [

@@ -16,6 +16,7 @@ class CategoryCollection extends ResourceCollection
     {
         // return parent::toArray($request);
         if(!$this->collection->isEmpty()){
+            dd($this->collection);
             // $request not empty
             foreach($this->collection as $value){
                 foreach($value->subs as $key => $item){

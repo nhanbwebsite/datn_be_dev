@@ -13,6 +13,7 @@ class Category extends Model
     protected $fillable = [
         "name",
         "slug" ,
+        'is_post',
         "url_img",
         "is_active" ,
         "created_by" ,
@@ -25,5 +26,10 @@ class Category extends Model
 
     public function subs(){
         return $this->hasMany(SubCategory::class, 'category_id', 'id');
+    }
+
+    public static function subByCategoryID($category_id){
+        $data = SubCategory::where('category_id',$category_id)->get();
+        return $data;
     }
 }
