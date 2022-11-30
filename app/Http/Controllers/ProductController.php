@@ -244,17 +244,19 @@ class ProductController extends Controller
                     $dataWaitUpdate = ProductVariantDetail::where('product_id',$product->id)
                                                           ->where('variant_id',$valueVariant)->first();
 
+                                                        //   dd($dataWaitUpdate);
                     if($dataWaitUpdate){
                         $dataWaitUpdate->update([
                             "variant_id" => $valueVariant
                         ]);
+
+                    $dataVarianDetails = ProductVariantDetail::where('product_id',$dataWaitUpdate->product_id)->first();
                         foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
-                            ProductVariantDetailById::update([
-                                "pro_variant_id" => $dataWaitUpdate->id,
+                                 ProductVariantDetailById::where('pro_variant_id',$dataVarianDetails->id)->update([
+                                "pro_variant_id" => $dataVarianDetails->id,
                                 "color_id" => $valueColor,
                                 "price" => $request->prices_by_variant_id[$key][$keyColors],
-                                "discount" => $request->discount_by_variant_id[$key][$keyColors],
-                                "images"
+                                "discount" => $request->discount_by_variant_id[$key][$keyColors]
                             ]);
                         }
                     } else{
