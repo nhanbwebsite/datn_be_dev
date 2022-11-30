@@ -223,7 +223,8 @@ class ProductController extends Controller
             $product->meta_keywords =  $request->meta_keywords ?? $product->meta_keywords;
             $product->meta_description =  $request->meta_description ?? $product->meta_description;
             $product->name = $request->name ?? $product->name;
-            $product->slug = Str::slug($request->slug) ?? Str::slug($request->name);
+            // $product->slug = Str::slug($request->slug) ?? Str::slug($request->name);
+            $product->slug = Str::slug($request->name);
             $product->description = $request->description ?? $product->description;
             $product->url_image = $request->url_image ?? $product->url_image;
             $product->specification_infomation = $request->specification_infomation ?? $product->specification_infomation;

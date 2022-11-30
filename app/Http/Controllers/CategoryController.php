@@ -24,7 +24,6 @@ class CategoryController extends Controller
         $input['limit'] = !empty($input['limit']) ? $input['limit'] : 10;
         try{
             $data = Category::where('is_active', $input['is_active'] ?? 1)
-            ->where('')
             ->where(function($query) use ($input){
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
@@ -226,11 +225,61 @@ class CategoryController extends Controller
         }
     }
 
-
     public function getClientCategory(){
         try{
             $data = Category::where('is_active', 1)->get();
             foreach( $data as $value){
+                // push object subscategories
+                $value->subs = Category::subByCategoryID($value->id);
+            }
+        } catch(Exception $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+
+        return response()->json([
+            'status'=>'success',
+            'data' =>$data
+        ]);
+    }
+    public function getCategoryProducts(){
+        try{
+            $data = Category::where('is_active', 1)
+            ->where('is_post',0)
+            ->get();
+            foreach( $data as $value){
+                // push object subscategories
+                $value->subs = Category::subByCategoryID($value->id);
+            }
+        } catch(Exception $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+
+        return response()->json([
+            'status'=>'success',
+            'data' =>$data
+        ]);
+    }
+    public function getCategory_is_post(){
+        try{
+            $data = Category::where('is_active', 1)
+            ->where('is_post',1)
+            ->get();
+            foreach( $data as $value){
+                // push object subscategories
                 $value->subs = Category::subByCategoryID($value->id);
             }
         } catch(Exception $e){
