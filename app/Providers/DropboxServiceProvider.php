@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\DropboxRefreshAccessToken;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
@@ -29,8 +30,18 @@ class DropboxServiceProvider extends ServiceProvider
     public function boot()
     {
         Storage::extend('dropbox', function ($app, $config){
-            $adapter = new DropboxAdapter(new Client($config['authorization_token']));
-            return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
+            $token = new DropboxRefreshAccessToken();
+            $token->getToken();
+            if(!empty($token)){
+                $adapter = new DropboxAdapter(new Client($token));
+                return new FilesystemAdapter(new Filesystem($adapter, $config), $adapter, $config);
+            }
+            else{
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Lỗi làm mới Dropbox access token !'
+                ], 400);
+            }
         });
     }
 }

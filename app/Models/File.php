@@ -11,10 +11,8 @@ class File extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'files';
     protected $fillable = [
-        'slug',
         'name',
         'extension',
-        'path',
         'created_at',
         'updated_at',
         'deleted_at',

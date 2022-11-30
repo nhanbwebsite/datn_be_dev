@@ -2,7 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\DropboxRefreshAccessToken;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Spatie\Dropbox\Client;
 
 class FileCollection extends ResourceCollection
 {
@@ -18,11 +20,17 @@ class FileCollection extends ResourceCollection
         if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $value){
+                $token = new DropboxRefreshAccessToken();
+                $token->getToken();
+                if(empty($token)){
+                    $path = null;
+                }
+                $client = new Client($token);
+                $path = $client->getTemporaryLink(PATH_DROPBOX.$value->name);
                 $result['data'][] = [
                     'id'            => $value->id,
-                    'slug'          => $value->slug,
                     'name'          => $value->name,
-                    'path'          => $value->path,
+                    'path'          => $path ?? null,
                     'extension'     => $value->extension,
                     'created_at'    => $value->created_at->format('d-m-Y H:i:s'),
                     'updated_at'    => $value->updated_at->format('d-m-Y H:i:s'),

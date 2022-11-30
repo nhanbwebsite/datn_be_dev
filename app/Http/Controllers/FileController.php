@@ -50,16 +50,13 @@ class FileController extends Controller
         $user = $request->user();
         try{
             DB::beginTransaction();
-            $client = new Client(env('DROPBOX_ACCESS_TOKEN'));
+
             foreach($input as $file){
                 $upload = $this->uploadFile($file);
                 if(!empty($upload)){
-                    $path = $client->getTemporaryLink(PATH_DROPBOX.$upload['name']);
                     File::create([
-                        'slug' => explode('.', $upload['name'])[0],
                         'name' => $upload['name'],
                         'extension' => $upload['extension'],
-                        'path' => $path,
                         'created_by' => $user->id,
                         'updated_by' => $user->id,
                     ]);
@@ -152,11 +149,11 @@ class FileController extends Controller
                     'message' => 'File không tồn tại !'
                 ], 404);
             }
-            if(FacadesFile::exists('images/'.$data->name)){
-                FacadesFile::delete('images/'.$data->name);
-            }
+
             $data->deleted_by = $user->id;
             $data->save();
+
+            Storage::disk('dropbox')->delete(PATH_DROPBOX.$data->name);
             $data->delete();
 
             DB::commit();
@@ -192,8 +189,8 @@ class FileController extends Controller
                     'message' => 'Chỉ hỗ trợ định dạng: !'.implode(",", $allow_ext),
                 ]);
             }
-
-            $checkFileExists = File::where('name', $fileOriginalName)->first();
+            $fileNameCheck = explode('.', $fileOriginalName)[0];
+            $checkFileExists = File::where('name', $fileNameCheck)->first();
             if(!empty($checkFileExists)){
                 $fileOriginalName = explode('.', $fileOriginalName)[0].'_'.time().'.'.$fileOriginalExtension;
             }
