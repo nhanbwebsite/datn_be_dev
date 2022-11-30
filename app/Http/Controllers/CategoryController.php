@@ -75,11 +75,19 @@ class CategoryController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
+            if(!empty($request->is_post)){
+                $categoryCreate = Category::create([
+                    'name' => $request->name,
+                    'slug' => Str::slug($request->name),
+                    'is_post' => 1
+                ]);
+            } else {
+                $categoryCreate = Category::create([
+                    'name' => $request->name,
+                    'slug' => Str::slug($request->name)
+                ]);
+            }
 
-            $categoryCreate = Category::create([
-                'name' => $request->name,
-                'slug' => Str::slug($request->name)
-            ]);
             DB::commit();
 
 

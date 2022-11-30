@@ -62,7 +62,7 @@ class ColorsController extends Controller
           $create =   Color::create([
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
-                "color_code" => $request->color,
+                "color_code" => $request->color_code,
                 'created_by' => $user->id
             ]);
 
