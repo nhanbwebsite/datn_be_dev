@@ -244,7 +244,10 @@ class CategoryController extends Controller
             ], $e->getStatusCode());
         }
 
-        return response()->json($data);
+        return response()->json([
+            'status'=>'success',
+            'data' =>$data
+        ]);
     }
 
 }
