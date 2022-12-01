@@ -494,9 +494,24 @@ class ProductController extends Controller
     //  product by subcategory id
 
     public function producstBySubcategoryId($SubId) {
-        $data = Product:: productsBySubCate($SubId);
+        //  $product = new Product();
+
+        $dataProducts = Product::productsBySubCate($SubId);
+        // dd($data);
+        $dataReturn = [];
+        foreach($dataProducts as $key => $value){
+
+                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->product_id);
+
+                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
+
+                 $value->variants = Product::productVariants($value->product_id);
+                 array_push($dataReturn,[
+                     "product" =>  $value,
+                 ]);
+        }
         return response()->json([
-            "data" => $data
+            "data" => $dataProducts
         ]);
     }
 

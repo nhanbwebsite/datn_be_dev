@@ -76,7 +76,8 @@ class Product extends Model
     }
 
     public static function productsBySubCate($id){
-        $proBySub = DB::table(('products'))
+        $proBySub = DB::table('products')
+        ->select('products.id as product_id','products.brand_id','sub_categories.id as sub_cate','products.code','products.meta_title','products.meta_keywords','products.meta_description','products.name as product_name','products.description','products.url_image')
         ->join('sub_categories', 'products.subcategory_id', '=', 'sub_categories.id')
         ->where('products.subcategory_id',$id)
         ->orderByDesc('products.id')->get();
