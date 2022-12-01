@@ -33,7 +33,7 @@ class Post extends Model
     ];
 
     public function category() {
-        return $this->belongsTo(PostCategories::class, 'category_id','id');
+        return $this->belongsTo(SubCategory::class, 'category_id','id');
     }
 
     public function createdBy(){

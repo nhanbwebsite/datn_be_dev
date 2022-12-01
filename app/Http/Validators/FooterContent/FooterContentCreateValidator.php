@@ -8,9 +8,9 @@ class FooterContentCreateValidator extends ValidatorBase
 {
     protected function rules(){
         return [
-            'category_id' => 'required|exists:post_categories,id',
+            'category_id' => 'required|exists:footer_category,id',
             'title' => 'required|max:255',
-            'slug' => 'string|max:255|unique_deleted_at_null:posts,slug',
+            'slug' => 'string|max:255|unique_deleted_at_null:footer_content,slug',
             'content'=>'required',
             'is_active'=> 'numeric',
         ];
@@ -32,7 +32,7 @@ class FooterContentCreateValidator extends ValidatorBase
 
     protected function attributes(){
         return [
-            'category_id'=>'Mã danh mục bài viết',
+            'category_id'=>'Danh mục footer',
             'title'=>'Tiêu đề',
             'slug' => 'Slug',
             'content'=>'Nội dung',

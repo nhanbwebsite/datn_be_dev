@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Validators\Post;
+namespace App\Http\Validators\FooterContent;
 
 use App\Http\Validators\ValidatorBase;
 
@@ -8,7 +8,7 @@ class FooterContentUpdateValidator extends ValidatorBase
 {
     protected function rules(){
         return [
-            'category_id' => 'required|exists:post_categories,id',
+            'category_id' => 'required|exists:footer_category,id',
             'title' => 'required|max:255',
             'content'=>'required',
             'is_active'=> 'numeric',

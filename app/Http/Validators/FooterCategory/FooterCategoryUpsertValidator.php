@@ -7,7 +7,7 @@ use App\Http\Validators\ValidatorBase;
 class FooterCategoryUpsertValidator extends ValidatorBase{
     protected function rules(){
         return [
-            'slug' => 'string|max:255|unique_deleted_at_null:post_categories,slug',
+            'slug' => 'string|max:255|unique_deleted_at_null:footer_category,slug',
             'name' => 'required|string|max:255',
             'is_active' => 'numeric',
         ];
@@ -28,7 +28,7 @@ class FooterCategoryUpsertValidator extends ValidatorBase{
     protected function attributes(){
         return [
             'slug' => 'Slug',
-            'name' => 'Tên danh mục bài viết',
+            'name' => 'Tên danh mục Footer',
             'is_active' => 'Kích hoạt'
         ];
     }
