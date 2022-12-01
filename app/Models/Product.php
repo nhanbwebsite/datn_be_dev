@@ -137,7 +137,8 @@ class Product extends Model
         ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
         ->join('variants','productVariant.variant_id','variants.id')
         ->join('colors','productVariantDetails.color_id','colors.id')
-        ->where('products.name','like',"%$keywords%")
+        ->where('products.name','like','%'.$keywords.'%')
+        ->orWhere('products.meta_title','like','%'.$keywords.'%')
         ->get();
         return $data;
     }

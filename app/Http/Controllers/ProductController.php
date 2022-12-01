@@ -206,7 +206,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id, ProductUpdateValidator $validator)
     {
-        dd('sdfsdfsdfsd');
+
         $input = $request->all();
         $user = $request->user();
         $validator->validate($input);
@@ -250,14 +250,15 @@ class ProductController extends Controller
                             "variant_id" => $valueVariant
                         ]);
 
-                         $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->first();
+                        $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->first();
 
                         foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
                                 $dataVarianDetails->update([
                                 "pro_variant_id" => $dataVarianDetails->id,
                                 "color_id" => $valueColor,
                                 "price" => $request->prices_by_variant_id[$key][$keyColors],
-                                "discount" => $request->discount_by_variant_id[$key][$keyColors]
+                                "discount" => $request->discount_by_variant_id[$key][$keyColors],
+                                "quantity" => $dataVarianDetails->quantity
                             ]);
                         }
                     } else{
@@ -569,9 +570,10 @@ class ProductController extends Controller
 
     // tìm sản phẩm
 
-    public function search($keywords){
+    public function search(Request $req){
+
         $product = new Product();
-        $data = $product-> productByKeywords($keywords);
+        $data = $product-> productByKeywords($req->keywords);
         return response()->json([
             'status' => 'success',
             'data' => $data,
