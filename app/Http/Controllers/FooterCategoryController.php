@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Validators\FooterCategory\FooterCategoryUpsertValidator;
 use App\Http\Resources\FooterCategoryCollection;
 use App\Http\Resources\FooterCategoryResource;
+use App\Http\Resources\LoadFooterContentResource;
 use App\Models\FooterCategory;
 use Exception;
 use Illuminate\Http\Request;
@@ -202,6 +203,32 @@ class FooterCategoryController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Đã xóa thành công danh mục ' . $data->name
+        ]);
+    }
+
+    public function loadByCate($id)
+    {
+        try{
+            $data = FooterCategory::find($id);
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
+                ], 404);
+            }
+        } catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new LoadFooterContentResource($data),
         ]);
     }
 }

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\FooterContentCollection;
 use App\Http\Resources\FooterContentResource;
+use App\Http\Resources\LoadFooterContentResource;
 use App\Http\Validators\FooterContent\FooterContentCreateValidator;
-use App\Http\Validators\Post\FooterContentUpdateValidator;
+use App\Http\Validators\FooterContent\FooterContentUpdateValidator;
+use App\Models\FooterCategory;
 use App\Models\FooterContent;
 use Exception;
 use Illuminate\Http\Request;
@@ -221,4 +223,6 @@ class FooterContentController extends Controller
             'message' => 'Đã xóa bài viết ['.$data->title.'] !'
         ]);
     }
+
+
 }
