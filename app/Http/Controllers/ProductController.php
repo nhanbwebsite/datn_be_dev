@@ -206,7 +206,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id, ProductUpdateValidator $validator)
     {
-
+        dd('sdfsdfsdfsd');
         $input = $request->all();
         $user = $request->user();
         $validator->validate($input);
@@ -250,10 +250,10 @@ class ProductController extends Controller
                             "variant_id" => $valueVariant
                         ]);
 
-                    $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->first();
+                         $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->first();
 
                         foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
-                                 ProductVariantDetailById::where('pro_variant_id',$dataVarianDetails->id)->update([
+                                $dataVarianDetails->update([
                                 "pro_variant_id" => $dataVarianDetails->id,
                                 "color_id" => $valueColor,
                                 "price" => $request->prices_by_variant_id[$key][$keyColors],
