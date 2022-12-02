@@ -16,8 +16,7 @@ class BrandController extends Controller
     public function index()
     {
         try{
-
-            $data = Brands::paginate(9);
+            $data = Brands::where('is_post',0)->paginate(9);
             return response()->json([
                 'status' => 'success',
                 'data' => $data
@@ -63,17 +62,34 @@ class BrandController extends Controller
                 ], 422);
             }
 
-          $create =   Brands::create([
-                'brand_name' => $request->brand_name,
-                'slug' => Str::slug($request->brand_name)
-            ]);
-
-            if($create) {
-                return response()->json([
-                    'status' => 'Created successfully',
-                    'data =>' => $create
+            if(!empty($request->is_post)){
+                $create =   Brands::create([
+                    'brand_name' => $request->brand_name,
+                    'slug' => Str::slug($request->brand_name),
+                    'is_post' => $request->is_post
                 ]);
+
+                if($create) {
+                    return response()->json([
+                        'status' => 'Created successfully',
+                        'data =>' => $create
+                    ]);
+                }
+            } else{
+                $create =   Brands::create([
+                    'brand_name' => $request->brand_name,
+                    'slug' => Str::slug($request->brand_name)
+                ]);
+
+                if($create) {
+                    return response()->json([
+                        'status' => 'Created successfully',
+                        'data =>' => $create
+                    ]);
+                }
             }
+
+
 
         } catch(Exception $e) {
             return response()->json([
@@ -148,10 +164,15 @@ class BrandController extends Controller
                 ], 422);
             }
           $data = Brands::find($id);
-          $data->update([
+
+          if(!empty($request->is_post)){
+
+            $data->update([
                 'brand_name' => $request->brand_name,
                 'slug' => Str::slug($request->brand_name),
+                'is_post' => $request->is_post,
                 'is_active' => $request->is_active,
+                'updated_by' => auth('sanctum')->user()->id,
             ]);
 
             if($data) {
@@ -160,6 +181,23 @@ class BrandController extends Controller
                     'data =>' => $data
                 ]);
             }
+          } else {
+            $data->update([
+                'brand_name' => $request->brand_name,
+                'slug' => Str::slug($request->brand_name),
+                'is_active' => $request->is_active,
+                'updated_by' => auth('sanctum')->user()->id,
+            ]);
+
+            if($data) {
+                return response()->json([
+                    'status' => 'Created successfully',
+                    'data =>' => $data
+                ]);
+            }
+
+          }
+
 
         } catch(Exception $e) {
             return response()->json([
@@ -211,6 +249,21 @@ class BrandController extends Controller
                 'status' => 'error',
                 'message' => $e->getMessage()
             ]);
+        }
+    }
+
+    public function brand_post() {
+        try{
+            $data = Brands::where('is_post',1)->get();
+            return response()->json([
+                'status' => 'success',
+                'data' => $data
+            ]);
+        } catch(Exception $e){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage()
+                ]);
         }
     }
 }

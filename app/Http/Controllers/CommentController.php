@@ -8,8 +8,10 @@ use App\Http\Validators\Comment\CommentCreateValidator;
 use App\Http\Validators\Comment\CommentUpdateValidator;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
+use App\Models\Rep_comment;
 class CommentController extends Controller
 {
     /**
@@ -22,9 +24,6 @@ class CommentController extends Controller
         $input['limit'] = $request->limit;
         try{
             $data = Comment::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input){
-                if(!empty($input['parent_id'])){
-                    $query->where('parent_id', $input['parent_id']);
-                }
                 if(!empty($input['user_id'])){
                     $query->where('user_id', $input['user_id']);
                 }
@@ -51,18 +50,50 @@ class CommentController extends Controller
      */
     public function store(Request $request, CommentCreateValidator $validator)
     {
-        $input = $request->all();
-        $validator->validate($input);
+        // dd($request->all());
+
         try{
             DB::beginTransaction();
-            Comment::create([
-                'user_id' => auth('sanctum')->user()->id,
-                'parent_id' => $request->parent_id ?? null,
-                'post_id' => $request->post_id,
-                'content' => $request->content,
-                'created_by' => auth('sanctum')->user()->id,
-                'updated_by' => auth('sanctum')->user()->id,
-            ]);
+
+            if(!empty($request->id_comment)){
+
+                $rules = [
+                    'rep_content' => 'required|min:2|max:255',
+                ];
+
+                $messages = [
+
+                    'rep_content.required' => ':attribute tối thiểu 2 kí tự ',
+
+                ];
+
+                $attributes = [
+                    'rep_content' => 'Nội dung bình luận',
+                ];
+                $validator = Validator::make($request->only('rep_content'), $rules, $messages, $attributes);
+                if($validator->fails()){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => $validator->errors(),
+                    ], 422);
+                }
+                Rep_comment::create([
+                    'id_comment' => $request->id_comment,
+                    'rep_content' => $request->rep_content,
+                    'created_by' => auth('sanctum')->user()->id,
+                    'updated_by' => auth('sanctum')->user()->id,
+                ]);
+            } else{
+                $input = $request->all();
+                $validator->validate($input);
+                Comment::create([
+                    'product_id' => $request->product_id,
+                    'content' => $request->content,
+                    'created_by' => auth('sanctum')->user()->id,
+                    'updated_by' => auth('sanctum')->user()->id,
+                ]);
+            }
+
             DB::commit();
         }
         catch(HttpException $e){
@@ -128,6 +159,13 @@ class CommentController extends Controller
         $validator->validate($input);
         try {
             DB::beginTransaction();
+
+            if(!empty($request->rep_id_comment)){
+                $comment = Rep_comment::find($request->rep_id_comment);
+                $comment->rep_content = $request->rep_content;
+                $comment->save();
+            } else{
+
             $user = $request->user();
             $comment = Comment::find($id);
             if(empty($comment)){
@@ -136,10 +174,14 @@ class CommentController extends Controller
                     'message' => 'Người dùng không tồn tại !',
                 ], 404);
             }
+
             $comment->content = $request->content ?? $comment->content;
             $comment->is_active = $request->is_active ?? $comment->is_active;
             $comment->updated_by = $user->id;
             $comment->save();
+            }
+
+
 
             DB::commit();
         }

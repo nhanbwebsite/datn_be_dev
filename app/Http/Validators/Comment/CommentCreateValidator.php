@@ -8,7 +8,7 @@ class CommentCreateValidator extends ValidatorBase{
     protected function rules(){
         return [
             'user_id' => 'numeric|exists:users,id',
-            'post_id' => 'required|numeric',
+            'product_id' => 'required|numeric',
             'content' => 'required',
         ];
     }
@@ -17,8 +17,8 @@ class CommentCreateValidator extends ValidatorBase{
         return [
             'user_id.required' => ':attribute không được để trống !',
             'user_id.numeric' => ':attribute chưa đúng !',
-            'post_id.required' => ':attribute không được để trống !',
-            'post_id.numeric' => ':attribute chưa đúng !',
+            'product_id.required' => ':attribute không được để trống !',
+            'product_id.numeric' => ':attribute chưa đúng !',
             'content.required' => ':attribute không được để trống !',
         ];
     }
@@ -26,7 +26,7 @@ class CommentCreateValidator extends ValidatorBase{
     protected function attributes(){
         return [
             'user_id' => 'Mã người dùng',
-            'post_id' => 'Mã bài viết',
+            'product_id' => 'ID sản phẩm',
             'content' => 'Nội dung',
         ];
     }

@@ -9,3 +9,8 @@ Route::prefix('admin')->group(function(){
     Route::patch('brands/{id}',[BrandController::class,'show']);
     Route::delete('brands/{id}',[BrandController::class,'destroy']);
 });
+
+Route::prefix('brand_post')->group(function(){
+    Route::get('/',[BrandController::class,'brand_post']);
+
+});

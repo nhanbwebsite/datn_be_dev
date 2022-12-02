@@ -29,6 +29,8 @@ class ProductController extends Controller
 
        $dataReturn = [];
        foreach($dataProducts as $key => $value){
+
+                $value ->create_by_name = product::getNameCreated($value->created_by)->created_by_name;
                 $value-> cartegory_id = product::category($value->id)->cartegory_id;
                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
@@ -40,7 +42,6 @@ class ProductController extends Controller
     //    return response()->json([
     //     'data' => $dataReturn
     //    ]);
-
         return response()->json([
             "data" => $dataProducts
         ]);
@@ -251,12 +252,12 @@ class ProductController extends Controller
                         $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->get();
 
                         foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
-                                $dataVarianDetails[$keyColors]->update([
+                                $dataVarianDetails[$key]->update([
                                 "pro_variant_id" => $dataWaitUpdate->id,
                                 "color_id" => $valueColor,
                                 "price" => $request->prices_by_variant_id[$key][$keyColors],
                                 "discount" => $request->discount_by_variant_id[$key][$keyColors],
-                                "quantity" => $dataVarianDetails[$keyColors]->quantity
+                                "quantity" => $dataVarianDetails[$key]->quantity
                             ]);
                         }
                     } else{
@@ -579,7 +580,6 @@ class ProductController extends Controller
         }
 
     }
-
 
     // tìm sản phẩm
 

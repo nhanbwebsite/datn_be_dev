@@ -74,11 +74,20 @@ class SubcategoryController extends Controller
                 ],400);
             }
 
+           if(!empty($request->brand_id)){
+            $create = SubCategory::create([
+                'category_id' => $request->category_id,
+                'name' => $request->name,
+                'slug' => Str::slug($request->name),
+                'brand_id' => $request->brand_id
+            ]);
+           } else{
             $create = SubCategory::create([
                 'category_id' => $request->category_id,
                 'name' => $request->name,
                 'slug' => Str::slug($request->name)
             ]);
+           }
 
             DB::commit();
         } catch(Exception $e) {
@@ -166,12 +175,20 @@ class SubcategoryController extends Controller
             }
 
             $subcategory = SubCategory::find($id);
-            $subcategory->update([
-                'category_id' => $request->category_id,
-                'name' => $request->name,
-                'brand_id' => $request->brand_id,
-                'slug' => Str::slug($request->name),
-            ]);
+            if(!empty($request->brand_id)){
+                $subcategory->update([
+                    'category_id' => $request->category_id,
+                    'name' => $request->name,
+                    'slug' => Str::slug($request->name),
+                    'brand_id' => $request->brand_id,
+                ]);
+            } else{
+                $subcategory->update([
+                    'category_id' => $request->category_id,
+                    'name' => $request->name,
+                    'slug' => Str::slug($request->name),
+                ]);
+            }
 
             DB::commit();
 
