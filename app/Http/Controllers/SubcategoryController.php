@@ -169,6 +169,7 @@ class SubcategoryController extends Controller
             $subcategory->update([
                 'category_id' => $request->category_id,
                 'name' => $request->name,
+                'brand_id' => $request->brand_id,
                 'slug' => Str::slug($request->name),
             ]);
 

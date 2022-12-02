@@ -247,9 +247,9 @@ class ProductController extends Controller
                         $dataWaitUpdate->update([
                             "variant_id" => $valueVariant
                         ]);
-
-                        $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->first();
-
+                        dd($dataWaitUpdate);
+                        $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->variant_id)->get();
+                        dd($dataVarianDetails);
                         foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
 
                                 $dataVarianDetails->update([
