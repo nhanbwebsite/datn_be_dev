@@ -93,6 +93,7 @@ class VNPayController extends Controller
                 if ($input['vnp_ResponseCode'] == '00' || $input['vnp_TransactionStatus'] == '00') {
                     $input['created_by'] = !empty($user) ? $user->id : null;
                     $input['updated_by'] = !empty($user) ? $user->id : null;
+                    $input['vnp_Amount'] = $input['vnp_Amount'] / 100;
                     VNPayOrder::create($input);
                 } else {
                     throw new HttpException(400, 'Thanh toán thất bại !');
