@@ -27,7 +27,6 @@ class Order extends Model
         'payment_method_id',
         'shipping_method_id',
         'status',
-        'type',
         'created_at',
         'updated_at',
         'deleted_at',

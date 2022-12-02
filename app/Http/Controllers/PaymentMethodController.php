@@ -141,7 +141,6 @@ class PaymentMethodController extends Controller
                 ], 404);
             }
             $paymentMethod->name = $request->name ?? $paymentMethod->name;
-            $paymentMethod->code = strtoupper($request->code) ?? $paymentMethod->code;
             $paymentMethod->is_active = $request->is_active ?? $paymentMethod->is_active;
             $paymentMethod->updated_by = $user->id;
             $paymentMethod->save();

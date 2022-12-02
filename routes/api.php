@@ -110,3 +110,5 @@ require __DIR__ . '/File/file.php';
 
 // Biến thể
 require __DIR__ . '/ProductVariants/productVariants.php';
+
+require __DIR__ . '/VNPay/vnpay.php';

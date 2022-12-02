@@ -9,6 +9,7 @@ use App\Http\Validators\Order\OrderDetailCreateValidator;
 use App\Http\Validators\Order\OrderUpdateValidator;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\VNPay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -89,7 +90,7 @@ class OrderController extends Controller
             DB::beginTransaction();
 
             $create = Order::create([
-                'code' => 'DH'.date('dmYHis', time()),
+                'code' => $input['code'],
                 'user_id' => $user->id,
                 'address' => $input['address'],
                 'ward_id' => $input['ward_id'],
@@ -103,7 +104,6 @@ class OrderController extends Controller
                 'fee_ship' => $input['fee_ship'] ?? 0,
                 'payment_method_id' => $input['payment_method_id'],
                 'shipping_method_id' => $input['shipping_method_id'],
-                'type' => !empty($user) ? 'L' : 'N',
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);

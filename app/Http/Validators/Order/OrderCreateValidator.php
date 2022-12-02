@@ -21,6 +21,7 @@ class OrderCreateValidator extends ValidatorBase
             'discount' => 'required|numeric',
             'coupon_id' => 'nullable|numeric',
             'details' => 'required',
+            'returnUrl' => 'required|url'
         ];
     }
 
@@ -56,6 +57,8 @@ class OrderCreateValidator extends ValidatorBase
             'fee_ship.numeric' => ':attribute chưa đúng !',
             'coupon_id.numeric' => ':attribute phải là số !',
             'details.required' => ':attribute không được để trống !',
+            'returnUrl.required' => ':attribute không được để trống !',
+            'returnUrl.url' => ':attribute chưa đúng định dạng URL !',
         ];
     }
 
@@ -75,6 +78,7 @@ class OrderCreateValidator extends ValidatorBase
             'fee_ship' => 'Phí vận chuyển',
             'coupon_id' => 'Mã giảm giá',
             'details' => 'Chi tiết đơn hàng',
+            'returnUrl' => 'URL thông báo kết quả giao dịch',
         ];
     }
 }
