@@ -31,8 +31,7 @@ class ProductResource extends JsonResource
                 // 'discount'      => $this->discount,
                 // 'discount_formatted' => number_format($this->discount ?? 0).'đ',
                 'specification_infomation' => $this->specification_infomation,
-                'brand_id'      => $this->brand_id,
-                'brand_name'    => $this->brand->brand_name,
+
                 'subcategory_id' => $this->subcategory_id,
                 'subcategory_name' => $this->subcategory->name,
                 'category'      => $this->subcategory->category_id,

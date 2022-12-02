@@ -111,4 +111,11 @@ require __DIR__ . '/File/file.php';
 // Biến thể
 require __DIR__ . '/ProductVariants/productVariants.php';
 
+// VNPay
 require __DIR__ . '/VNPay/vnpay.php';
+
+//Danh mục Footer
+require __DIR__ . '/FooterCategory/footer-category.php';
+
+//Nội dung Footer
+require __DIR__ . '/FooterContent/footer-content.php';

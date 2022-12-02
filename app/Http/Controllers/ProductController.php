@@ -29,7 +29,6 @@ class ProductController extends Controller
 
        $dataReturn = [];
        foreach($dataProducts as $key => $value){
-                 $brand_name = $value->brand->brand_name;
                 $value-> cartegory_id = product::category($value->id)->cartegory_id;
                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
@@ -108,7 +107,7 @@ class ProductController extends Controller
                 // 'price' => $input['price'],
                 // 'discount' => $input['discount'],
                 'specification_infomation' => $input['specification_infomation'] ?? null,
-                'brand_id' => $input['brand_id'],
+
                 'subcategory_id' => $input['subcategory_id'],
                 'is_active' => $input['is_active'] ?? 1,
                 'created_by' => $user->id,
@@ -126,8 +125,7 @@ class ProductController extends Controller
                             "pro_variant_id" => $proVariant->id,
                             "color_id" => $valueColor,
                             "price" => $request->prices_by_variant_id[$key][$keyColors],
-                            "discount" => $request->discount_by_variant_id[$key][$keyColors],
-                            "images"
+                            "discount" => $request->discount_by_variant_id[$key][$keyColors]
                         ]);
                     }
                 }
@@ -206,7 +204,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id, ProductUpdateValidator $validator)
     {
-        dd('sdfsdfsdfsd');
+
         $input = $request->all();
         $user = $request->user();
         $validator->validate($input);
@@ -229,7 +227,7 @@ class ProductController extends Controller
             $product->description = $request->description ?? $product->description;
             $product->url_image = $request->url_image ?? $product->url_image;
             $product->specification_infomation = $request->specification_infomation ?? $product->specification_infomation;
-            $product->brand_id = $request->brand_id ?? $product->brand_id;
+
             $product->subcategory_id = $request->subcategory_id ?? $product->subcategory_id;
             // $product->price = $request->price ?? $product->price;
             // $product->discount = $request->discount ?? $product->discount;
@@ -250,14 +248,15 @@ class ProductController extends Controller
                             "variant_id" => $valueVariant
                         ]);
 
-                         $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->first();
+                        $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->get();
 
                         foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
-                                $dataVarianDetails->update([
-                                "pro_variant_id" => $dataVarianDetails->id,
+                                $dataVarianDetails[$keyColors]->update([
+                                "pro_variant_id" => $dataWaitUpdate->id,
                                 "color_id" => $valueColor,
                                 "price" => $request->prices_by_variant_id[$key][$keyColors],
-                                "discount" => $request->discount_by_variant_id[$key][$keyColors]
+                                "discount" => $request->discount_by_variant_id[$key][$keyColors],
+                                "quantity" => $dataVarianDetails[$keyColors]->quantity
                             ]);
                         }
                     } else{
@@ -493,9 +492,24 @@ class ProductController extends Controller
     //  product by subcategory id
 
     public function producstBySubcategoryId($SubId) {
-        $data = Product:: productsBySubCate($SubId);
+        //  $product = new Product();
+
+        $dataProducts = Product::productsBySubCate($SubId);
+        // dd($data);
+        $dataReturn = [];
+        foreach($dataProducts as $key => $value){
+
+                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->product_id);
+
+                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
+
+                 $value->variants = Product::productVariants($value->product_id);
+                 array_push($dataReturn,[
+                     "product" =>  $value,
+                 ]);
+        }
         return response()->json([
-            "data" => $data
+            "data" => $dataProducts
         ]);
     }
 
@@ -569,9 +583,10 @@ class ProductController extends Controller
 
     // tìm sản phẩm
 
-    public function search($keywords){
+    public function search(Request $req){
+
         $product = new Product();
-        $data = $product-> productByKeywords($keywords);
+        $data = $product-> productByKeywords($req->keywords);
         return response()->json([
             'status' => 'success',
             'data' => $data,

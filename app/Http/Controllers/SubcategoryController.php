@@ -49,18 +49,21 @@ class SubcategoryController extends Controller
             DB::beginTransaction();
             $rules = [
                 'category_id' => 'required',
-                'name' => 'required|max:255'
+                'name' => 'required|max:255',
+                'brand_id' => 'required',
             ];
 
             $messages = [
                 'category_id.required' => ':atribuite không được để trống !',
                 'name.required' => ':attribute không được để trống !',
-                'name.max' => ':attribute tối đa 255 ký tự !'
+                'name.max' => ':attribute tối đa 255 ký tự !',
+                'brand_id.required' => ':attribute không được để trống !'
             ];
 
             $attributes = [
-                'category_id' => 'Danh mục cha không được để trống',
-                'Tên Sub danh mục không được để trống'
+                'category_id' => 'Danh mục cha',
+                'name' => 'Tên danh mục con',
+                'brand_id' => 'Tên thương hiệu'
             ];
 
             $validator = Validator::make($request->all(),$rules, $messages, $attributes);
@@ -135,21 +138,22 @@ class SubcategoryController extends Controller
 
         $rules = [
             'category_id' => 'required',
-            'name' => 'required|max:255'
+            'name' => 'required|max:255',
+            'brand_id' => 'required',
         ];
 
         $messages = [
             'category_id.required' => ':atribuite không được để trống !',
             'name.required' => ':attribute không được để trống !',
-            'name.max' => ':attribute tối đa 255 ký tự !'
+            'name.max' => ':attribute tối đa 255 ký tự !',
+            'brand_id.required' => ':attribute không được để trống !'
         ];
 
         $attributes = [
-            'category_id' => 'Danh mục cha không được để trống',
-            'Tên Sub danh mục không được để trống'
+            'category_id' => 'Danh mục cha',
+            'name' => 'Tên danh mục con',
+            'brand_id' => 'Tên thương hiệu'
         ];
-
-
 
         try {
             DB::beginTransaction();
@@ -165,6 +169,7 @@ class SubcategoryController extends Controller
             $subcategory->update([
                 'category_id' => $request->category_id,
                 'name' => $request->name,
+                'brand_id' => $request->brand_id,
                 'slug' => Str::slug($request->name),
             ]);
 

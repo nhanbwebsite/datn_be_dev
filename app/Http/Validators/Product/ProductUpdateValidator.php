@@ -15,7 +15,6 @@ class ProductUpdateValidator extends ValidatorBase
             // 'price' => 'numeric|min:0',
             // 'discount' => 'numeric|min:0',
             'specification_infomation' => 'nullable',
-            'brand_id' => 'required|numeric',
             'subcategory_id' => 'required|numeric',
             'is_active' => 'numeric',
         ];
@@ -34,8 +33,6 @@ class ProductUpdateValidator extends ValidatorBase
             // 'price.min' => ':attribute tối thiểu là 0 !',
             // 'discount.required' => ':attribute không được để trống !',
             // 'discount.min' => ':attribute tối thiểu là 0 !',
-            'brand_id.required' => ':attribute không được để trống !',
-            'brand_id.numeric' => ':attribute chưa đúng định dạng số !',
             'subcategory_id.required' => ':attribute không được để trống !',
             'subcategory_id.numeric' => ':attribute chưa đúng định dạng số !',
         ];
@@ -50,7 +47,6 @@ class ProductUpdateValidator extends ValidatorBase
             // 'price' => 'Giá bán',
             // 'discount' => 'Giảm giá',
             'specification_infomation' => 'Thông số kỹ thuật',
-            'brand_id' => 'Mã thương hiệu',
             'subcategory_id' => 'Mã danh mục',
             'is_active' => 'Trạng thái',
         ];

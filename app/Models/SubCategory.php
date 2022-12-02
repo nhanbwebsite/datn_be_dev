@@ -13,6 +13,7 @@ class SubCategory extends Model
     protected $fillable = [
         'category_id',
         'name',
+        'brand_id',
         'slug',
         'url_img',
         'is_active',
@@ -36,6 +37,10 @@ class SubCategory extends Model
         ->get();
         return $sybByCateId; ;
         // return $this->belongsToMany(ProductVariantDetail::class, 'productVariant', 'product_id', 'variant_id');
+    }
+
+    public function posts(){
+        return $this->hasMany(Post::class, 'category_id', 'id');
     }
 }
 

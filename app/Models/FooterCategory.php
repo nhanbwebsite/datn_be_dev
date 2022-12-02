@@ -6,41 +6,35 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Post extends Model
+class FooterCategory extends Model
 {
-    use HasFactory, SoftDeletes;
-    protected $table = 'posts';
+    use HasFactory,SoftDeletes;
+    protected $table = 'footer_category';
     protected $fillable = [
-        'category_id',
-        'user_id',
-        'title',
-        'short_des',
-        'content_post',
-        'image',
-        'meta_title',
-        'meta_keywords',
-        'meta_description',
+        'name',
         'slug',
-        'views',
         'is_active',
-        'is_feature',
         'created_by',
         'updated_by',
         'deleted_by',
         'created_at',
         'updated_at',
-        'deleted_at'
+        'deleted_at',
     ];
-
-    public function category() {
-        return $this->belongsTo(SubCategory::class, 'category_id','id');
-    }
-
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function footerContent(){
+        return $this->hasMany(FooterContent::class, 'category_id', 'id');
     }
 
     public function updatedBy(){
         return $this->belongsTo(User::class, 'updated_by', 'id');
     }
+    public static function footerContentId($category_id){
+        $data = FooterContent::where('category_id',$category_id)->get();
+        return $data;
+    }
+
 }

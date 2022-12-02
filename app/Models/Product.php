@@ -22,7 +22,7 @@ class Product extends Model
         'url_image',
         'price',
         'discount',
-        'brand_id',
+
         'subcategory_id',
         'is_active',
         'created_at',
@@ -45,9 +45,9 @@ class Product extends Model
         return $this->hasMany(productAmountByWarehouse::class, 'product_id', 'id');
     }
 
-    public function brand(){
-        return $this->belongsTo(Brands::class, 'brand_id', 'id');
-    }
+    // public function brand(){
+    //     return $this->belongsTo(Brands::class, 'brand_id', 'id');
+    // }
 
     public function subcategory(){
         return $this->belongsTo(SubCategory::class, 'subcategory_id', 'id');
@@ -76,7 +76,8 @@ class Product extends Model
     }
 
     public static function productsBySubCate($id){
-        $proBySub = DB::table(('products'))
+        $proBySub = DB::table('products')
+        ->select('products.id as product_id','products.slug','sub_categories.id as subcategory_id','products.code','products.meta_title','products.meta_keywords','products.meta_description','products.name as product_name','products.description','products.url_image')
         ->join('sub_categories', 'products.subcategory_id', '=', 'sub_categories.id')
         ->where('products.subcategory_id',$id)
         ->orderByDesc('products.id')->get();
@@ -137,12 +138,10 @@ class Product extends Model
         ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
         ->join('variants','productVariant.variant_id','variants.id')
         ->join('colors','productVariantDetails.color_id','colors.id')
-        ->where('products.name','like',"%$keywords%")
+        ->where('products.name','like','%'.$keywords.'%')
+        ->orWhere('products.meta_title','like','%'.$keywords.'%')
         ->get();
         return $data;
     }
-
-
-
 
 }
