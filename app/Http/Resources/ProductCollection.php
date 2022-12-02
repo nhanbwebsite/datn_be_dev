@@ -34,8 +34,7 @@ class ProductCollection extends ResourceCollection
                     'discount'      => $value->discount,
                     'discount_formatted' => number_format($value->discount ?? 0).'đ',
                     'specification_infomation' => $value->specification_infomation,
-                    'brand_id' => $value->brand_id,
-                    'brand_name' => $value->brand->brand_name,
+
                     'subcategory_id' => $value->subcategory_id,
                     'subcategory_name' => $value->subcategory->name,
                     'variants' => $value->variants,
