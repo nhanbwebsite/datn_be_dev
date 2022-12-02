@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\FooterCategoryResource;
 use App\Http\Resources\FooterContentCollection;
 use App\Http\Resources\FooterContentResource;
+use App\Http\Resources\LoadFooterContentClientCollection;
 use App\Http\Resources\LoadFooterContentResource;
 use App\Http\Validators\FooterContent\FooterContentCreateValidator;
 use App\Http\Validators\FooterContent\FooterContentUpdateValidator;
@@ -222,6 +224,23 @@ class FooterContentController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa bài viết ['.$data->title.'] !'
         ]);
+    }
+
+    public function loadAll()
+    {
+        try{
+            $data = FooterContent::orderBy('created_at','desc')->get();
+        } catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new LoadFooterContentClientCollection($data));
     }
 
 

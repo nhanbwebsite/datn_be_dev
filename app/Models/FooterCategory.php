@@ -32,5 +32,9 @@ class FooterCategory extends Model
     public function updatedBy(){
         return $this->belongsTo(User::class, 'updated_by', 'id');
     }
+    public static function footerContentId($category_id){
+        $data = FooterContent::where('category_id',$category_id)->get();
+        return $data;
+    }
 
 }
