@@ -144,7 +144,4 @@ class Product extends Model
         return $data;
     }
 
-
-
-
 }
