@@ -37,6 +37,10 @@ class SubCategory extends Model
         return $sybByCateId; ;
         // return $this->belongsToMany(ProductVariantDetail::class, 'productVariant', 'product_id', 'variant_id');
     }
+
+    public function posts(){
+        return $this->hasMany(Post::class, 'category_id', 'id');
+    }
 }
 
 

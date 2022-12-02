@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Validators\FooterCategory\FooterCategoryUpsertValidator;
 use App\Http\Resources\FooterCategoryCollection;
 use App\Http\Resources\FooterCategoryResource;
+use App\Http\Resources\LoadFooterCategoryClientCollection;
 use App\Http\Resources\LoadFooterContentResource;
 use App\Models\FooterCategory;
 use Exception;
@@ -230,5 +231,32 @@ class FooterCategoryController extends Controller
             'status' => 'success',
             'data' => new LoadFooterContentResource($data),
         ]);
+    }
+
+    public function loadAllByCate(Request $request)
+    {
+        try{
+            $data = FooterCategory::where('is_active', 1)
+            ->get();
+            foreach( $data as $value){
+                // push object subscategories
+                $value->footerContent = FooterCategory::footerContentId($value->id);
+            }
+        } catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+
+        return response()->json([
+            'status'=>'success',
+            'data' =>$data
+        ]);
+
     }
 }
