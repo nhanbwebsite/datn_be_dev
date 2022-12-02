@@ -144,4 +144,10 @@ class Product extends Model
         return $data;
     }
 
+    public static function getNameCreated($id){
+        $data = DB::table('products')->select('users.name as created_by_name')
+                ->join('users','products.created_by','users.id')->first();
+        return $data;
+    }
+
 }

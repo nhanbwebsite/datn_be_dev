@@ -14,6 +14,7 @@ class SubCategory extends Model
         'category_id',
         'name',
         'brand_id',
+        'is_post',
         'slug',
         'url_img',
         'is_active',
