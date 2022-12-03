@@ -197,7 +197,7 @@ class Product extends Model
 
     public static function AllCategory(){
         $data = DB::table('categories')
-        ->select('categories.id as category_id')
+        ->select('categories.id as category_id','categories.name')
         ->where('is_post',0)
         ->get();
         return $data;
