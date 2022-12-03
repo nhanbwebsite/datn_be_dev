@@ -29,7 +29,7 @@ class VNPayController extends Controller
                 'vnp_IpAddr' => $request->ip(),
                 'vnp_Locale' => VNPAY_LOCALE,
                 'vnp_OrderInfo' => 'Thanh toan don hang DH'.date('YmdHis', time()),
-                'vnp_ReturnUrl' => env('VNPAY_RETURN_URL'),
+                'vnp_ReturnUrl' => $input['returnUrl'],
                 'vnp_ExpireDate' => date('YmdHis', time() + 15*60),
                 'vnp_TxnRef' => 'DH'.date('YmdHis', time()),
             ];
@@ -61,7 +61,10 @@ class VNPayController extends Controller
             ], $e->getStatusCode());
         }
 
-        return $finalUrl ?? null;
+        return response()->json([
+            'status' => 'success',
+            'url' => $finalUrl ?? null,
+        ]);
     }
 
     public function returnData(Request $request){
