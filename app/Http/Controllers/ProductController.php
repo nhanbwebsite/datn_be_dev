@@ -595,15 +595,14 @@ class ProductController extends Controller
     }
 
     public function getAllSubcate(){
-        $data = Product::getAllSubcate();
-        $dataReturn = [];
-        foreach($data as $key => $value) {
-            $value -> products = Product::productsBySubCate($value->id);
-            foreach($value->products as $key2 => $value2) {
-                $value2->productsVariantDetails = Product::variantDetailsProductByProId($value -> products[$key]->product_id);
+        $data = Product::AllCategory();
+            foreach($data as $key => $value){
+                $value->products = Product::AllSubCategoryByCategoryId($value->id);
+                foreach($value->products as $key2 => $value2){
+                    // dd($value2);
+                    $value2->productVariants = Product::variantDetailsProductByProId($value2->id);
+                }
             }
-            // $value->products->productsVariantDetails
-        }
         return response()->json([
             'status' => 'success',
             'data' => $data,
