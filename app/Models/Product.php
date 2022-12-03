@@ -205,7 +205,7 @@ class Product extends Model
 
     public static function AllSubCategoryByCategoryId($id){
         $data = DB::table('products')
-        ->select('products.id','products.name','products.slug','sub_categories.id as sub_category_id','sub_categories.name as sub_category_name','categories.id as category_id','categories.name as category_name')
+        ->select('products.id','products.name','products.slug','products.url_image','sub_categories.id as sub_category_id','sub_categories.name as sub_category_name','categories.id as category_id','categories.name as category_name')
         ->join('sub_categories','products.subcategory_id','sub_categories.id')
         ->join('categories','sub_categories.category_id','categories.id')
         ->where('categories.is_post',0)
