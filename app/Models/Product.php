@@ -195,7 +195,7 @@ class Product extends Model
         return $data;
     }
 
-    public function AllCategory(){
+    public static function AllCategory(){
         $data = DB::table('categories')
         ->where('is_post',0)
         ->get();
