@@ -157,6 +157,61 @@ class Product extends Model
         return $data;
     }
 
+    public static function getAllBrans(){
+        $data = DB::table('brands')
+        ->select('brands.id','brands.brand_name','brands.slug','sub_categories.id as sub_category_id','sub_categories.name as sub_category_name')
+        ->join('sub_categories','brands.id','sub_categories.brand_id')
+        ->where('is_post',0)
+        ->get();
+        return $data;
+    }
+
+    public static function productsByBrand($id){
+        $proBySub = DB::table('products')
+        ->select('products.id as product_id','products.slug','sub_categories.id as subcategory_id','products.code','products.meta_title','products.meta_keywords','products.meta_description','products.name as product_name','products.description','products.url_image')
+        ->join('sub_categories', 'products.subcategory_id', '=', 'sub_categories.id')
+        ->join('brands', 'sub_categories.brand_id', '=', 'brands.id')
+        ->where('brands.id',$id)
+        ->orderByDesc('products.id')->get();
+        // ->paginate(4);
+        return $proBySub;
+    }
+
+    public static function AllProductsByBrand(){
+        $proBySub = DB::table('products')
+        ->select('products.id as product_id','products.slug','sub_categories.id as subcategory_id','products.code','products.meta_title','products.meta_keywords','products.meta_description','products.name as product_name','products.description','products.url_image')
+        ->join('sub_categories', 'products.subcategory_id', '=', 'sub_categories.id')
+        ->join('brands', 'sub_categories.brand_id', '=', 'brands.id')
+        ->orderByDesc('products.id')->get();
+        // ->paginate(4);
+        return $proBySub;
+    }
+
+    public function AllProductByCategory(){
+        $data = DB::table('products')
+        ->select('products.id as product_id','products.name','products.slug','products.subcategory_id')
+        ->join('sub_categories','products.subcategory_id','sub_categories.id')
+        ->get();
+        return $data;
+    }
+
+    public function AllCategory(){
+        $data = DB::table('categories')
+        ->where('is_post',0)
+        ->get();
+        return $data;
+    }
+
+    public function AllSubCategoryByCategoryId($id){
+        $data = DB::table('products')
+        ->join('sub_categories','products.subcategory_id','sub_categories.id')
+        ->join('categories','sub_categories.category_id','categories.id')
+        ->where('categories.is_post',0)
+        ->where('categories.id',$id)
+        ->get();
+        return $data;
+    }
+
 
 
 }
