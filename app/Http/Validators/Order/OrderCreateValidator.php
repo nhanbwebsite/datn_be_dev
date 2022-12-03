@@ -8,6 +8,7 @@ class OrderCreateValidator extends ValidatorBase
 {
     protected function rules(){
         return [
+            'code' => 'required|string|unique_deleted_at_null:orders,code',
             'phone' => 'required|regex:/^0[2-9]{1}[0-9]{8}$/',
             'fee_ship' => 'required|numeric',
             'address' => 'required|string|max:255',
@@ -21,12 +22,14 @@ class OrderCreateValidator extends ValidatorBase
             'discount' => 'required|numeric',
             'coupon_id' => 'nullable|numeric',
             'details' => 'required',
-            'returnUrl' => 'required|url'
         ];
     }
 
     protected function messages(){
         return [
+            'code.required' => ':attribute không được để trống !',
+            'code.string' => ':attribute phải là chuỗi !',
+            'code.unique_deleted_at_null' => ':attribute đã tồn tại !',
             'phone.required' => ':attribute không được để trống !',
             'phone.regex' => ':attribute chưa đúng định dạng ! VD: 0946636842',
             'fee_ship.required' => ':attribute không được để trống !',
@@ -57,13 +60,12 @@ class OrderCreateValidator extends ValidatorBase
             'fee_ship.numeric' => ':attribute chưa đúng !',
             'coupon_id.numeric' => ':attribute phải là số !',
             'details.required' => ':attribute không được để trống !',
-            'returnUrl.required' => ':attribute không được để trống !',
-            'returnUrl.url' => ':attribute chưa đúng định dạng URL !',
         ];
     }
 
     protected function attributes(){
         return [
+            'code' => 'Mã đơn hàng',
             'phone' => 'Số điện thoại',
             'email' => 'Email',
             'fee_ship' => 'Phí vận chuyển',
@@ -78,7 +80,6 @@ class OrderCreateValidator extends ValidatorBase
             'fee_ship' => 'Phí vận chuyển',
             'coupon_id' => 'Mã giảm giá',
             'details' => 'Chi tiết đơn hàng',
-            'returnUrl' => 'URL thông báo kết quả giao dịch',
         ];
     }
 }

@@ -9,6 +9,7 @@ class OrderDetailCreateValidator extends ValidatorBase
     protected function rules(){
         return [
             'product_id' => 'required|numeric|exists:products,id',
+            'variant_id' => 'required|numeric|exists:productVariant,id',
             'quantity' => 'required|numeric',
             'price' => 'required|numeric',
         ];

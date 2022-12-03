@@ -177,16 +177,8 @@ class CartController extends Controller
         $validator->validate($input);
         try{
             DB::beginTransaction();
+
             $discountPrice = 0;
-            if(!empty($input['details'])){
-                foreach($input['details'] as $d){
-                    // $productFind = Product::find($d['product_id']);
-                    $variantFind = ProductVariantDetail::find($d['variant_id']);
-                    if($variantFind->discount > 0){
-                        $discountPrice += $variantFind->discount * $d['quantity'];
-                    }
-                }
-            }
 
             if(!empty($input['coupon_id'])){
                 $checkIsset = Coupon::where('id', $input['coupon_id'])->where('is_active', 1)->first();
@@ -223,6 +215,16 @@ class CartController extends Controller
                     'status' => 'success',
                     'message' => 'Giỏ hàng không tồn tại !'
                 ], 404);
+            }
+
+            if(!empty($input['details'])){
+                foreach($input['details'] as $d){
+                    // $productFind = Product::find($d['product_id']);
+                    $variantFind = ProductVariantDetail::find($d['variant_id']);
+                    if($variantFind->discount > 0){
+                        $discountPrice += $variantFind->discount * $d['quantity'];
+                    }
+                }
             }
 
             $data->address = $input['address'] ?? $data->address;
@@ -288,12 +290,12 @@ class CartController extends Controller
                     'message' => 'Sản phẩm không tồn tại trong giỏ hàng !'
                 ], 404);
             }
-            $data->updated_by = $user_id;
+            $data->deleted_by = $user_id;
             $data->save();
             $data->delete();
 
             if(count($cart->details) == 0){
-                $cart->updated_by = $user_id;
+                $cart->deleted_by = $user_id;
                 $cart->delete();
             }
 
@@ -337,11 +339,11 @@ class CartController extends Controller
                 ], 404);
             }
             foreach($data as $detail){
-                $detail->updated_by = $user_id;
+                $detail->deleted_by = $user_id;
                 $detail->delete();
             }
 
-            $cart->updated_by = $user_id;
+            $cart->deleted_by = $user_id;
             $cart->save();
             $cart->delete();
 
