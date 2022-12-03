@@ -2,21 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Validators\FooterCategory\FooterCategoryUpsertValidator;
-use App\Http\Resources\FooterCategoryCollection;
-use App\Http\Resources\FooterCategoryResource;
-use App\Http\Resources\LoadFooterCategoryClientCollection;
-use App\Http\Resources\LoadFooterContentResource;
-use App\Models\FooterCategory;
-use Exception;
+use App\Http\Resources\ContactCollection;
+use App\Http\Resources\ContactResource;
+use App\Http\Validators\Contact\ContactCreateValidator;
+use App\Http\Validators\Contact\ContactValidator;
+use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 
-class FooterCategoryController extends Controller
+class ContactController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -28,14 +24,17 @@ class FooterCategoryController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = FooterCategory::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input) {
+            $data = Contact::where('is_active', $input['is_active'] ?? 1)->where(function($query) use($input) {
                 if(!empty($input['name'])){
                     $query->where('name', 'like', '%'.$input['name'].'%');
+                }
+                if(!empty($input['phone'])){
+                    $query->where('phone', 'like', '%'.$input['phone'].'%');
                 }
                 if(!empty($input['is_active'])){
                     $query->where('is_active', $input['is_active']);
                 }
-            })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
+            })->orderBy('created_at', 'asc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
         }
         catch(HttpException $e){
             return response()->json([
@@ -47,7 +46,7 @@ class FooterCategoryController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        return response()->json(new FooterCategoryCollection($data));
+        return response()->json(new ContactCollection($data));
     }
 
     /**
@@ -56,36 +55,26 @@ class FooterCategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request,FooterCategoryUpsertValidator $validator)
+    public function store(Request $request, ContactCreateValidator $validator  )
     {
         $input = $request->all();
-        $input['slug'] = Str::slug($input['name']) ?? null;
+        $input['slug']=  Str::slug($input['name']) ?? null;
         $validator->validate($input);
         $user = $request->user();
         try {
             DB::beginTransaction();
-            if(!empty($request->is_active)){
-                $data = FooterCategory::create([
-                    'name' => mb_strtoupper(mb_substr($input['name'], 0, 1)).mb_substr($input['name'], 1),
-                    'slug' => $input['slug'],
-                    'is_active' => $input['is_active'] ?? 1,
-                    'created_by' => $user->id,
-                    'updated_by' => $user->id,
-                    'is_contact' => 1
-                ]);
-            }else{
-                $data = FooterCategory::create([
-                    'name' => mb_strtoupper(mb_substr($input['name'], 0, 1)).mb_substr($input['name'], 1),
-                    'slug' => $input['slug'],
-                    'is_active' => $input['is_active'] ?? 1,
-                    'created_by' => $user->id,
-                    'updated_by' => $user->id,
-                ]);
-            }
-
-
+            $data = Contact::create([
+                'name' => mb_strtoupper(mb_substr($input['name'], 0, 1 )).mb_substr($input['name'], 1),
+                'phone'=>$input['phone'],
+                'time' =>$input['time'],
+                'category_id'=>$input['category_id'],
+                'slug' => $input['slug'],
+                'is_active' => $input['is_active'] ?? 1,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
+            ]);
             DB::commit();
-        } catch(HttpException $e) {
+        }catch(HttpException $e){
             DB::rollback();
             return response()->json([
                 'status' => 'error',
@@ -101,16 +90,17 @@ class FooterCategoryController extends Controller
             'message' => '['.$data->name . '] đã được tạo thành công !',
         ]);
     }
+
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\CategoryFooter  $CategoryFooter
+     * @param  \App\Models\Contact  $contact
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
         try{
-            $data = FooterCategory::find($id);
+            $data = Contact::find($id);
 
             if(empty($data)){
                 return response()->json([
@@ -126,17 +116,18 @@ class FooterCategoryController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data' => new FooterCategoryResource($data),
+            'data' => new ContactResource($data),
         ]);
     }
+
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\CategoryFooter  $CategoryFooter
+     * @param  \App\Models\Contact  $contact
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, FooterCategoryUpsertValidator $validator)
+        public function update(Request $request, $id, ContactCreateValidator $validator)
     {
         $input = $request->all();
         $input['slug'] = Str::slug($input['name']) ?? null;
@@ -145,7 +136,7 @@ class FooterCategoryController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = FooterCategory::find($id);
+            $data = Contact::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
@@ -154,6 +145,8 @@ class FooterCategoryController extends Controller
             }
             $data->update([
                 'name' => mb_strtoupper(mb_substr($input['name'], 0, 1)).mb_substr($input['name'], 1),
+                'phone' => $input['phone'],
+                'time' => $input['time'],
                 'slug' => $input['slug'],
                 'updated_by' => $user->id,
             ]);
@@ -176,19 +169,20 @@ class FooterCategoryController extends Controller
         ]);
     }
 
+
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\CategoryFooter  $CategoryFooter
+     * @param  \App\Models\Contact  $contact
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id, Request $request)
+    public function destroy(Request $request, $id)
     {
         $user = $request->user();
         try {
             DB::beginTransaction();
 
-            $data = FooterCategory::find($id);
+            $data = Contact::find($id);
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
@@ -215,84 +209,6 @@ class FooterCategoryController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Đã xóa thành công danh mục ' . $data->name
-        ]);
-    }
-
-    public function loadByCate($id)
-    {
-        try{
-            $data = FooterCategory::find($id);
-            if(empty($data)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
-                ], 404);
-            }
-        } catch(HttpException $e){
-            return response()->json([
-                'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
-        }
-        return response()->json([
-            'status' => 'success',
-            'data' => new LoadFooterContentResource($data),
-        ]);
-    }
-
-    public function loadAllByCate(Request $request)
-    {
-        try{
-            $data = FooterCategory::where('is_active', 1)
-            ->get();
-            foreach( $data as $value){
-                // push object subscategories
-                $value->footerContent = FooterCategory::footerContentId($value->id);
-            }
-        } catch(HttpException $e){
-            return response()->json([
-                'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
-        }
-
-        return response()->json([
-            'status'=>'success',
-            'data' =>$data
-        ]);
-
-    }
-
-    public function getCategory_is_contact(){
-        try{
-            $data = FooterCategory::where('is_active', 1)
-            ->where('is_contact',1)
-            ->get();
-            foreach( $data as $value){
-                // push object contact
-                $value->contact = FooterCategory::contactByCategoryID($value->id);
-            }
-        }  catch(HttpException $e){
-            return response()->json([
-                'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
-        }
-        return response()->json([
-            'status'=>'success',
-            'data' =>$data
         ]);
     }
 }

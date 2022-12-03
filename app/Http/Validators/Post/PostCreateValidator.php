@@ -8,7 +8,8 @@ class PostCreateValidator extends ValidatorBase
 {
     protected function rules(){
         return [
-            'category_id' => 'required|exists:post_categories,id',
+            // 'category_id' => 'required|exists:post_categories,id',
+            'subcategory_id' => 'required|exists:sub_categories,id',
             'title' => 'required|max:255',
             'slug' => 'string|max:255|unique_deleted_at_null:posts,slug',
             'short_des'=>'required|max:255',

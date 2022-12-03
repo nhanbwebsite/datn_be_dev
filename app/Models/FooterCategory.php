@@ -36,5 +36,15 @@ class FooterCategory extends Model
         $data = FooterContent::where('category_id',$category_id)->get();
         return $data;
     }
+    public static function contactByCategoryID($category_id){
+        $data = Contact::where('category_id',$category_id)->get();
+        return $data;
+    }
 
+    // public function contact(){
+    //     return $this->belongsTo(Contact::class, 'category_id', 'id');
+    // }
+    public function contact(){
+        return $this->hasMany(Contact::class, 'category_id', 'id');
+    }
 }
