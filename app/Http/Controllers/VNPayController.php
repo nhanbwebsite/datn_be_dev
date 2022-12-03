@@ -29,7 +29,7 @@ class VNPayController extends Controller
                 'vnp_IpAddr' => $request->ip(),
                 'vnp_Locale' => VNPAY_LOCALE,
                 'vnp_OrderInfo' => 'Thanh toan don hang DH'.date('YmdHis', time()),
-                'vnp_ReturnUrl' => env('VNPAY_RETURN_URL'),
+                'vnp_ReturnUrl' => $input['returnUrl'],
                 'vnp_ExpireDate' => date('YmdHis', time() + 15*60),
                 'vnp_TxnRef' => 'DH'.date('YmdHis', time()),
             ];
@@ -61,7 +61,10 @@ class VNPayController extends Controller
             ], $e->getStatusCode());
         }
 
-        return $finalUrl ?? null;
+        return response()->json([
+            'status' => 'success',
+            'url' => $finalUrl ?? null,
+        ]);
     }
 
     public function returnData(Request $request){
@@ -96,10 +99,16 @@ class VNPayController extends Controller
                     $input['vnp_Amount'] = $input['vnp_Amount'] / 100;
                     VNPayOrder::create($input);
                 } else {
-                    throw new HttpException(400, 'Thanh toán thất bại !');
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Thanh toán không thành công ! Vui lòng thử lại !',
+                    ], 400);
                 }
             } else {
-                throw new HttpException(400, 'Sai chữ ký !');
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Sai chữ ký ! Dữ liệu đã bị can thiệp trong quá trình truyền tải đến VNPay !'
+                ], 400);
             }
 
             DB::commit();
