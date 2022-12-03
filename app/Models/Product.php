@@ -202,7 +202,7 @@ class Product extends Model
         return $data;
     }
 
-    public function AllSubCategoryByCategoryId($id){
+    public static function AllSubCategoryByCategoryId($id){
         $data = DB::table('products')
         ->join('sub_categories','products.subcategory_id','sub_categories.id')
         ->join('categories','sub_categories.category_id','categories.id')
