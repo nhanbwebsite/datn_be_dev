@@ -150,4 +150,13 @@ class Product extends Model
         return $data;
     }
 
+    public static function getAllSubcate(){
+        $data = DB::table('sub_categories')
+        ->select('sub_categories.id','sub_categories.category_id','sub_categories.name','sub_categories.slug','sub_categories.brand_id','sub_categories.url_img')
+                ->get();
+        return $data;
+    }
+
+
+
 }

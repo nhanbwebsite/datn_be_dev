@@ -37,3 +37,5 @@ Route::get('client/products_search/',[ProductController::class,'search']);
 // province by store, products < 0
 Route::get('client/productsfindbylocation',[ProductController::class,'getProvincesByWarehouse']);
 
+Route::get('client/getallproductbysubcategories',[ProductController::class,'getAllSubcate']);
+
