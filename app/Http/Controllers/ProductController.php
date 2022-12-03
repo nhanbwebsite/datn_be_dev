@@ -597,10 +597,12 @@ class ProductController extends Controller
     public function getAllSubcate(){
         $data = Product::AllCategory();
             foreach($data as $key => $value){
-                $value->products = Product::AllSubCategoryByCategoryId($value->id);
+                // dd($value);
+                $value->products = Product::AllSubCategoryByCategoryId($value->category_id);
                 foreach($value->products as $key2 => $value2){
                     // dd($value2);
                     $value2->productVariants = Product::variantDetailsProductByProId($value2->id);
+                    // dd($value2->productVariants);
                 }
             }
         return response()->json([
