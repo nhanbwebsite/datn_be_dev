@@ -96,10 +96,16 @@ class VNPayController extends Controller
                     $input['vnp_Amount'] = $input['vnp_Amount'] / 100;
                     VNPayOrder::create($input);
                 } else {
-                    throw new HttpException(400, 'Thanh toán thất bại !');
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Thanh toán không thành công ! Vui lòng thử lại !',
+                    ], 400);
                 }
             } else {
-                throw new HttpException(400, 'Sai chữ ký !');
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Sai chữ ký ! Dữ liệu đã bị can thiệp trong quá trình truyền tải đến VNPay !'
+                ], 400);
             }
 
             DB::commit();
