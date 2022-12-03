@@ -35,16 +35,13 @@ class FooterContentController extends Controller
                 if(!empty($input['title'])){
                     $query->where('title', 'like', '%'.$input['title'].'%');
                 }
-                if(!empty($input['slug'])){
-                    $query->where('slug', $input['slug']);
-                }
                 if(!empty($input['user_id'])){
                     $query->where('user_id', $input['user_id']);
                 }
-                if(!empty($input['category_id'])){
-                    $query->where('category_id', $input['category_id']);
+                if(!empty($input['is_active'])){
+                    $query->where('is_active', $input['is_active']);
                 }
-            })->orderBy('created_at', 'desc')->paginate($input['limit'] ?? 5);
+            })->orderBy('created_at', 'asc')->paginate($input['limit'] ?? 10);
         }
         catch(HttpException $e){
             return response()->json([
