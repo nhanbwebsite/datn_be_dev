@@ -237,7 +237,8 @@ class ProductController extends Controller
             $product->save();
 
             if(isset($request->variant_ids)){
-
+                $deleted = DB::table('productVariant')->where('product_id', $product->id)->get();
+                dd($deleted);
                 foreach($request->variant_ids as $key => $valueVariant) {
 
                     $dataWaitUpdate = ProductVariantDetail::where('product_id',$product->id)
@@ -591,6 +592,22 @@ class ProductController extends Controller
             'status' => 'success',
             'data' => $data,
         ]);
+    }
+
+    public function getAllSubcate(){
+        $data = Product::getAllSubcate();
+        $dataReturn = [];
+        foreach($data as $key => $value) {
+            $value -> products = Product::productsBySubCate($value->id);
+            foreach($value->products as $key2 => $value2) {
+                $value2->productsVariantDetails = Product::variantDetailsProductByProId($value -> products[$key]->product_id);
+            }
+            // $value->products->productsVariantDetails
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => $data,
+        ],200);
     }
 
 }
