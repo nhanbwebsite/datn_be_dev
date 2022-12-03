@@ -220,6 +220,7 @@ class OrderController extends Controller
             $update->email=  $input['email'] ?? $update->email;
             $update->shipping_method_id = $input['shipping_method_id'] ?? $update->shipping_method_id;
             $update->payment_method_id = $input['payment_method_id'] ?? $update->payment_method_id;
+            $update->updated_by = $user->id;
             $update->save();
 
             DB::commit();
