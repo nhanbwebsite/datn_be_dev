@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Validators\VNPay\VNPayCreateValidator;
+use App\Http\Validators\VNPay\VNPayOrderCreateValidator;
 use App\Models\Order;
 use App\Models\VNPayOrder;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ class VNPayController extends Controller
         $input = $request->all();
         $validator->validate($input);
         try{
+            $order_code = 'DH'.date('YmdHis', time());
             $params = [
                 'vnp_Version' => env('VNPAY_VERSION'),
                 'vnp_Command' => VNPAY_COMMAND_PAY,
@@ -28,10 +30,10 @@ class VNPayController extends Controller
                 'vnp_CurrCode' => VNPAY_CURRENCY,
                 'vnp_IpAddr' => $request->ip(),
                 'vnp_Locale' => VNPAY_LOCALE,
-                'vnp_OrderInfo' => 'Thanh toan don hang DH'.date('YmdHis', time()),
+                'vnp_OrderInfo' => 'Thanh toan don hang ['.$order_code.']',
                 'vnp_ReturnUrl' => $input['returnUrl'],
                 'vnp_ExpireDate' => date('YmdHis', time() + 15*60),
-                'vnp_TxnRef' => 'DH'.date('YmdHis', time()),
+                'vnp_TxnRef' => $order_code,
             ];
             ksort($params);
             $vnpay_query_params = '';
@@ -67,7 +69,7 @@ class VNPayController extends Controller
         ]);
     }
 
-    public function returnData(Request $request){
+    public function returnData(Request $request, VNPayOrderCreateValidator $validator){
         $input = $request->all();
         $user = $request->user();
 
@@ -97,6 +99,7 @@ class VNPayController extends Controller
                     $input['created_by'] = !empty($user) ? $user->id : null;
                     $input['updated_by'] = !empty($user) ? $user->id : null;
                     $input['vnp_Amount'] = $input['vnp_Amount'] / 100;
+                    $validator->validate($input);
                     VNPayOrder::create($input);
                 } else {
                     return response()->json([
@@ -127,7 +130,9 @@ class VNPayController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Đã thanh toán thành công ! Mã đơn hàng: '.$input['vnp_TxnRef'],
+            'data' => [
+                'order_code' => $input['vnp_TxnRef'],
+            ],
         ]);
     }
 }

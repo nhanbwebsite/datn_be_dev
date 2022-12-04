@@ -46,6 +46,7 @@ class CartResource extends JsonResource
                 'total'         => $totalPrice + $this->fee_ship - $this->discount ?? 0,
                 'total_formatted' => number_format($totalPrice + $this->fee_ship - $this->discount ?? 0).'đ',
                 'coupon_id'     => $this->coupon_id ?? null,
+                'coupon_code'     => $this->coupon->code ?? null,
                 'discount'      => $this->discount ?? 0,
                 'discount_formatted' => number_format($this->discount ?? 0).'đ',
                 'fee_ship'      => $this->fee_ship,
