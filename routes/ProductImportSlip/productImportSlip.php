@@ -17,4 +17,4 @@
         // Route::delete('/{id}', 'destroy');
     });
 
-    ?>
+?>

@@ -601,7 +601,8 @@ class ProductController extends Controller
                 $value->products = Product::AllSubCategoryByCategoryId($value->category_id);
                 foreach($value->products as $key2 => $value2){
                     // dd($value2);
-                    $value2->productVariants = Product::variantDetailsProductByProId($value2->id);
+                    $value2->productVariantsDetails = Product::variantDetailsProductByProId($value2->id);
+                    $value2->variants = Product::productVariants($value2->id);
                     // dd($value2->productVariants);
                 }
             }
