@@ -90,12 +90,12 @@ class CartController extends Controller
             if(empty($cart)){
                 $cartCreate = Cart::create([
                     'user_id' => $user->id,
-                    'address' => $input['address'],
-                    'ward_id' => $input['ward_id'],
-                    'district_id' => $input['district_id'],
-                    'province_id' => $input['province_id'],
-                    'phone' => $input['phone'],
-                    'email' => $input['email'],
+                    'address' => $user->address ?? null,
+                    'ward_id' => $user->ward_id,
+                    'district_id' => $user->district_id,
+                    'province_id' => $user->province_id,
+                    'phone' => $user->phone,
+                    'email' => $user->email ?? null,
                     'fee_ship' => 18000,
                     'discount' => $discountPrice > 0 ? $discountPrice : 0,
                     'created_by' => $user->id,
