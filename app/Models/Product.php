@@ -89,6 +89,7 @@ class Product extends Model
         $data = DB::table('productVariantDetails')
         ->where('productVariantDetails.pro_variant_id',$proVariantId)
         ->get();
+        return $data;
     }
 
     public static function variantDetailsProductByProId($id){
@@ -220,6 +221,13 @@ class Product extends Model
         return $data;
     }
 
+
+
+    public static function getColorById($id){
+        $data = DB::table('colors')
+                ->where('colors.id',$id)->first();
+        return $data;
+    }
 
 
 }
