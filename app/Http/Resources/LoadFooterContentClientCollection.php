@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\ResourceCollection;
+
+class LoadFooterContentClientCollection extends ResourceCollection
+{
+    /**
+     * Transform the resource collection into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     */
+    public function toArray($request)
+    {
+        if(!$this->collection->isEmpty()){
+            foreach($this->collection as $value){
+                $result['data'][] = [
+                    'id'            => $value->id,
+                    'category_id'   => $value->category_id,
+                    'category_name'   => $value->category->name,
+                    'title'          => $value->title,
+                    'content'       => $value->content,
+                    'slug'          => $value->slug,
+                    'is_active'     => $value->is_active,
+                    'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
+                    'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
+                    'updated_by'    => $value->updatedBy->name ?? null,
+                ];
+            }
+            return $result;
+    }
+    $result['data'] = [];
+    return $result;
+}
+}

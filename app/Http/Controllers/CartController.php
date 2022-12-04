@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CartResource;
+use App\Http\Validators\Cart\CartCreateValidator;
 use App\Http\Validators\Cart\CartDetailUpsertValidator;
 use App\Http\Validators\Cart\CartUpdateValidator;
 use App\Models\AddressNote;
@@ -11,6 +12,8 @@ use App\Models\CartDetail;
 use App\Models\Coupon;
 use App\Models\CouponOrder;
 use App\Models\Product;
+use App\Models\ProductVariantDetail;
+use App\Models\ProductVariantDetailById;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -52,10 +55,10 @@ class CartController extends Controller
         ]);
     }
 
-    public function addToCart(Request $request, CartDetailUpsertValidator $detailValidator){
+    public function addToCart(Request $request, CartCreateValidator $validator){
         $user = $request->user();
         $input = $request->all();
-        $detailValidator->validate($input);
+        $validator->validate($input);
         try{
             DB::beginTransaction();
             $product = Product::find($input['product_id']);
@@ -65,21 +68,36 @@ class CartController extends Controller
                     'message' => 'Không tìm thấy sản phẩm !'
                 ], 404);
             }
+            $variant = ProductVariantDetail::where('is_active', 1)->where('id', $input['variant_id'])->first();
+            if(empty($variant)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Không tìm thấy biến thể sản phẩm !'
+                ], 404);
+            }
+            $variantDetail = ProductVariantDetailById::where('pro_variant_id', $variant->id)->where('is_active', 1)->first();
+            if(empty($variantDetail)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Không tồn tại chi tiết biến thể sản phẩm !',
+                ], 404);
+            }
+
             $discountPrice = 0;
-            if(!empty($product->discount)){
-                $discountPrice += $product->discount * $input['quantity'];
+            if(!empty($variantDetail->discount)){
+                $discountPrice += $variantDetail->discount * $input['quantity'];
             }
             $cart = Cart::where('user_id', $user->id)->whereNull('deleted_at')->first();
             if(empty($cart)){
-                $address = AddressNote::where('user_id', $user->id)->where('is_default', 1)->first();
+                $addressNote = AddressNote::where('user_id', $user->id)->where('is_default', 1)->first();
                 $cartCreate = Cart::create([
                     'user_id' => $user->id,
-                    'address' => $address->address,
-                    'ward_id' => $address->ward_id,
-                    'district_id' => $address->district_id,
-                    'province_id' => $address->province_id,
-                    'phone' => $address->phone,
-                    'email' => $address->email,
+                    'address' => !empty($addressNote) ? $addressNote->address : (!empty($user->address) ? $user->address : $input['address']),
+                    'ward_id' => !empty($addressNote) ? $addressNote->ward_id : $user->ward_id,
+                    'district_id' => !empty($addressNote) ? $addressNote->district_id : $user->district_id,
+                    'province_id' => !empty($addressNote) ? $addressNote->province_id : $user->province_id,
+                    'phone' => $user->phone,
+                    'email' => !empty($addressNote) ? $addressNote->email : (!empty($user->email) ? $user->email : (!empty($input['email']) ? $input['email'] : null)),
                     'fee_ship' => 18000,
                     'discount' => $discountPrice > 0 ? $discountPrice : 0,
                     'created_by' => $user->id,
@@ -89,7 +107,8 @@ class CartController extends Controller
                 CartDetail::create([
                     'cart_id' => $cartCreate->id,
                     'product_id' => $input['product_id'],
-                    'price' => $product->discount == 0 ? $product->price : $product->price - $product->discount,
+                    'variant_id' => $input['variant_id'],
+                    'price' => $variantDetail->discount == 0 ? $variantDetail->price : $variantDetail->price - $variantDetail->discount,
                     'quantity' => $input['quantity'] ?? 1,
                     'created_by' => $user->id,
                     'updated_by' => $user->id,
@@ -99,24 +118,26 @@ class CartController extends Controller
             else {
                 $check = CartDetail::where('product_id', $input['product_id'])->first();
                 if(empty($check)){
-                    $detailValidator->validate($input);
+                    $validator->validate($input);
 
                     $cart->discount += $discountPrice;
                     $cart->save();
                     CartDetail::create([
                         'cart_id' => $cart->id,
                         'product_id' => $input['product_id'],
-                        'price' => $product->discount == 0 ? $product->price : $product->price - $product->discount,
-                        'quantity' => $input['quantity'],
+                        'variant_id' => $input['variant_id'],
+                        'price' => $variantDetail->discount == 0 ? $variantDetail->price : $variantDetail->price - $variantDetail->discount,
+                        'quantity' => $input['quantity'] ?? 1,
                         'created_by' => $user->id,
                         'updated_by' => $user->id,
                     ]);
                     $message = 'Đã thêm sản phẩm vào giỏ hàng !';
-
                 }
                 else{
-                    $detailValidator->validate($input);
+                    $validator->validate($input);
 
+                    $cart->discount += $discountPrice;
+                    $cart->save();
                     $check->quantity += $input['quantity'];
                     $check->save();
                     $message = 'Đã cập nhật giỏ hàng !';
@@ -156,15 +177,8 @@ class CartController extends Controller
         $validator->validate($input);
         try{
             DB::beginTransaction();
+
             $discountPrice = 0;
-            if(!empty($input['details'])){
-                foreach($input['details'] as $d){
-                    $productFind = Product::find($d['product_id']);
-                    if($productFind->discount > 0){
-                        $discountPrice += $productFind->discount * $d['quantity'];
-                    }
-                }
-            }
 
             if(!empty($input['coupon_id'])){
                 $checkIsset = Coupon::where('id', $input['coupon_id'])->where('is_active', 1)->first();
@@ -201,6 +215,16 @@ class CartController extends Controller
                     'status' => 'success',
                     'message' => 'Giỏ hàng không tồn tại !'
                 ], 404);
+            }
+
+            if(!empty($input['details'])){
+                foreach($input['details'] as $d){
+                    // $productFind = Product::find($d['product_id']);
+                    $variantFind = ProductVariantDetail::find($d['variant_id']);
+                    if($variantFind->discount > 0){
+                        $discountPrice += $variantFind->discount * $d['quantity'];
+                    }
+                }
             }
 
             $data->address = $input['address'] ?? $data->address;
@@ -266,12 +290,12 @@ class CartController extends Controller
                     'message' => 'Sản phẩm không tồn tại trong giỏ hàng !'
                 ], 404);
             }
-            $data->updated_by = $user_id;
+            $data->deleted_by = $user_id;
             $data->save();
             $data->delete();
 
             if(count($cart->details) == 0){
-                $cart->updated_by = $user_id;
+                $cart->deleted_by = $user_id;
                 $cart->delete();
             }
 
@@ -311,15 +335,15 @@ class CartController extends Controller
             if(empty($data)){
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Sản phẩm không tồn tại trong giỏ hàng !'
+                    'message' => 'Giỏ hàng không tồn tại !'
                 ], 404);
             }
             foreach($data as $detail){
-                $detail->updated_by = $user_id;
+                $detail->deleted_by = $user_id;
                 $detail->delete();
             }
 
-            $cart->updated_by = $user_id;
+            $cart->deleted_by = $user_id;
             $cart->save();
             $cart->delete();
 

@@ -22,6 +22,7 @@ class CartResource extends JsonResource
                 foreach($this->details as $key => $detail){
                     $totalPrice += $detail->price * $detail->quantity;
                     $dataDetail[$key]['product_id'] = $detail->product_id;
+                    $dataDetail[$key]['variant_id'] = $detail->variant_id;
                     $dataDetail[$key]['product_image'] = $detail->product->url_image ?? null;
                     $dataDetail[$key]['price'] = $detail->price;
                     $dataDetail[$key]['price_formatted'] = number_format($detail->price).'đ';
@@ -42,14 +43,13 @@ class CartResource extends JsonResource
                 'district'      => $this->district->name,
                 'ward_id'       => $this->ward_id,
                 'ward'          => $this->ward->name,
-                'total'         => $totalPrice - $this->discount ?? 0,
-                'total_formatted' => number_format($totalPrice - $this->discount ?? 0).'đ',
+                'total'         => $totalPrice + $this->fee_ship - $this->discount ?? 0,
+                'total_formatted' => number_format($totalPrice + $this->fee_ship - $this->discount ?? 0).'đ',
                 'coupon_id'     => $this->coupon_id ?? null,
-                'promotion_name'=> $this->coupon->promotion->name ?? null,
                 'discount'      => $this->discount ?? 0,
-                'discount_formatted' => number_format($discountPrice ?? 0).'đ',
+                'discount_formatted' => number_format($this->discount ?? 0).'đ',
                 'fee_ship'      => $this->fee_ship,
-                'fee_ship_formatted' => number_format($this->fee_ship),
+                'fee_ship_formatted' => number_format($this->fee_ship).'đ',
                 'shipping_method_id' => $this->shipping_method_id ?? null,
                 'shipping_method' => $this->shippingMethod->name ?? null,
                 'payment_method_id' => $this->payment_method_id ?? null,

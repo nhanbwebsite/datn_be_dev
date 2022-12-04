@@ -5,11 +5,19 @@ Route::get('client/subcategories',[SubcategoryController::class,'getSubcateClien
 Route::prefix('admin')->group(function (){
     Route::get('/subcategories',[SubcategoryController::class,'index']);
 
-    Route::post('/subcategories',[SubcategoryController::class,'store']);
+Route::get('subcategories',[SubcategoryController::class,'index']);
+Route::prefix('subcategories')->group(function (){
+    Route::get('/',[SubcategoryController::class,'index']);
 
-    Route::get('/subcategories/{id}',[SubcategoryController::class,'show']);
 
-    Route::patch('/subcategories/{id}',[SubcategoryController::class,'update']);
+    Route::post('/',[SubcategoryController::class,'store']);
 
-    Route::delete('/subcategories/{id}',[SubcategoryController::class,'destroy']);
+    Route::get('/{id}',[SubcategoryController::class,'show']);
+
+    Route::patch('/{id}',[SubcategoryController::class,'update']);
+
+    Route::delete('/{id}',[SubcategoryController::class,'destroy']);
 });
+
+Route::get('client/subcategories/loadPost',[SubcategoryController::class,'loadAllPostByCate']);
+Route::get('client/subcategories/loadPostBycate/{id}',[SubcategoryController::class,'loadPostByCate']);

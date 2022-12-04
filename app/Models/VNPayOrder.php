@@ -6,35 +6,31 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Post extends Model
+class VNPayOrder extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $table = 'posts';
+    protected $table = 'vnpay_orders';
     protected $fillable = [
-        'id',
-        'subcategory_id',
-        'user_id',
-        'title',
-        'short_des',
-        'content_post',
-        'image',
-        'meta_title',
-        'meta_keywords',
-        'meta_description',
-        'slug',
-        'views',
-        'is_active',
-        'is_feature',
+        'vnp_TxnRef',
+        'vnp_Amount',
+        'vnp_BankCode',
+        'vnp_BankTranNo',
+        'vnp_CardType',
+        'vnp_OrderInfo',
+        'vnp_PayDate',
+        'vnp_ResponseCode',
+        'vnp_TransactionNo',
+        'vnp_TransactionStatus',
+        'created_at',
+        'updated_at',
+        'deleted_at',
         'created_by',
         'updated_by',
         'deleted_by',
-        'created_at',
-        'updated_at',
-        'deleted_at'
     ];
 
-    public function subcategory() {
-        return $this->belongsTo(SubCategory::class, 'subcategory_id','id');
+    public function getOrder($vnp_TxnRef){
+        return Order::where('code', $vnp_TxnRef)->first();
     }
 
     public function createdBy(){

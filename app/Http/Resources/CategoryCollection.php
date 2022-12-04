@@ -18,32 +18,35 @@ class CategoryCollection extends ResourceCollection
         if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $value){
-                foreach($value->subs as $key => $item){
-                    $subcategoryData[$key]['id'] = $item->id;
-                    $subcategoryData[$key]['category_id'] = $value->id;
-                    $subcategoryData[$key]['name'] = $item->name;
-                    $subcategoryData[$key]['slug'] = $item->slug;
-                    $subcategoryData[$key]['url_img'] = $item->url_img ?? null;
-                    $subcategoryData[$key]['is_active'] = $item->is_active;
-                    $subcategoryData[$key]['created_at'] = $item->created_at->format('Y-m-d H:i:s');
-                    $subcategoryData[$key]['updated_at'] = $item->updated_at->format('Y-m-d H:i:s');
-                    $subcategoryData[$key]['created_by'] = $item->created_by;
-                    $subcategoryData[$key]['updated_by'] = $item->updated_by;
+                $subcategoryData = [];
+                if(!$value->subs->isEmpty()){
+                    foreach($value->subs as $k => $item){
+                        $subcategoryData[$k]['id'] = $item->id;
+                        $subcategoryData[$k]['category_id'] = $value->id;
+                        $subcategoryData[$k]['name'] = $item->name;
+                        $subcategoryData[$k]['slug'] = $item->slug;
+                        $subcategoryData[$k]['url_img'] = $item->url_img ?? null;
+                        $subcategoryData[$k]['is_active'] = $item->is_active;
+                        $subcategoryData[$k]['created_at'] = $item->created_at->format('Y-m-d H:i:s');
+                        $subcategoryData[$k]['updated_at'] = $item->updated_at->format('Y-m-d H:i:s');
+                        $subcategoryData[$k]['created_by'] = $item->created_by;
+                        $subcategoryData[$k]['updated_by'] = $item->updated_by;
+                    }
                 }
-
                 $result['data'][] = [
                     'id'            => $value->id,
                     'name'          => $value->name,
                     'slug'          => $value->slug,
                     'url_img'       => $value->url_img,
                     'is_active'     => $value->is_active,
-                    'subs'          => $subcategoryData ?? null,
+                    'subs'          => $subcategoryData,
                     'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
                     'created_by'    => $value->createdBy->name ?? null,
                     'updated_by'    => $value->updatedBy->name ?? null,
                 ];
             }
+
             $result['paginator'] = [
                 'currentPage' => $this->currentPage(),
                 'totalPages' => $this->lastPage(),
