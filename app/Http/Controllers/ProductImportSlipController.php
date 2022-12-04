@@ -286,7 +286,4 @@ class ProductImportSlipController extends Controller
         ],200);
     }
 
-    public static function getproductsImportSlip(){
-
-    }
 }
