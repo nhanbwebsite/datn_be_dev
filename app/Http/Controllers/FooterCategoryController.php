@@ -64,7 +64,7 @@ class FooterCategoryController extends Controller
         $user = $request->user();
         try {
             DB::beginTransaction();
-            if(!empty($request->is_active)){
+            if(!empty($request->is_contact)){
                 $data = FooterCategory::create([
                     'name' => mb_strtoupper(mb_substr($input['name'], 0, 1)).mb_substr($input['name'], 1),
                     'slug' => $input['slug'],
@@ -244,14 +244,19 @@ class FooterCategoryController extends Controller
         ]);
     }
 
-    public function loadAllByCate(Request $request)
+    public function loadAllByCate()
     {
         try{
             $data = FooterCategory::where('is_active', 1)
             ->get();
             foreach( $data as $value){
-                // push object subscategories
-                $value->footerContent = FooterCategory::footerContentId($value->id);
+                if(FooterCategory::where('is_contact',1)->get()){
+                    $value->contact = FooterCategory::contactByCategoryID($value->id);
+                }
+                if(FooterCategory::where('is_contact',0)->get()){
+                    $value->footerContent = FooterCategory::footerContentId($value->id);
+                }
+
             }
         } catch(HttpException $e){
             return response()->json([

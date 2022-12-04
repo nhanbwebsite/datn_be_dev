@@ -14,10 +14,12 @@ use App\Http\Controllers\FooterCategoryController;
         Route::delete('/{id}',[FooterCategoryController::class,'destroy']);
         //Trả dữ liệu con theo id dữ liêuk
         Route::get('load-by-cate/{id}',[FooterCategoryController::class,'loadByCate']);
-        //Trả về dữ liệu con của danh mục là is_contact
+
 
 
     });
         //Trả tất cả dữ liệu không phân trang bao gồm dữ liệu con
     Route::get('/client/footer-category/load-all',[FooterCategoryController::class,'loadAllByCate']);
-    Route::get('client/footer-category/categories_contact',[FooterCategoryController::class,'getCategory_is_contact']);
+     //Trả về dữ liệu con của danh mục là is_contact
+
+    Route::get('/client/footer-category/categories_contact',[FooterCategoryController::class,'getCategory_is_contact']);

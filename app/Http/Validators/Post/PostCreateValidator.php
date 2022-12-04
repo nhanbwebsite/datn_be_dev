@@ -12,7 +12,7 @@ class PostCreateValidator extends ValidatorBase
             'subcategory_id' => 'required|exists:sub_categories,id',
             'title' => 'required|max:255',
             'slug' => 'string|max:255|unique_deleted_at_null:posts,slug',
-            'short_des'=>'required|max:255',
+            'short_des'=>'required',
             'content_post'=>'required',
             'image' => 'string',
             'meta_title' => 'required|max:120',
