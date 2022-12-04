@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\LoadPostByCateResouce;
 use App\Models\Category;
 use App\Models\SubCategory;
 // use Illuminate\Contracts\Validation\Validator;
@@ -11,8 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
 class SubcategoryController extends Controller
 {
     /**
@@ -254,64 +251,6 @@ class SubcategoryController extends Controller
         ]);
     }
 
-    public function loadAllPostByCate()
-    {
-        try{
-            $data = SubCategory::where('is_active', 1)
-            ->get();
-
-
-            foreach( $data as $value){
-
-                $value-> posts=SubCategory::postByCategoryID($value->id);
-
-
-            }
-        } catch(HttpException $e){
-            return response()->json([
-                'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
-        }
-
-        return response()->json([
-            'status'=>'success',
-            'data' =>$data
-        ]);
-
-    }
-
-    public function loadPostByCate($id)
-    {
-        try{
-            $data = SubCategory::find($id);
-            if(empty($data)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
-                ], 404);
-            }
-        } catch(HttpException $e){
-            return response()->json([
-                'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
-        }
-        return response()->json([
-            'status' => 'success',
-            'data' => new LoadPostByCateResouce($data),
-        ]);
-
-    }
-
     public function getSubcateClients(){
         try {
             $data = SubCategory::all();
@@ -328,5 +267,8 @@ class SubcategoryController extends Controller
             ],400);
 
         }
+        return response()->json([
+            'data' =>   $data
+        ]);
     }
 }
