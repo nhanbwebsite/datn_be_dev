@@ -250,4 +250,22 @@ class SubcategoryController extends Controller
             'data' =>   $name
         ]);
     }
+
+    public function getSubcateClients(){
+        try {
+            $data = SubCategory::all();
+            return response()->json([
+                'message' => 'SubCategories',
+                'data' => $data
+            ],200);
+
+        } catch (Exception $e) {
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ],400);
+
+        }
+    }
 }

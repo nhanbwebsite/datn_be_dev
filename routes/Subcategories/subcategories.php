@@ -1,7 +1,7 @@
 <?php
 // subcategories routes
 use App\Http\Controllers\SubcategoryController;
-Route::get('subcategories',[SubcategoryController::class,'index']);
+Route::get('client/subcategories',[SubcategoryController::class,'getSubcateClients']);
 Route::prefix('admin')->group(function (){
     Route::get('/subcategories',[SubcategoryController::class,'index']);
 
