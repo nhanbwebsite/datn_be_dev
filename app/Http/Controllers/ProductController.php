@@ -625,11 +625,17 @@ class ProductController extends Controller
     public static function getproductsImportSlip(){
         $data = Product::all();
         foreach($data as $key => $value){
-
             $value->proVariant = Product::productVariants($value->id);
-            dd($value->proVariant);
+            foreach($value->proVariant as $key2 => $value2){
+                $value2->productVariantDetails = Product::variantDetailsByProvariant($value2->id);
+                foreach($value2->productVariantDetails as $key => $value){
+                    $value->color = Product::getColorById($value->color_id);
+                }
+            }
         }
+        return response()->json([
+            'data' => $data
+        ],200);
     }
-
 
 }

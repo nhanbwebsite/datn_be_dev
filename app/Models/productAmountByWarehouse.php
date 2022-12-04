@@ -10,7 +10,7 @@ class productAmountByWarehouse extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'productAmountByWarehouse';
-    public $timestamps = false;
+    // public $timestamps = false;
     protected $fillable = [
         'product_id',
         'variant_id',

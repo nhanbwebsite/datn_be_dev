@@ -62,59 +62,68 @@ class ProductImportSlipController extends Controller
     public function store(Request $request, ProductImportSlipCreateValidator $validator, ProductImportSlipDetailCreateValidator $validatorDetail)
     {
         $input = $request->all();
+
         // $validator->validate($input);
+        $details = $input['details'];
         foreach($input['details'] as $key => $value){
             $validatorDetail->validate($value);
         }
         try {
             DB::beginTransaction();
             // Phiếu nhập
-            $ProductImportSlip = ProductImportSlipModel::create([
-                'name' => $input['name'], // tên phiếu nhập
-                'code' => strtoupper('PN'.date('YmdHis', time())),
-                'warehouse_id' => $input['warehouse_id'],
-                'status' => $input['status'],
-                'note' => $input['note'],
-                'created_by'=> auth('sanctum')->user()->id,
-                'updated_by' => auth('sanctum')->user()->id,
-            ]);
-            $details = $input['details'];
-//  chi tiết phiếu nhập
-            foreach($details as $key => $detail) {
-                ProductImportSlipDetail::create([
-                    'product_import_slip_id' => $ProductImportSlip->id,
-                    'product_id' => $detail['product_id'],
-                    'variant_id' => $detail['variant_id'],
-                    'pro_variant_id' => $detail['pro_variant_id'],
-                    'quantity_import' => $detail['quantity_import'],
-                    'price_import' => $detail['price_import'],
-                    'created_by' => auth('sanctum')->user()->id,
-                    'updated_by' => auth('sanctum')->user()->id,
-                ]);
-                //  Thêm vào số lượng sản phẩm ở kho tổng
-                $check = productAmountByWarehouse::where('product_id', $detail['product_id'])
-                ->where('pro_variant_id', $detail['pro_variant_id'])
-                ->where('variant_id', $detail['variant_id'])
-                ->where('warehouse_id', $request->warehouse_id)->first();
-//  kiểm tra điều kiện để cộng thêm số lượng hoặc tạo mới nếu sản phẩm đó chưa từng thêm thì sẽ tạo mới
-                if(!empty($check)){
-                    $check->product_amount += $detail['quantity_import'];
-                    $check->updated_by = auth('sanctum')->user()->id;
-                    $check->save();
-                }
-                else{
-                    productAmountByWarehouse::create([
-                        'product_id' => $detail['product_id'],
-                        'variant_id' => $detail['variant_id'],
-                        'pro_variant_id' => $detail['pro_variant_id'],
-                        'product_amount' => $detail['quantity_import'],
-                        'warehouse_id' => $request->warehouse_id,
+            if(isset($request->name) && isset($request->warehouse_id)){
+                foreach($request->name as $key => $value){
+                    $ProductImportSlip = ProductImportSlipModel::create([
+                        'name' => $value, // tên phiếu nhập
+                        'code' => strtoupper('PN'.date('YmdHis', time())),
+                        'warehouse_id' => $request->warehouse_id[$key],
+                        'note' => $request->note[$key],
+                        'created_by'=> auth('sanctum')->user()->id,
+                        'updated_by' => auth('sanctum')->user()->id,
+                    ]);
+
+                    //  chi tiết phiếu nhập
+                    // dd($details);
+                    ProductImportSlipDetail::create([
+                        'product_import_slip_id' => $ProductImportSlip->id,
+                        'product_id' => $details[$key]['product_id'],
+                        'variant_id' => $details[$key]['variant_id'],
+                        'pro_variant_id' => $details[$key]['pro_variant_id'],
+                        'quantity_import' => $details[$key]['quantity_import'],
+                        'price_import' => $details[$key]['price_import'],
                         'created_by' => auth('sanctum')->user()->id,
                         'updated_by' => auth('sanctum')->user()->id,
                     ]);
+                    //  Thêm vào số lượng sản phẩm ở kho tổng
+                    $check = productAmountByWarehouse::where('product_id', $details[$key]['product_id'])
+                    ->where('pro_variant_id', $details[$key]['pro_variant_id'])
+                    ->where('variant_id', $details[$key]['variant_id'])
+                    ->where('warehouse_id', $request->warehouse_id)->first();
+
+    //  kiểm tra điều kiện để cộng thêm số lượng hoặc tạo mới nếu sản phẩm đó chưa từng thêm thì sẽ tạo mới
+                    if(!empty($check)){
+                        $check->product_amount += $details[$key]['quantity_import'];
+                        $check->updated_by = auth('sanctum')->user()->id;
+                        $check->save();
+                    }else{
+                        // dd( $details[$key]);
+                        productAmountByWarehouse::create([
+                            'product_id' => $details[$key]['product_id'],
+                            'variant_id' => $details[$key]['variant_id'],
+                            'pro_variant_id' => $details[$key]['pro_variant_id'],
+                            'product_amount' => $details[$key]['quantity_import'],
+                            'warehouse_id' => $request->warehouse_id[$key],
+                            'created_by' => auth('sanctum')->user()->id,
+                            'updated_by' => auth('sanctum')->user()->id,
+                        ]);
+                    }
+    //kết thúc kiểm tra
                 }
-//kết thúc kiểm tra
             }
+
+
+
+
             DB::commit();
         } catch(HttpException $e) {
             DB::rollBack();
