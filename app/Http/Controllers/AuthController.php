@@ -368,6 +368,6 @@ class AuthController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        return $smsResponse ?? null;
+        return $smsResponse ?? response()->json([]);
     }
 }
