@@ -293,4 +293,34 @@ class OrderController extends Controller
             'message' => 'Đã xóa đơn hàng ['.$data->code.'] !'
         ]);
     }
+
+    public function getAllOrderByUserID(Request $request){
+        $input = $request->all();
+        $input['limit'] = $request->limit ?? 10;
+        $user = $request->user();
+        try{
+            $data = Order::where(function ($query) use ($input) {
+                if(!empty($input['status'])){
+                    $query->where('status', $input['status']);
+                }
+                if(!empty($input['from'])){
+                    $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', strtotime($input['from'])));
+                    if(!empty($input['to'])){
+                        $query->whereDate('created_at', '<=', date('Y-m-d H:i:s', strtotime($input['to'])));
+                    }
+                }
+            })->where('user_id', $user->id)->orderBy('orders.created_at', 'desc')->paginate($input['limit']);
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new OrderCollection($data));
+    }
 }

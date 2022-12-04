@@ -10,4 +10,7 @@ Route::controller(OrderController::class)->middleware('auth:sanctum')->prefix('o
     // Route::delete('/{id}', 'destroy')->middleware('checkAction:all');
 });
 
+Route::controller(OrderController::class)->middleware('auth:sanctum')->prefix('client')->group(function (){
+    Route::get('/getOrders', 'getAllOrderByUserID');
+});
 ?>
