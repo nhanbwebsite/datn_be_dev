@@ -595,9 +595,11 @@ class ProductController extends Controller
     }
 
     public function getAllSubcate(){
+        $dataReturn = [];
         $data = Product::AllCategory();
+
             foreach($data as $key => $value){
-                // dd($value);
+
                 $value->products = Product::AllSubCategoryByCategoryId($value->category_id);
                 foreach($value->products as $key2 => $value2){
                     // dd($value2);
@@ -606,9 +608,16 @@ class ProductController extends Controller
                     // dd($value2->productVariants);
                 }
             }
+
+            foreach( $data as $key => $value){
+                if(count($value->products) > 0){
+                    $dataReturn['data'][] = $data[$key];
+                }
+            }
+
         return response()->json([
             'status' => 'success',
-            'data' => $data,
+            'data' => $dataReturn['data'],
         ],200);
     }
 

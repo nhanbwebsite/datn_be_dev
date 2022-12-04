@@ -285,4 +285,8 @@ class ProductImportSlipController extends Controller
             'data' => $data
         ],200);
     }
+
+    public static function getproductsImportSlip(){
+
+    }
 }
