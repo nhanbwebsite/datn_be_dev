@@ -9,4 +9,4 @@
         Route::delete('/{id}', 'destroy');
     });
 
-    Route::get('/slideshowclient');
+    Route::get('/slideshowclient',[SlideshowController::class,'getclientslideshowDetails']);

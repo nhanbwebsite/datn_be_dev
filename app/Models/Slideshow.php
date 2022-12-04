@@ -24,4 +24,5 @@ class Slideshow extends Model
     public function details(){
         return $this->hasMany(Slideshow_detail::class, 'slideshow_id', 'id');
     }
+
 }

@@ -120,3 +120,6 @@ require __DIR__ . '/FooterCategory/footer-category.php';
 //Nội dung Footer
 require __DIR__ . '/FooterContent/footer-content.php';
 require __DIR__ . '/Contact/contact.php';
+
+// sl;ideshow
+require __DIR__ . '/slideshow/slideshow.php';

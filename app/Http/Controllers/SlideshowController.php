@@ -6,8 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\Slideshow;
 use App\Models\Slideshow_detail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
+use App\Http\Resources\SlideshowResource;
+use App\Http\Resources\SlideshowCollection;
+use App\Http\Resources\SlideshowCollectionClient;
 class SlideshowController extends Controller
 {
     /**
@@ -20,7 +24,7 @@ class SlideshowController extends Controller
         $data = Slideshow::paginate(9);
         return response()->json([
             'status' => 'success',
-            'data' => $data
+            'data' => new SlideshowCollection($data)
         ],200);
     }
 
@@ -34,20 +38,22 @@ class SlideshowController extends Controller
     {
         $rules = [
             'title' => 'required',
-            'image' => 'Hình không được bỏ trống'
+            'images' => 'required'
         ];
 
         $messages = [
-            'title.required' => ':attribute tên màu không được để trống'
+            'title.required' => ':attribute không được để trống',
+            'images.required' => ':attribute không được để trống'
         ];
 
         $attributes = [
-            'title' => 'Tiêu đề slideshow'
+            'title' => 'Tiêu đề slideshow',
+            'images' => 'hình'
         ];
 
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->only(['title']), $rules, $messages, $attributes);
+            $validator = Validator::make($request->only(['title','images']), $rules, $messages, $attributes);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -56,16 +62,17 @@ class SlideshowController extends Controller
             }
 
           $create = Slideshow::create([
-                'name' => $request->title,
+                'title' => $request->title,
                 'slug' => Str::slug($request->title),
                 'created_by' => auth('sanctum')->user()->id
             ]);
 
-            if(!empty($request->image)){
-                foreach($request->image as $key => $value){
+            if(!empty($request->images)){
+                foreach($request->images as $key => $value){
                     Slideshow_detail::create([
                         'slideshow_id' => $create->id,
-                        'image' => $request->value
+                        'image' => $value,
+                        'created_by' => auth('sanctum')->user()->id
                     ]);
                 }
             }
@@ -99,6 +106,11 @@ class SlideshowController extends Controller
                 'message' =>  'Không tìm thấy slideshow !'
             ],400);
         }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => new SlideshowResource($data)
+        ],200);
     }
 
     /**
@@ -112,19 +124,22 @@ class SlideshowController extends Controller
     {
         $rules = [
             'title' => 'required',
+            'images' => 'required'
         ];
 
         $messages = [
-            'title.required' => ':attribute tên màu không được để trống'
+            'title.required' => ':attribute không được để trống',
+            'images.required' => ':attribute không được để trống'
         ];
 
         $attributes = [
-            'title' => 'Tiêu đề slideshow'
+            'title' => 'Tiêu đề slideshow',
+            'images' => 'hình'
         ];
 
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->only(['title']), $rules, $messages, $attributes);
+            $validator = Validator::make($request->only(['title','images']), $rules, $messages, $attributes);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -194,6 +209,15 @@ class SlideshowController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Xóa slideshow thành công'
+        ],200);
+    }
+
+    public function getclientslideshowDetails()
+    {
+        $data = Slideshow::all();
+        return response()->json([
+            'status' => 'success',
+            'data' => new SlideshowCollectionClient($data)
         ],200);
     }
 }

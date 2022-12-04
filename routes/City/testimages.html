@@ -1,0 +1,30 @@
+
+<div class="boxImg" id="boxImg">
+
+</div>
+<script>
+
+function getImages(){
+    fetch('http://localhost:8000/api/slideshowclient')
+    .then((data) => {
+        return data.json();
+    })
+    .then((data)=> {
+            console.log('data hình để filter',data.data);
+        return data.data;
+    })
+}
+
+getImages()
+
+    fetch('https://duynh404.cf/api/files')
+    .then((data) => {
+        return data.json();
+    })
+    .then((data) => {
+        let boxImg = document.querySelector('#boxImg');
+        console.log('data all',data.data);
+
+    });
+
+</script>
