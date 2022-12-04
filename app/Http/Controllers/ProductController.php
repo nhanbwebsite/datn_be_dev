@@ -595,7 +595,6 @@ class ProductController extends Controller
     }
 
     public function getAllSubcate(){
-        $dataReturn = [];
         $data = Product::AllCategory();
 
             foreach($data as $key => $value){
@@ -620,5 +619,17 @@ class ProductController extends Controller
             'data' => $dataReturn['data'],
         ],200);
     }
+
+
+
+    public static function getproductsImportSlip(){
+        $data = Product::all();
+        foreach($data as $key => $value){
+
+            $value->proVariant = Product::productVariants($value->id);
+            dd($value->proVariant);
+        }
+    }
+
 
 }

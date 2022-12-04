@@ -85,6 +85,12 @@ class Product extends Model
         return $proBySub;
     }
 
+    public static function variantDetailsByProvariant($proVariantId){
+        $data = DB::table('productVariantDetails')
+        ->where('productVariantDetails.pro_variant_id',$proVariantId)
+        ->get();
+    }
+
     public static function variantDetailsProductByProId($id){
         $data = DB::table('products')->select('products.id as product_id','productVariantDetails.color_id','productVariantDetails.price','productVariantDetails.discount','productVariantDetails.quantity','colors.name as color_name','colors.color_code','variants.variant_name','productVariant.variant_id')
         ->join('productVariant','products.id', 'productVariant.product_id')
