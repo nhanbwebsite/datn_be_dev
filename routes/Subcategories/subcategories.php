@@ -13,3 +13,6 @@ Route::prefix('subcategories')->group(function (){
 
     Route::delete('/{id}',[SubcategoryController::class,'destroy']);
 });
+
+Route::get('client/subcategories/loadPost',[SubcategoryController::class,'loadAllPostByCate']);
+Route::get('client/subcategories/loadPostBycate/{id}',[SubcategoryController::class,'loadPostByCate']);

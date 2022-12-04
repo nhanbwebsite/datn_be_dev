@@ -33,6 +33,7 @@ class LoadFooterContentResource extends JsonResource
                 'slug'=>$this->slug,
                 'is_active'=>$this->is_active,
                 'content' => $contentFooter ?? null,
+                'content_contact' => $contentFooter ?? null,
                 'created_at' => $this->created_at->format('d-m-Y H:i:s'),
                 'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
                 'created_by'    => $this->createdBy->name ?? null,

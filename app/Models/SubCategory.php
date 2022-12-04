@@ -40,8 +40,13 @@ class SubCategory extends Model
         // return $this->belongsToMany(ProductVariantDetail::class, 'productVariant', 'product_id', 'variant_id');
     }
 
+
     public function posts(){
-        return $this->hasMany(Post::class, 'category_id', 'id');
+        return $this->hasMany(Post::class, 'subcategory_id', 'id');
+    }
+    public static function postByCategoryID($subcategory_id){
+        $data = Post::where('subcategory_id',$subcategory_id)->get();
+        return $data;
     }
 }
 
