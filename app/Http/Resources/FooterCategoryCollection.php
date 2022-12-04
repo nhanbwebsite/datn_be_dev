@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class PostCollection extends ResourceCollection
+class FooterCategoryCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -18,21 +18,12 @@ class PostCollection extends ResourceCollection
             foreach($this->collection as $value){
                 $result['data'][] = [
                     'id'            => $value->id,
-                    'author'        => $value->createdBy->name ?? null,
-                    'subcategory_id'   => $value->subcategory_id,
-                    'category_name'   => $value-> subcategory->name,
-                    'title'          => $value->title,
-                    'short_des'          => $value->short_des,
-                    'content_post'       => $value->content_post,
-                    'image'       => $value->image ?? null,
-                    'meta_title'          => $value->meta_title,
-                    'meta_keywords'          => $value->meta_keywords,
-                    'meta_description'          => $value->meta_description,
+                    'name'          => $value->name,
                     'slug'          => $value->slug,
-                    'views'          => $value->views,
                     'is_active'     => $value->is_active,
                     'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
+                    'created_by'    => $value->createdBy->name ?? null,
                     'updated_by'    => $value->updatedBy->name ?? null,
                 ];
             }
@@ -53,4 +44,5 @@ class PostCollection extends ResourceCollection
         $result['paginator'] = [];
         return $result;
     }
+
 }

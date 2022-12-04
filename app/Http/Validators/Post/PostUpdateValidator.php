@@ -8,9 +8,9 @@ class PostUpdateValidator extends ValidatorBase
 {
     protected function rules(){
         return [
-            'category_id' => 'required|exists:post_categories,id',
+            'subcategory_id' => 'required|exists:sub_categories,id',
             'title' => 'required|max:255',
-            'short_des'=>'required|max:255',
+            'short_des'=>'required',
             'content_post'=>'required',
             'image' => 'string',
             'meta_title' => 'required|max:120',
@@ -21,8 +21,8 @@ class PostUpdateValidator extends ValidatorBase
 
     protected function messages(){
         return [
-            'category_id.required' => ':attribute không được để trống !',
-            'category_id.exists' => ':attribute không tồn tại !',
+            'subcategory_id.required' => ':attribute không được để trống !',
+            'subcategory_id.exists' => ':attribute không tồn tại !',
             'title.required' => ':attribute không được để trống !',
             'title.max' => ':attribute đã vượt qua độ dài cho phép !',
             'short_des.required' => ':attribute không được để trống !',
@@ -39,7 +39,7 @@ class PostUpdateValidator extends ValidatorBase
 
     protected function attributes(){
         return [
-            'category_id'=>'Mã danh mục bài viết',
+            'subcategory_id'=>'Mã danh mục bài viết',
             'title'=>'Tiêu đề',
             'short_des'=>'Mô tả',
             'content_post'=>'Nội dung',

@@ -34,10 +34,10 @@ class PostController extends Controller
                 if(!empty($input['user_id'])){
                     $query->where('user_id', $input['user_id']);
                 }
-                if(!empty($input['category_id'])){
-                    $query->where('category_id', $input['category_id']);
+                if(!empty($input['subcategory_id'])){
+                    $query->where('subcategory_id', $input['subcategory_id']);
                 }
-            })->orderBy('created_at', 'desc')->paginate($input['limit'] ?? 5);
+            })->orderBy('created_at', 'desc')->paginate($input['limit'] ?? 10);
         }
         catch(HttpException $e){
             return response()->json([
@@ -66,7 +66,7 @@ class PostController extends Controller
         try {
             DB::beginTransaction();
             $data = Post::create([
-                'category_id'=>$input['category_id'],
+                'subcategory_id'=>$input['subcategory_id'],
                 'user_id'=> $user->id,
                 'title'=> $input['title'],
                 'short_des'=> $input['short_des'],
@@ -158,7 +158,7 @@ class PostController extends Controller
                 ], 404);
             }
 
-            $data->category_id = $input['category_id'] ?? $data->category_id;
+            $data->subcategory_id = $input['category_id'] ?? $data->subcategory_id;
             $data->title = $input['title'] ?? $data->title;
             $data->short_des = $input['short_des'] ?? $data->short_des;
             $data->content_post = $input['content_post'] ?? $data->content_post;

@@ -9,6 +9,7 @@ use App\Http\Validators\Order\OrderDetailCreateValidator;
 use App\Http\Validators\Order\OrderUpdateValidator;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\VNPayOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -25,7 +26,7 @@ class OrderController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit ?? 10;
         try{
-            $data = Order::with(['details', 'addressNote', 'createdBy'])
+            $data = Order::with(['details', 'createdBy'])
             ->where(function ($query) use ($input) {
                 if(!empty($input['code'])){
                     $query->where('code', $input['code']);
@@ -41,11 +42,6 @@ class OrderController extends Controller
                 if(!empty($input['user_id'])){
                     $query->whereHas('createdBy', function($q) use($input) {
                         $q->where('user_id', $input['user_id']);
-                    });
-                }
-                if(!empty($input['role_id'])){
-                    $query->whereHas('createdBy', function($q) use($input) {
-                        $q->where('role_id', $input['role_id']);
                     });
                 }
                 if(!empty($input['from'])){
@@ -78,7 +74,7 @@ class OrderController extends Controller
     public function store(Request $request, OrderCreateValidator $orderCreateValidator, OrderDetailCreateValidator $orderDetailCreateValidator)
     {
         $input = $request->all();
-        $input['total'] = 0;
+        $input['total'] = $input['fee_ship'];
         $orderCreateValidator->validate($input);
         foreach($input['details'] as $key => $value){
             $orderDetailCreateValidator->validate($value);
@@ -89,7 +85,7 @@ class OrderController extends Controller
             DB::beginTransaction();
 
             $create = Order::create([
-                'code' => 'DH'.date('dmYHis', time()),
+                'code' => $input['code'],
                 'user_id' => $user->id,
                 'address' => $input['address'],
                 'ward_id' => $input['ward_id'],
@@ -103,14 +99,15 @@ class OrderController extends Controller
                 'fee_ship' => $input['fee_ship'] ?? 0,
                 'payment_method_id' => $input['payment_method_id'],
                 'shipping_method_id' => $input['shipping_method_id'],
-                'type' => !empty($user) ? 'L' : 'N',
+                'status' => ORDER_STATUS_NEW,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
-            foreach($input['details'] as $key => $value){
+            foreach($input['details'] as $value){
                 OrderDetail::create([
                     'order_id' => $create->id,
                     'product_id' => $value['product_id'],
+                    'variant_id' => $value['variant_id'],
                     'quantity' => $value['quantity'],
                     'price' => $value['price'],
                     'created_by' => $user->id,
@@ -118,12 +115,22 @@ class OrderController extends Controller
                 ]);
             }
 
-            CouponOrder::create([
-                'coupon_id' => $input['coupon_id'],
-                'order_id' => $create->id,
-                'created_by' => $user->id,
-                'updated_by' => $user->id,
-            ]);
+            if(!empty($input['coupon_id'])){
+                CouponOrder::create([
+                    'coupon_id' => $input['coupon_id'],
+                    'order_id' => $create->id,
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id,
+                ]);
+            }
+
+            if($input['payment_method_id'] == PAYMENT_METHOD_VNPAY){
+                $checkVNPay = VNPayOrder::where('vnp_TxnRef', $create->code)->first();
+                if(!empty($checkVNPay) && ($checkVNPay->vnp_ResponseCode == '00' && $checkVNPay->vnp_TransactionStatus == '00')){
+                    $create->status = ORDER_STATUS_SHIPPING;
+                    $create->save();
+                }
+            }
 
             DB::commit();
         }
@@ -200,6 +207,10 @@ class OrderController extends Controller
                 ], 404);
             }
 
+            if(!empty($input['coupon_id'])){
+                $orderUser = Order::where('user_id', $user->id)->get()->toArray();
+            }
+
             $update->status = $input['status'] ?? $update->status;
             $update->address = $input['address'] ?? $update->address;
             $update->ward_id =  $input['ward_id'] ?? $update->ward_id;
@@ -209,6 +220,7 @@ class OrderController extends Controller
             $update->email=  $input['email'] ?? $update->email;
             $update->shipping_method_id = $input['shipping_method_id'] ?? $update->shipping_method_id;
             $update->payment_method_id = $input['payment_method_id'] ?? $update->payment_method_id;
+            $update->updated_by = $user->id;
             $update->save();
 
             DB::commit();
