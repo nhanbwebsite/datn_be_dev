@@ -22,7 +22,7 @@ class OrderCollection extends ResourceCollection
                 foreach($value->details as $key => $detail){
                     $dataDetails[$key]['product_id'] = $detail->product_id;
                     $dataDetails[$key]['product_name'] = $detail->product->name;
-                    $dataDetails[$key]['product_image'] = $detail->product->image;
+                    $dataDetails[$key]['product_image'] = $detail->product->url_image;
                     $dataDetails[$key]['price'] = $detail->price;
                     $dataDetails[$key]['quantity'] = $detail->quantity;
                 }
@@ -37,9 +37,6 @@ class OrderCollection extends ResourceCollection
                     'status'                => $value->status,
                     'status_code'           => $value->getStatus->code,
                     'status_name'           => $value->getStatus->name,
-                    'type'                  => $value->type,
-                    'type_name'             => $value->type == 'L' ? 'LOGINED' : 'NOT_LOGIN',
-                    'address_note_id'       => $value->address_note_id,
                     'address'               => $value->address,
                     'ward_id'               => $value->ward_id,
                     'ward'                  => $value->ward->name,
