@@ -7,7 +7,7 @@ Route::controller(OrderController::class)->middleware('auth:sanctum')->prefix('o
     Route::post('/', 'store')->middleware('checkAction:all,create-order');
     Route::get('/{id}', 'show')->middleware('checkAction:all,view-order');
     Route::put('/{id}', 'update')->middleware('checkAction:all,update-order');
-    Route::delete('/{id}', 'destroy')->middleware('checkAction:all');
+    // Route::delete('/{id}', 'destroy')->middleware('checkAction:all');
 });
 
 ?>

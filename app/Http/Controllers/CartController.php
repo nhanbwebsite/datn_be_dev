@@ -23,7 +23,6 @@ class CartController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request)
@@ -89,15 +88,14 @@ class CartController extends Controller
             }
             $cart = Cart::where('user_id', $user->id)->whereNull('deleted_at')->first();
             if(empty($cart)){
-                $addressNote = AddressNote::where('user_id', $user->id)->where('is_default', 1)->first();
                 $cartCreate = Cart::create([
-                    'user_id' => $user->id,
-                    'address' => !empty($addressNote) ? $addressNote->address : (!empty($user->address) ? $user->address : $input['address']),
-                    'ward_id' => !empty($addressNote) ? $addressNote->ward_id : $user->ward_id,
-                    'district_id' => !empty($addressNote) ? $addressNote->district_id : $user->district_id,
-                    'province_id' => !empty($addressNote) ? $addressNote->province_id : $user->province_id,
-                    'phone' => $user->phone,
-                    'email' => !empty($addressNote) ? $addressNote->email : (!empty($user->email) ? $user->email : (!empty($input['email']) ? $input['email'] : null)),
+                    'user_id' => $input['user_id'],
+                    'address' => $input['address'],
+                    'ward_id' => $input['ward_id'],
+                    'district_id' => $input['district_id'],
+                    'province_id' => $input['province_id'],
+                    'phone' => $input['phone'],
+                    'email' => $input['email'],
                     'fee_ship' => 18000,
                     'discount' => $discountPrice > 0 ? $discountPrice : 0,
                     'created_by' => $user->id,
@@ -219,8 +217,7 @@ class CartController extends Controller
 
             if(!empty($input['details'])){
                 foreach($input['details'] as $d){
-                    // $productFind = Product::find($d['product_id']);
-                    $variantFind = ProductVariantDetail::find($d['variant_id']);
+                    $variantFind = ProductVariantDetailById::find($d['variant_id']);
                     if($variantFind->discount > 0){
                         $discountPrice += $variantFind->discount * $d['quantity'];
                     }
@@ -234,7 +231,7 @@ class CartController extends Controller
             $data->phone = $input['phone'] ?? $data->phone;
             $data->email = $input['email'] ?? $data->email;
             $data->coupon_id = $input['coupon_id'] ?? $data->coupon_id;
-            $data->discount = ($discountPrice == $input['discount'] ? $input['discount'] : $discountPrice) ?? $data->discount;
+            $data->discount = $discountPrice ?? $data->discount;
             $data->fee_ship = $input['fee_ship'] ?? $data->fee_ship;
             $data->shipping_method_id = $input['shipping_method_id'] ?? $data->shipping_method_id;
             $data->payment_method_id = $input['payment_method_id'] ?? $data->payment_method_id;
