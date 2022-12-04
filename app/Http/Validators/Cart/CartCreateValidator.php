@@ -9,7 +9,7 @@ class CartCreateValidator extends ValidatorBase
 
     protected function rules(){
         return [
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'exists:users,id',
             'address' => 'required|string|max:255',
             'ward_id' => 'required|exists:wards,id',
             'district_id' => 'required|exists:districts,id',
@@ -24,7 +24,6 @@ class CartCreateValidator extends ValidatorBase
 
     protected function messages(){
         return [
-            'user_id.required' => ':attribute không được để trống !',
             'user_id.exists' => ':attribute không tồn tại !',
             'address.required' => ':attribute không được để trống !',
             'address.string' => ':attribute phải là chuỗi !',

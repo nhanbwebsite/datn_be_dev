@@ -89,7 +89,7 @@ class CartController extends Controller
             $cart = Cart::where('user_id', $user->id)->whereNull('deleted_at')->first();
             if(empty($cart)){
                 $cartCreate = Cart::create([
-                    'user_id' => $input['user_id'],
+                    'user_id' => $user->id,
                     'address' => $input['address'],
                     'ward_id' => $input['ward_id'],
                     'district_id' => $input['district_id'],
