@@ -96,8 +96,7 @@ class ProductImportSlipController extends Controller
                     ]);
                     // dd($dataProvariantDetails);
                     //  Thêm vào số lượng sản phẩm ở kho tổng
-                    $check = productAmountByWarehouse::where('pro_variant_id', $dataProvariantDetails->pro_variant_id)
-                                                     ->where('color_id', $request->color_id)
+                    $check = productAmountByWarehouse::where('pro_variant_id', $dataProvariantDetails['pro_variant_id'])
                                                      ->where('warehouse_id', $request->warehouse_id)->first();
 
     //  kiểm tra điều kiện để cộng thêm số lượng hoặc tạo mới nếu sản phẩm đó chưa từng thêm thì sẽ tạo mới
@@ -108,7 +107,7 @@ class ProductImportSlipController extends Controller
                     }else{
                         // dd( $details[$key]);
                         productAmountByWarehouse::create([
-                            'pro_variant_id' => $dataProvariantDetails->pro_variant_id,
+                            'pro_variant_id' => $dataProvariantDetails['pro_variant_id'],
                             'color_id' => $details[$key]['color_id'],
                             'product_amount' => $details[$key]['quantity_import'],
                             'warehouse_id' => $request->warehouse_id[$key],
