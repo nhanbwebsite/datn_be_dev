@@ -11,11 +11,7 @@ class ProductVariantDetail extends Model
     protected $table = "productVariant";
     protected $fillable = [
         'variant_id',
-        'color_id',
         'product_id',
-        'quantity',
-        'price',
-        'discount',
         'is_active',
         'created_at',
         'updated_at',
@@ -24,4 +20,16 @@ class ProductVariantDetail extends Model
         'updated_by',
         'deleted_by',
     ];
+
+    public function pro_variant(){
+        return $this->hasOne(ProductVariantDetailById::class, 'pro_variant_id', 'id');
+    }
+
+    public function product(){
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
+
+    public function variant(){
+        return $this->belongsTo(ProductVariant::class, 'variant_id', 'id');
+    }
 }

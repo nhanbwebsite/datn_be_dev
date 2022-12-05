@@ -27,4 +27,8 @@ class ProductVariantDetailById extends Model
     public function product_variant(){
         return $this->belongsTo(Warehouse::class, 'pro_variant_id', 'id');
     }
+
+    public function color(){
+        return $this->belongsTo(Color::class, 'color_id', 'id');
+    }
 }
