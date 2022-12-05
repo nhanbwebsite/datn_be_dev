@@ -588,6 +588,7 @@ class ProductController extends Controller
         // dd($req->all());
         $product = new Product();
         $data = $product-> productByKeywords($req->keywords);
+
         return response()->json([
             'status' => 'success',
             'data' => $data,

@@ -140,7 +140,7 @@ class Product extends Model
     public function productByKeywords($keywords){
         $data = DB::table('products')
         ->select('products.id','products.name as product_name','productVariantDetails.price','products.slug','productVariantDetails.discount','products.description','products.url_image','products.subcategory_id','productVariantDetails.quantity','variants.variant_name','variants.slug as variant_slug ','colors.name as color_name','colors.slug as color_slug')
-        ->join('productAmountByWarehouse','products.id','productAmountByWarehouse.product_id')
+        // ->join('productAmountByWarehouse','products.id','productAmountByWarehouse.product_id')
         ->join('productVariant','products.id','productVariant.product_id')
         ->join('productVariantDetails','productVariant.id','productVariantDetails.pro_variant_id')
         ->join('variants','productVariant.variant_id','variants.id')
