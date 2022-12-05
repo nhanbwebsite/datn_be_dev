@@ -229,5 +229,8 @@ class Product extends Model
         return $data;
     }
 
+    public function getProductByWardHouse($wardhouse_id){
+
+    }
 
 }

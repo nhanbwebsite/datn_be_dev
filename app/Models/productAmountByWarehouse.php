@@ -40,4 +40,10 @@ class productAmountByWarehouse extends Model
     public function warehouse(){
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
+
+    public function productVariant(){
+        return $this->belongsTo(ProductVariant::class, 'variant_id', 'id');
+    }
+
+
 }
