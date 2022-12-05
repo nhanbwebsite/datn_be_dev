@@ -32,7 +32,7 @@ Route::get('productsBySubcate/{subId}',[ProductController::class,'producstBySubc
 Route::get('client/products/category/{id}',[ProductController::class,'productsByCategoryId']);
 
 // tìm sản phẩm
-Route::get('client/products_search/',[ProductController::class,'search']);
+Route::get('client_products_search/',[ProductController::class,'search']);
 
 // province by store, products < 0
 Route::get('client/productsfindbylocation',[ProductController::class,'getProvincesByWarehouse']);
