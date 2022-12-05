@@ -585,7 +585,7 @@ class ProductController extends Controller
     // tìm sản phẩm
 
     public function search(Request $req){
-
+        // dd($req->all());
         $product = new Product();
         $data = $product-> productByKeywords($req->keywords);
         return response()->json([
