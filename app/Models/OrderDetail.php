@@ -14,6 +14,7 @@ class OrderDetail extends Model
         'order_id',
         'product_id',
         'variant_id',
+        'color_id',
         'quantity',
         'price',
         'created_at',
@@ -30,5 +31,17 @@ class OrderDetail extends Model
 
     public function product(){
         return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
+
+    public function variant(){
+        return $this->belongsTo(ProductVariantDetail::class, 'variant_id', 'id');
+    }
+
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by', 'id');
     }
 }

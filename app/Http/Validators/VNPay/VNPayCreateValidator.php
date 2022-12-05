@@ -25,7 +25,7 @@ class VNPayCreateValidator extends ValidatorBase
     protected function attributes(){
         return [
             'amount' => 'Số tiền thanh toán',
-            'returUrl' => 'URL thông báo trạng thái thanh toán',
+            'returnUrl' => 'URL thông báo trạng thái thanh toán',
         ];
     }
 }

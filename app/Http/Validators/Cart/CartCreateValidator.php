@@ -17,7 +17,8 @@ class CartCreateValidator extends ValidatorBase
             'email' => 'nullable|email',
             'phone' => 'regex:/^0[2-9]{1}[0-9]{8}$/',
             'product_id' => 'required|exists:products,id',
-            'variant_id' => 'required|exists:productVariant,id',
+            'variant_id' => 'required|exists:variants,id',
+            'color_id' => 'required|exists:colors,id',
             'quantity' => 'required|numeric|min:1',
         ];
     }
@@ -36,6 +37,8 @@ class CartCreateValidator extends ValidatorBase
             'product_id.exists' => ':attribute không tồn tại !',
             'variant_id.required' => ':attribute không được để trống !',
             'variant_id.exists' => ':attribute không tồn tại !',
+            'color_id.required' => ':attribute không được để trống !',
+            'color_id.exists' => ':attribute không tồn tại !',
             'quantity.required' => ':attribute không được để trống !',
             'quantity.numeric' => ':attribute phải là số !',
             'quantity.min' => ':attribute tối thiểu là 1 !',
@@ -54,6 +57,7 @@ class CartCreateValidator extends ValidatorBase
             'product_id' => 'ID sản phẩm',
             'variant_id' => 'ID biến thể sản phẩm',
             'quantity' => 'Số lượng',
+            'color_id' => 'Màu sắc',
         ];
     }
 }
