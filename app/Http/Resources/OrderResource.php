@@ -19,6 +19,10 @@ class OrderResource extends JsonResource
             foreach($this->details as $key => $detail){
                 $dataDetails[$key]['product_id'] = $detail->product_id;
                 $dataDetails[$key]['product_name'] = $detail->product->name;
+                $dataDetails[$key]['variant_id'] = $detail->variant_id;
+                $dataDetails[$key]['variant_name'] = $detail->variant->variant->variant_name;
+                $dataDetails[$key]['color_id'] = $detail->color_id;
+                $dataDetails[$key]['color_name'] = $detail->variant->pro_variant->color->name;
                 $dataDetails[$key]['product_image'] = $detail->product->image;
                 $dataDetails[$key]['price'] = $detail->price;
                 $dataDetails[$key]['quantity'] = $detail->quantity;

@@ -14,6 +14,7 @@ class CartDetail extends Model
         'cart_id',
         'product_id',
         'variant_id',
+        'color_id',
         'price',
         'quantity',
         'created_at',

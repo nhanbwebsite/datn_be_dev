@@ -74,12 +74,11 @@ class OrderController extends Controller
     public function store(Request $request, OrderCreateValidator $orderCreateValidator, OrderDetailCreateValidator $orderDetailCreateValidator)
     {
         $input = $request->all();
-        $input['total'] = $input['fee_ship'];
         $orderCreateValidator->validate($input);
-        foreach($input['details'] as $key => $value){
-            $orderDetailCreateValidator->validate($value);
-            $input['total'] += $value['price'];
-        }
+        // foreach($input['details'] as $key => $value){
+        //     $orderDetailCreateValidator->validate($value);
+        //     $input['total'] += $value['price'];
+        // }
         $user = $request->user();
         try{
             DB::beginTransaction();
@@ -108,6 +107,7 @@ class OrderController extends Controller
                     'order_id' => $create->id,
                     'product_id' => $value['product_id'],
                     'variant_id' => $value['variant_id'],
+                    'color_id' => $value['color_id'],
                     'quantity' => $value['quantity'],
                     'price' => $value['price'],
                     'created_by' => $user->id,
