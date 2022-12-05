@@ -123,3 +123,5 @@ require __DIR__ . '/Contact/contact.php';
 
 // sl;ideshow
 require __DIR__ . '/slideshow/slideshow.php';
+
+require __DIR__ . '/statistical/index.php';

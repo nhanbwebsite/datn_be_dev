@@ -12,9 +12,9 @@ class productAmountByWarehouse extends Model
     protected $table = 'productAmountByWarehouse';
     // public $timestamps = false;
     protected $fillable = [
-        'product_id',
-        'variant_id',
+        'product_variant_detail_id',
         'pro_variant_id',
+        'color_id',
         'product_amount',
         'warehouse_id',
         'created_at',
@@ -40,4 +40,10 @@ class productAmountByWarehouse extends Model
     public function warehouse(){
         return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
+
+    public function productVariant(){
+        return $this->belongsTo(ProductVariant::class, 'variant_id', 'id');
+    }
+
+
 }

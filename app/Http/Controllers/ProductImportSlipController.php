@@ -84,21 +84,21 @@ class ProductImportSlipController extends Controller
 
                     //  chi tiết phiếu nhập
                     // dd($details);
-                    ProductImportSlipDetail::create([
+                  $dataProvariantDetails =  ProductImportSlipDetail::create([
                         'product_import_slip_id' => $ProductImportSlip->id,
                         'product_id' => $details[$key]['product_id'],
-                        'variant_id' => $details[$key]['variant_id'],
                         'pro_variant_id' => $details[$key]['pro_variant_id'],
+                        'color_id' => $details[$key]['color_id'],
                         'quantity_import' => $details[$key]['quantity_import'],
                         'price_import' => $details[$key]['price_import'],
                         'created_by' => auth('sanctum')->user()->id,
                         'updated_by' => auth('sanctum')->user()->id,
                     ]);
+                    // dd($dataProvariantDetails);
                     //  Thêm vào số lượng sản phẩm ở kho tổng
-                    $check = productAmountByWarehouse::where('product_id', $details[$key]['product_id'])
-                    ->where('pro_variant_id', $details[$key]['pro_variant_id'])
-                    ->where('variant_id', $details[$key]['variant_id'])
-                    ->where('warehouse_id', $request->warehouse_id)->first();
+                    $check = productAmountByWarehouse::where('pro_variant_id', $dataProvariantDetails->pro_variant_id)
+                                                     ->where('color_id', $request->color_id)
+                                                     ->where('warehouse_id', $request->warehouse_id)->first();
 
     //  kiểm tra điều kiện để cộng thêm số lượng hoặc tạo mới nếu sản phẩm đó chưa từng thêm thì sẽ tạo mới
                     if(!empty($check)){
@@ -108,9 +108,8 @@ class ProductImportSlipController extends Controller
                     }else{
                         // dd( $details[$key]);
                         productAmountByWarehouse::create([
-                            'product_id' => $details[$key]['product_id'],
-                            'variant_id' => $details[$key]['variant_id'],
-                            'pro_variant_id' => $details[$key]['pro_variant_id'],
+                            'pro_variant_id' => $dataProvariantDetails->pro_variant_id,
+                            'color_id' => $details[$key]['color_id'],
                             'product_amount' => $details[$key]['quantity_import'],
                             'warehouse_id' => $request->warehouse_id[$key],
                             'created_by' => auth('sanctum')->user()->id,
