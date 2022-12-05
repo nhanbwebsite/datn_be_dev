@@ -34,7 +34,7 @@ class ProductImportSlipDetailCreateValidator extends ValidatorBase
             'product_id' => 'ID sản phẩm',
             'quantity_import' => 'Số lượng nhập',
             'price_import' => 'Giá nhập',
-            'Chi tiết biến thể sản phẩm'
+            'pro_variant_id' => 'Chi tiết biến thể sản phẩm'
         ];
     }
 }
