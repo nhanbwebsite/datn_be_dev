@@ -75,10 +75,15 @@ class OrderController extends Controller
     {
         $input = $request->all();
         $orderCreateValidator->validate($input);
-        // foreach($input['details'] as $key => $value){
-        //     $orderDetailCreateValidator->validate($value);
-        //     $input['total'] += $value['price'];
-        // }
+        $order_code_cod = 'DH'.date('YmdHis', time());
+        if(!empty($input['payment_method_id'])){
+            if(!in_array($input['payment_method_id'], PAYMENT_METHOD_ID_ONLINE)){
+                $input['code'] = $order_code_cod;
+            }
+        }
+        foreach($input['details'] as $key => $value){
+            $orderDetailCreateValidator->validate($value);
+        }
         $user = $request->user();
         try{
             DB::beginTransaction();

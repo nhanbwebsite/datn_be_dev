@@ -7,6 +7,7 @@ define('ROLE_ADMIN', 4);
 define('PAYMENT_METHOD_COD', 2);
 define('PAYMENT_METHOD_MOMO', 3);
 define('PAYMENT_METHOD_VNPAY', 5);
+define('PAYMENT_METHOD_ID_ONLINE', [3, 5]);
 
 define('ORDER_STATUS_NEW', 10);
 define('ORDER_STATUS_APPROVED', 11);

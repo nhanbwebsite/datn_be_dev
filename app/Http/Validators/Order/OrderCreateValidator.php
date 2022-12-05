@@ -8,7 +8,7 @@ class OrderCreateValidator extends ValidatorBase
 {
     protected function rules(){
         return [
-            'code' => 'required|string|unique_deleted_at_null:orders,code',
+            'code' => 'nullable|string|unique_deleted_at_null:orders,code',
             'phone' => 'required|regex:/^0[2-9]{1}[0-9]{8}$/',
             'fee_ship' => 'required|numeric',
             'address' => 'required|string|max:255',
@@ -28,7 +28,7 @@ class OrderCreateValidator extends ValidatorBase
 
     protected function messages(){
         return [
-            'code.required' => ':attribute không được để trống !',
+            // 'code.required' => ':attribute không được để trống !',
             'code.string' => ':attribute phải là chuỗi !',
             'code.unique_deleted_at_null' => ':attribute đã tồn tại !',
             'phone.required' => ':attribute không được để trống !',
