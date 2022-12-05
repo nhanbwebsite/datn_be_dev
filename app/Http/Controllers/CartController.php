@@ -255,18 +255,6 @@ class CartController extends Controller
                         $detailDatas->quantity = $item['quantity'];
                         $detailDatas->price = $variantFind2->discount > 0 ? $variantFind2->price - $variantFind2->discount : $variantFind2->price;
                         $detailDatas->save();
-                    } else{
-                        $detailDatas->deleted_by = $user->id;
-                        $detailDatas->save();
-                        $detailDatas->delete();
-                        CartDetail::create([
-                            'cart_id' => $data->id,
-                            'product_id' => $item['product_id'],
-                            'variant_id' => $item['variant_id'],
-                            'color_id' => $item['color_id'],
-                            'quantity' => $item['quantity'],
-                            'price' => $variantFind2->discount > 0 ? $variantFind2->price - $variantFind2->discount : $variantFind2->price,
-                        ]);
                     }
                 }
             }
