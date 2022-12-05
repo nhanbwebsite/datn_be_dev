@@ -176,6 +176,7 @@ class CartController extends Controller
         $input = $request->all();
         $user = $request->user();
         $validator->validate($input);
+
         try{
             DB::beginTransaction();
 
@@ -242,20 +243,25 @@ class CartController extends Controller
             $data->updated_by = $user->id;
             $data->save();
 
+            foreach($data->details as $delete){
+                $delete->deleted_by = $user->id;
+                $delete->save();
+                $delete->delete();
+            }
+
             if(!empty($input['details'])){
                 foreach($input['details'] as $item){
                     $detailValidator->validate($item);
                     $variant2 = ProductVariantDetail::where('variant_id', $item['variant_id'])->where('product_id', $item['product_id'])->first();
                     $variantFind2 = ProductVariantDetailById::where('pro_variant_id', $variant2->id)->where('color_id', $item['color_id'])->first();
-                    $detailDatas = CartDetail::where('cart_id', $data->id)->where('product_id', $item['product_id'])->where('variant_id', $item['variant_id'])->where('color_id', $item['color_id'])->whereNull('deleted_at')->first();
-                    if(!empty($detailDatas)){
-                        $detailDatas->product_id = $item['product_id'];
-                        $detailDatas->variant_id = $item['variant_id'];
-                        $detailDatas->color_id = $item['color_id'];
-                        $detailDatas->quantity = $item['quantity'];
-                        $detailDatas->price = $variantFind2->discount > 0 ? $variantFind2->price - $variantFind2->discount : $variantFind2->price;
-                        $detailDatas->save();
-                    }
+                    CartDetail::create([
+                        'cart_id' => $data->id,
+                        'product_id' => $item['product_id'],
+                        'variant_id' => $item['variant_id'],
+                        'color_id' => $item['color_id'],
+                        'quantity' => $item['quantity'],
+                        'price' => $variantFind2->discount > 0 ? $variantFind2->price - $variantFind2->discount : $variantFind2->price,
+                    ]);
                 }
             }
 
