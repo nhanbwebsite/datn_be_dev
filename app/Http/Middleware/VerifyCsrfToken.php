@@ -13,7 +13,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'api/*'  => [
-            'throttle:200,0.5'
+            'throttle:100000000,0.5'
         ]
     ];
 }

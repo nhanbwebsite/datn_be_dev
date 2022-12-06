@@ -22,7 +22,7 @@ class Product extends Model
         'url_image',
         'price',
         'discount',
-
+        'specification_infomation',
         'subcategory_id',
         'is_active',
         'created_at',
