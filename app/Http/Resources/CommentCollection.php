@@ -17,7 +17,7 @@ class CommentCollection extends ResourceCollection
         // return parent::toArray($request);
         if(!$this->collection->isEmpty()){
             // $request not empty
-            foreach($this->collection as $value){
+            foreach($this->collection as $key => $value){
                 $result['data'][] = [
                     'id'            => $value->id,
                     'user_id'       => $value->user_id,
@@ -33,6 +33,11 @@ class CommentCollection extends ResourceCollection
                     'created_by'    => $value->createdBy->name ?? null,
                     'updated_by'    => $value->updatedBy->name ?? null,
                 ];
+
+                // 'rep_user_name' => $value->repComment->createdBy->name,
+                foreach($result['data'][$key]['rep_coment'] as $key2 => $value2) {
+                    $value2->rep_user_name =  $value->repComment->createdBy->name;
+                }
             }
             $result['paginator'] = [
                 'currentPage' => $this->currentPage(),
