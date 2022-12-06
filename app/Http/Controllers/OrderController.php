@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderCollection;
 use App\Http\Resources\OrderResource;
+use App\Http\Validators\Order\ClientCancelOrderValidator;
 use App\Http\Validators\Order\OrderCreateValidator;
 use App\Http\Validators\Order\OrderDetailCreateValidator;
 use App\Http\Validators\Order\OrderUpdateValidator;
@@ -296,6 +297,53 @@ class OrderController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Đã xóa đơn hàng ['.$data->code.'] !'
+        ]);
+    }
+
+    public function clientCancelOrder(Request $request, ClientCancelOrderValidator $validator){
+        $input = $request->all();
+        $validator->validate($input);
+        $user = $request->user();
+
+        try{
+            DB::beginTransaction();
+            $data = Order::where('code', $input['order_code'])->whereIn('status', ORDER_STATUS_CAN_CANCEL)->first();
+
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Đơn hàng đã ở trạng thái không thể hủy hoặc đã hủy !',
+                ], 400);
+            }
+
+            if($user->id !== $data->user_id){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Bạn chỉ có thể hủy những đơn do bạn đặt !',
+                ], 400);
+            }
+
+            $data->cancel_reason = $input['cancel_reason'];
+            $data->status = ORDER_STATUS_CANCELED;
+            $data->updated_by = $user->id;
+            $data->save();
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã hủy đơn hàng !'
         ]);
     }
 
