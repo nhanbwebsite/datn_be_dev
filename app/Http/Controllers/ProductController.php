@@ -415,7 +415,7 @@ class ProductController extends Controller
                 ->join('wards','stores.ward_id','wards.id')
                 ->where('products.is_active',1)
                 ->where('products.id',$request->product_id)
-                ->where('productAmountByWarehouse.variant_id',$request->variant_id)
+                ->where('productAmountByWarehouse.pro_variant_id',$request->variant_id)
                 ->where('productAmountByWarehouse.product_amount','>',0)
                 ->where('stores.province_id',$request->province_id)
                 ->where('stores.district_id',$request->district_id)
@@ -438,7 +438,7 @@ class ProductController extends Controller
                     ->join('wards','stores.ward_id','wards.id')
                     ->where('products.is_active',1)
                     ->where('products.id',$request->product_id)
-                    ->where('productAmountByWarehouse.variant_id',$request->variant_id)
+                    ->where('productAmountByWarehouse.pro_variant_id',$request->variant_id)
                     ->where('productAmountByWarehouse.product_amount','>',0)
                     ->where('stores.province_id',$request->province_id)
                     ->where('stores.district_id',$request->district_id)
@@ -460,7 +460,7 @@ class ProductController extends Controller
                     ->join('wards','stores.ward_id','wards.id')
                     ->where('products.is_active',1)
                     ->where('products.id',$request->product_id)
-                    ->where('productAmountByWarehouse.variant_id',$request->variant_id)
+                    ->where('productAmountByWarehouse.pro_variant_id',$request->variant_id)
                     ->where('productAmountByWarehouse.product_amount','>',0)
                     ->where('stores.province_id',$request->province_id)
                     ->get();
@@ -469,7 +469,6 @@ class ProductController extends Controller
                         'data' => $data
                     ]);
                 }
-
 
                 $data = DB::table('stores')
                 ->select('stores.name as store_name','provinces.id as province_id','provinces.name as province_name','districts.id as district_id','districts.name as district_name','wards.id as ward_id','wards.name as ward_name')
@@ -481,14 +480,13 @@ class ProductController extends Controller
                 ->join('wards','stores.ward_id','wards.id')
                 ->where('products.is_active',1)
                 ->where('products.id',$request->product_id)
-                ->where('productAmountByWarehouse.variant_id',$request->variant_id)
+                ->where('productAmountByWarehouse.pro_variant_id',$request->variant_id)
                 ->where('productAmountByWarehouse.product_amount','>',0)
                 ->get();
                 return response()->json([
                     'status' => 'success',
                     'data' => $data
                 ]);
-
         }
 
     //  product by subcategory id
