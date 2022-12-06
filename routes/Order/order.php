@@ -12,5 +12,6 @@ Route::controller(OrderController::class)->middleware('auth:sanctum')->prefix('o
 
 Route::controller(OrderController::class)->middleware('auth:sanctum')->prefix('client')->group(function (){
     Route::get('/getOrders', 'getAllOrderByUserID');
+    Route::put('/cancelOrder', 'clientCancelOrder');
 });
 ?>
