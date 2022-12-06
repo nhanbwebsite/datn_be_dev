@@ -48,6 +48,9 @@ class SubCategory extends Model
         $data = Post::where('subcategory_id',$subcategory_id)->get();
         return $data;
     }
+    public function post(){
+        return $this->hasMany(FooterContent::class, 'category_id', 'id');
+    }
 }
 
 
