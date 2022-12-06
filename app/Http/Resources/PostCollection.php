@@ -20,7 +20,7 @@ class PostCollection extends ResourceCollection
                     'id'            => $value->id,
                     'author'        => $value->createdBy->name ?? null,
                     'subcategory_id'   => $value->subcategory_id,
-                    //  'category_name'   => $value-> subcategory->name,
+                    'category_name'   => $value-> subcategory->name,
                     'title'          => $value->title,
                     'short_des'          => $value->short_des,
                     'content_post'       => $value->content_post,
