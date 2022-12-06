@@ -12,6 +12,7 @@ class Comment extends Model
     protected $table = 'comments';
     protected $fillable = [
         'product_id',
+        'user_id',
         'content',
         'is_active',
         'created_at',
@@ -34,12 +35,20 @@ class Comment extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function post(){
-        return $this->belongsTo(Post::class, 'post_id', 'id');
+    public function product(){
+        return $this->belongsTo(Post::class, 'product', 'id');
     }
 
     public function parentCmt($id){
         $data = Comment::where('id', $id)->where('is_active', 1)->whereNull('deleted_at')->first();
         return $data ?? null;
     }
+
+    public function getRepcomnentByCommentID(){
+        // $data = DB::table('rep_comments')
+        //         ->join('comments','rep_comments.id_comment','comments.id')
+        //         ->where('rep_comments.id_comment',$idComment);
+         return $this->hasMany(Rep_comment::class, 'id_comment', 'id');
+    }
+
 }

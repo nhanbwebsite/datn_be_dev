@@ -8,6 +8,6 @@ use App\Http\Controllers\CommentController;
         Route::get('/{id}', 'show')->middleware(['checkAction:all,view-comment']);
         Route::put('/{id}', 'update')->middleware(['checkAction:all,update-comment']);
         Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-comment']);
-    })
-
+    });
+    Route::get('/commentsAll', [CommentController::class,'index']);
 ?>
