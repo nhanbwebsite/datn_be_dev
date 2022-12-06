@@ -50,27 +50,31 @@ class CommentController extends Controller
      */
     public function store(Request $request, CommentCreateValidator $validator)
     {
-        // dd($request->all());
+        // dd(auth('sanctum')->user());
 
         try{
             DB::beginTransaction();
-
+            $is_active = 0;
+            $rep = false;
+            if(auth('sanctum')->user()->role_id == 1 || auth('sanctum')->user()->role_id == 4) {
+                $is_active = 1;
+            }
             if(!empty($request->id_comment)){
 
                 $rules = [
-                    'rep_content' => 'required|min:2|max:255',
+                    'rep_comment' => 'required|min:2|max:255',
                 ];
 
                 $messages = [
 
-                    'rep_content.required' => ':attribute tối thiểu 2 kí tự ',
+                    'rep_comment.required' => ':attribute tối thiểu 2 kí tự ',
 
                 ];
 
                 $attributes = [
-                    'rep_content' => 'Nội dung bình luận',
+                    'rep_comment' => 'Nội dung bình luận',
                 ];
-                $validator = Validator::make($request->only('rep_content'), $rules, $messages, $attributes);
+                $validator = Validator::make($request->only('rep_comment'), $rules, $messages, $attributes);
                 if($validator->fails()){
                     return response()->json([
                         'status' => 'error',
@@ -79,19 +83,26 @@ class CommentController extends Controller
                 }
                 Rep_comment::create([
                     'id_comment' => $request->id_comment,
-                    'rep_content' => $request->rep_content,
+                    'rep_comment' => $request->rep_comment,
+                    'is_active' => $is_active,
                     'created_by' => auth('sanctum')->user()->id,
-                    'updated_by' => auth('sanctum')->user()->id,
+                    'updated_by' => auth('sanctum')->user()->id
                 ]);
+
+                $rep = true;
             } else{
                 $input = $request->all();
                 $validator->validate($input);
                 Comment::create([
+                    "user_id" => auth('sanctum')->user()->id,
                     'product_id' => $request->product_id,
                     'content' => $request->content,
+                    'is_active' => $is_active,
                     'created_by' => auth('sanctum')->user()->id,
                     'updated_by' => auth('sanctum')->user()->id,
+
                 ]);
+
             }
 
             DB::commit();
@@ -107,9 +118,25 @@ class CommentController extends Controller
                 ],
             ], $e->getStatusCode());
         }
+
+
+
+        $mess = 'Đã lưu bình luận của bạn, quản trị viên sẽ xem xét phê duyệt !';
+        if($is_active == 1){
+        $mess = 'Bình luận thành công !';
+        }
+
+        if($rep == true){
+            $mess = 'Trả lời bình luận thành công !';
+            return response()->json([
+                'status' => 'success',
+                'message' => $mess,
+            ]);
+        }
+
         return response()->json([
             'status' => 'success',
-            'message' => 'Đã lưu bình luận của bạn, quản trị viên sẽ xem xét phê duyệt !',
+            'message' => $mess,
         ]);
     }
 
@@ -162,7 +189,7 @@ class CommentController extends Controller
 
             if(!empty($request->rep_id_comment)){
                 $comment = Rep_comment::find($request->rep_id_comment);
-                $comment->rep_content = $request->rep_content;
+                $comment->rep_comment = $request->rep_comment;
                 $comment->save();
             } else{
 
