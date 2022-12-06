@@ -9,4 +9,9 @@ Route::controller(UserController::class)->middleware(['auth:sanctum'])->prefix('
     Route::put('/{id}', 'update')->middleware(['checkAction:all,update-user']);
     Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-user']);
 });
+
+Route::controller(UserController::class)->prefix('client')->group(function (){
+    Route::get('userData', 'clientGetUser')->middleware('auth:sanctum');
+    Route::put('updateUserData', 'clientUpdateUser')->middleware('auth:sanctum');
+});
 ?>

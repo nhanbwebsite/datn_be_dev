@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
+use App\Http\Validators\User\ClientUserUpdateValidator;
 use App\Http\Validators\User\UserCreateValidator;
 use App\Http\Validators\User\UserUpdateValidator;
 use App\Models\User;
@@ -85,7 +86,7 @@ class UserController extends Controller
             $userCreate = User::create([
                 'name' => $request->name,
                 'address' => $request->address,
-                'role_id' => $request->role_id ?? ROLE_ID_USER,
+                'role_id' => $request->role_id ?? ROLE_USER,
                 'ward_id' => $request->ward_id,
                 'district_id' => $request->district_id,
                 'province_id' => $request->province_id,
@@ -239,6 +240,65 @@ class UserController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Đã xóa ['.$data->name.']',
+        ]);
+    }
+
+
+    public function clientGetUser(Request $request){
+        $user = $request->user();
+        try{
+            $data = User::find($user->id);
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new UserResource($data),
+        ]);
+    }
+
+    public function clientUpdateUser(Request $request, ClientUserUpdateValidator $validator){
+        $input = $request->all();
+        $validator->validate($input);
+        $user = $request->user();
+
+        try{
+            DB::beginTransaction();
+
+            $data = User::find($user->id);
+            $data->name = $input['name'] ?? $data->name;
+            $data->address = $input['address'] ?? $data->address;
+            $data->email = $input['email'] ?? $data->email;
+            $data->ward_id = $input['ward_id'] ?? $data->ward_id;
+            $data->district_id = $input['district_id'] ?? $data->district_id;
+            $data->province_id = $input['province_id'] ?? $data->province_id;
+            $data->updated_by = $user->id;
+            $data->save();
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã cập nhật thông tin !',
         ]);
     }
 }
