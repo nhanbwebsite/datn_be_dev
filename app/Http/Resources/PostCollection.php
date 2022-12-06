@@ -19,7 +19,7 @@ class PostCollection extends ResourceCollection
                 $result['data'][] = [
                     'id'            => $value->id,
                     'author'        => $value->createdBy->name ?? null,
-                    'subcategory_id'   => $value->subcategory_id,
+                    // 'subcategory_id'   => $value->subcategory_id,
                      'category_name'   => $value-> subcategory->name,
                     'title'          => $value->title,
                     'short_des'          => $value->short_des,
