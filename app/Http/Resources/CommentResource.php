@@ -18,11 +18,10 @@ class CommentResource extends JsonResource
         if(!empty($request)){
             return [
                 'id'            => $this->id,
-                'parent_id'     => $this->parent_id ?? null,
                 'user_id'       => $this->user_id,
                 'user_name'     => $this->user->name,
-                'post_id'       => $this->post_id,
-                'post_title'     => $this->post->title,
+                'product_id'       => $this->product_id,
+                'rep_comment' => $this->getRepcomnentByCommentID,
                 'role_id'       => $this->user->role_id,
                 'role'          => $this->user->role->name,
                 'content'       => $this->content,
