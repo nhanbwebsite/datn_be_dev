@@ -3,7 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
-
+use App\Models\Rep_comment;
 class CommentCollection extends ResourceCollection
 {
     /**
@@ -36,7 +36,8 @@ class CommentCollection extends ResourceCollection
 
                 // 'rep_user_name' => $value->repComment->createdBy->name,
                 foreach($result['data'][$key]['rep_coment'] as $key2 => $value2) {
-                    $value2->rep_user_name =  $value->repComment->createdBy->name;
+
+                    $value2->rep_user_name = Rep_comment::getUserName($value2['created_by']);
                 }
             }
             $result['paginator'] = [

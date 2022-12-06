@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Illuminate\Support\Facades\DB;
 class Rep_comment extends Model
 {
     use HasFactory, SoftDeletes;
@@ -24,6 +24,13 @@ class Rep_comment extends Model
 
     public function createdBy(){
         return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public static function getUserName($userId){
+        $data = DB::table('users')
+                ->where('users.id',$userId)
+                ->first()->name;
+        return $data;
     }
 
 }
