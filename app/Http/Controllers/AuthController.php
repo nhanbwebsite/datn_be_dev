@@ -341,10 +341,11 @@ class AuthController extends Controller
                             'phone' => $input['phone'],
                             'code' => $code,
                             'code_expired' => date('Y-m-d H:i:s', time()),
+                            'is_used' => 0,
                         ]);
                     }
                     else{
-                        if(empty($check->is_use) || $check->is_used == 0){
+                        if($check->is_used == 0){
                             if($check->code_expired > date('Y-m-d H-i-s', time()-60)){
                                 return response()->json([
                                     'status' => 'error',
