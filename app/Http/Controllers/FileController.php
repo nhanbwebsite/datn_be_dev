@@ -48,9 +48,24 @@ class FileController extends Controller
         $user = $request->user();
         try{
             DB::beginTransaction();
-
-            foreach($input as $file){
-                $upload = $this->uploadFile($file);
+            if(is_array($input['files'])){
+                foreach($input['files'] as $file){
+                    $upload = $this->uploadFile($file);
+                    if(!empty($upload)){
+                        File::create([
+                            'name' => $upload['name'],
+                            'extension' => $upload['extension'],
+                            'created_by' => $user->id,
+                            'updated_by' => $user->id,
+                        ]);
+                    }
+                    else{
+                        throw new HttpException(400, 'Lỗi upload file');
+                    }
+                }
+            }
+            else{
+                $upload = $this->uploadFile($input['files']);
                 if(!empty($upload)){
                     File::create([
                         'name' => $upload['name'],
@@ -63,6 +78,7 @@ class FileController extends Controller
                     throw new HttpException(400, 'Lỗi upload file');
                 }
             }
+
 
             DB::commit();
         }
@@ -171,19 +187,18 @@ class FileController extends Controller
 
             }
             $fileOriginalExtension = $file->getClientOriginalExtension();
-            $allow_ext = ['jpg', 'png', 'gif', 'jpeg'];
-            if(!in_array($fileOriginalExtension, $allow_ext)){
+            if(!in_array($fileOriginalExtension, EXTENSION_UPLOAD)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Chỉ hỗ trợ định dạng: !'.implode(",", $allow_ext),
+                    'message' => 'Chỉ hỗ trợ định dạng: !'.implode(",", EXTENSION_UPLOAD),
                 ]);
             }
             $checkFileExists = File::where('name', $fileOriginalName)->first();
             if(!empty($checkFileExists)){
                 $fileOriginalName = explode('.', $fileOriginalName)[0].'_'.time().'.'.$fileOriginalExtension;
             }
-
-            if(Storage::disk('public')->putFileAs(PATH_UPLOAD, $file, $fileOriginalName)){
+            $fileSystem = Storage::disk('public');
+            if($fileSystem->putFileAs(PATH_UPLOAD, $file, $fileOriginalName)){
                 $fileData['name'] = $fileOriginalName ?? null;
                 $fileData['extension'] = $fileOriginalExtension ?? null;
             }
