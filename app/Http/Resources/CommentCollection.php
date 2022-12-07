@@ -27,6 +27,7 @@ class CommentCollection extends ResourceCollection
                     'role'          => $value->user->role->name,
                     'content'       => $value->content,
                     'rep_coment' => $value->getRepcomnentByCommentID,
+                    'status_text' => $value->is_active = 1 ? 'Đã duyệt' : 'Chưa duyệt',
                     'is_active'     => $value->is_active,
                     'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
