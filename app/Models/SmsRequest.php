@@ -12,7 +12,9 @@ class SmsRequest extends Model
     protected $table = 'sms_requests';
     protected $fillable = [
         'phone',
+        'code',
         'code_expired',
+        'is_used',
         'created_at',
         'updated_at',
         'deleted_at',

@@ -152,6 +152,9 @@ class AuthController extends Controller
                 'password' => Hash::make($input['otp']),
             ]);
 
+            $new_sms->is_used = 1;
+            $new_sms->save();
+
             DB::commit();
         }
         catch(HttpException $e){
@@ -336,15 +339,19 @@ class AuthController extends Controller
                     if(empty($check)){
                         SmsRequest::create([
                             'phone' => $input['phone'],
-                            'code_expired' => date('Y-m-d H:i:s', time()+60),
+                            'code' => $code,
+                            'code_expired' => date('Y-m-d H:i:s', time()),
+                            'is_used' => 0,
                         ]);
                     }
                     else{
-                        if(date('Y-m-d H-i-s', time()) < $check->code_expired){
-                            return response()->json([
-                                'status' => 'error',
-                                'message' => 'Vui lòng đợi 1 phút để yêu cầu mã mới !',
-                            ], 400);
+                        if($check->is_used == 0){
+                            if($check->code_expired > date('Y-m-d H-i-s', time()-60)){
+                                return response()->json([
+                                    'status' => 'error',
+                                    'message' => 'Vui lòng đợi 1 phút để yêu cầu mã mới !',
+                                ], 400);
+                            }
                         }
                     }
                     break;
