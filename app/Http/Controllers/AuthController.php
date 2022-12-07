@@ -149,7 +149,7 @@ class AuthController extends Controller
                 'province_id' => $input['province_id'],
                 'phone' => $input['phone'],
                 'request_code_at' => date('Y-m-d H:i:s', time()+60),
-                'password' => Hash::make($input['password']),
+                'password' => Hash::make($input['otp']),
             ]);
 
             DB::commit();
