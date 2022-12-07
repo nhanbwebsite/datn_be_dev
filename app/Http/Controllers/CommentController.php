@@ -307,14 +307,16 @@ class CommentController extends Controller
         return response()->json($resource);
     }
 
-    public function getAllProductHaveComments(){
-        $data = Comment::getAllCommentByProduct();
+    public static function getReplyCommenproductByIdComment($id){
+        $data = DB::table('rep_comments')
+                ->select('users.name as user_reply','users.id as user_id','rep_comments.*')
+                ->join('comments','rep_comments.id_comment','comments.id')
+                ->join('users','comments.user_id','users.id')
+                ->where('rep_comments.id_comment',$id)
+                ->get();
+
         return response()->json([
-            'status' => 'success',
-            'data' =>$data,
+            'data' => $data,
         ],200);
-
     }
-
-
 }

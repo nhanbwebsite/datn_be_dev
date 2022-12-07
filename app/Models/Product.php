@@ -62,6 +62,11 @@ class Product extends Model
         return $data;
     }
 
+    public function comments(){
+        return $this->hasMany(Comment::class, 'product_id', 'id');
+    }
+
+
     public static function productVariants($id){
         // return $this->hasMany(ProductVariantDetail::class, 'product_id', 'id');
         $variantByProducts = DB::table(('productVariant'))->select('variants.id','variants.variant_name')

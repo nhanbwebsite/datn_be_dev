@@ -57,11 +57,15 @@ class Comment extends Model
         return $this->hasOne(Rep_comment::class, 'id_comment', 'id');
     }
 
+
+
     public static function getAllCommentByProduct(){
         $data = DB::table('products')
                 ->join('comments','products.id','comments.product_id')
                 ->get();
         return $data;
     }
+
+
 
 }

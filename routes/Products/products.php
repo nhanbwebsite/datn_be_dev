@@ -10,6 +10,7 @@ Route::prefix('products')->middleware('auth:sanctum')->group(function (){
     Route::put('/update/{id}',[ProductController::class,'update']);
     Route::delete('/{id}',[ProductController::class,'destroy']);
 
+
     // delete variant of product
 });
 
@@ -38,4 +39,7 @@ Route::get('client_products_search/',[ProductController::class,'search']);
 Route::get('client/productsfindbylocation',[ProductController::class,'getProvincesByWarehouse']);
 
 Route::get('client/getallproductbysubcategories',[ProductController::class,'getAllSubcate']);
+
+//  phân quyền admin
+Route::get('/productsHaveComment',[ProductController::class,'productsHaveCommentAll']);
 

@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Models\ProductVariantDetail;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantDetailById;
+use App\Http\Resources\ProductsHaveComemntCollection;
 class ProductController extends Controller
 {
     /**
@@ -636,5 +637,15 @@ class ProductController extends Controller
             'data' => $data
         ],200);
     }
+
+    public function productsHaveCommentAll(){
+        $data = Product::where('is_active',1)->paginate(9);
+        $data = new ProductsHaveComemntCollection($data);
+        return response()->json(
+             $data,200);
+
+    }
+
+
 
 }
