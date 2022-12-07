@@ -271,4 +271,29 @@ class CommentController extends Controller
             'message' => 'Đã xóa bình luận !',
         ]);
     }
+
+
+    public function getAllCommentByProductId(Request $request,$pro_id)
+    {
+        // $input['limit'] = $request->limit;
+        try{
+            $data = Comment::where('product_id',$pro_id)->paginate(9);
+            // $data = Comment::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input){
+            //     if(!empty($input['user_id'])){
+            //         $query->where('user_id', $input['user_id']);
+            //     }
+            //     if(!empty($input['post_id'])){
+            //         $query->where('post_id', $input['post_id']);
+            //     }
+            // })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
+            $resource = new CommentCollection($data);
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+        }
+        return response()->json($resource);
+    }
 }
