@@ -40,9 +40,6 @@ return [
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
-            'links' => [
-                public_path('images') => storage_path('app/images'),
-            ],
         ],
 
         's3' => [
@@ -55,14 +52,6 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
         ],
-
-        'dropbox' => [
-            'driver' => 'dropbox',
-            'app_key' => env('DROPBOX_APP_KEY'),
-            'app_secret' => env('DROPBOX_APP_SECRET'),
-            'refresh_token' => env('DROPBOX_REFRESH_TOKEN'),
-        ],
-
     ],
 
     /*
