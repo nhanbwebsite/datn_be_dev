@@ -19,13 +19,7 @@ class FileResource extends JsonResource
 
         // return parent::toArray($request);
         if(!empty($request)){
-            $token = new DropboxRefreshAccessToken();
-            $token->getToken();
-            if(empty($token)){
-                $path = null;
-            }
-            $client = new Client($token);
-            $path = $client->getTemporaryLink(PATH_DROPBOX.$this->name);
+            $path = env('FILE_URL').$this->name;
             return [
                 'id'            => $this->id,
                 'name'          => $this->name,

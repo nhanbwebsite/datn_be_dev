@@ -20,13 +20,7 @@ class FileCollection extends ResourceCollection
         if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $value){
-                $token = new DropboxRefreshAccessToken();
-                $token->getToken();
-                if(empty($token)){
-                    $path = null;
-                }
-                $client = new Client($token);
-                $path = $client->getTemporaryLink(PATH_DROPBOX.$value->name);
+                $path = env('FILE_URL').$value->name;
                 $result['data'][] = [
                     'id'            => $value->id,
                     'name'          => $value->name,
