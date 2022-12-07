@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use Illuminate\Support\Facades\DB;
 class Comment extends Model
 {
     use HasFactory, SoftDeletes;
@@ -57,10 +57,9 @@ class Comment extends Model
         return $this->hasOne(Rep_comment::class, 'id_comment', 'id');
     }
 
-    public function getAllCommentByProduct(){
+    public static function getAllCommentByProduct(){
         $data = DB::table('products')
                 ->join('comments','products.id','comments.product_id')
-                ->join('rep_comments','comments.id','rep_comments.id_comment')
                 ->get();
         return $data;
     }

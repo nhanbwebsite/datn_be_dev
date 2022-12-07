@@ -170,7 +170,7 @@ class CommentController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => new CommentResource($data),
-        ]);
+        ],200);
     }
 
     /**
@@ -305,6 +305,15 @@ class CommentController extends Controller
             ], $e->getStatusCode());
         }
         return response()->json($resource);
+    }
+
+    public function getAllProductHaveComments(){
+        $data = Comment::getAllCommentByProduct();
+        return response()->json([
+            'status' => 'success',
+            'data' =>$data,
+        ],200);
+
     }
 
 
