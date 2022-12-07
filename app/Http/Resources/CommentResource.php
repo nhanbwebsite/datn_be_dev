@@ -22,6 +22,7 @@ class CommentResource extends JsonResource
                 'user_name'     => $this->user->name,
                 'product_id'       => $this->product_id,
                 'rep_comment' => $this->getRepcomnentByCommentID,
+                'status_text' => $this->is_active = 1 ? 'Đã duyệt' : 'Chưa duyệt',
                 'role_id'       => $this->user->role_id,
                 'role'          => $this->user->role->name,
                 'content'       => $this->content,
