@@ -134,11 +134,13 @@ class AuthController extends Controller
                 ], 404);
             }
 
-            if($new_sms->code_expired > date('Y-m-d H:i:s', time()-60)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Mã đã hết hiệu lực !',
-                ], 400);
+            if($new_sms->is_used == 0){
+                if($new_sms->code_expired < date('Y-m-d H:i:s', time()-60)){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Mã đã hết hiệu lực !',
+                    ], 400);
+                }
             }
 
             $userCreate = User::create([
