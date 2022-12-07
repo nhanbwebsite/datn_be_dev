@@ -38,8 +38,7 @@ class CommentCollection extends ResourceCollection
 
                 // 'rep_user_name' => $value->repComment->createdBy->name,
                 foreach($result['data'][$key]['rep_coment'] as $key2 => $value2) {
-
-                    $value2->rep_user_name = Rep_comment::getUserName($value2['created_by'])->where('is_active',1);
+                    $value2->rep_user_name = Rep_comment::getUserName($value2['created_by']);
                 }
             }
             $result['paginator'] = [
