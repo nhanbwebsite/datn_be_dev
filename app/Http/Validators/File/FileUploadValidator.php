@@ -8,7 +8,7 @@ class FileUploadValidator extends ValidatorBase
 {
     protected function rules(){
         return [
-            'files' => 'required|file'
+            'files' => 'required'
         ];
     }
 
