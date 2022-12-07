@@ -134,7 +134,7 @@ class AuthController extends Controller
                 ], 404);
             }
 
-            if(date('Y-m-d H:i:s', time()) > $new_sms->code_expired){
+            if($new_sms->code_expired > date('Y-m-d H:i:s', time()-60)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Mã đã hết hiệu lực !',
