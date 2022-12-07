@@ -12,8 +12,10 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        'api/*'  => [
-            'throttle:100000000,0.5'
-        ]
+        'api/*' => [
+            'throttle:120,1',
+            'bindings',
+             \App\Library\Cobalt\Http\Middleware\LogMiddleware::class,
+        ],
     ];
 }

@@ -11,5 +11,6 @@ use App\Http\Controllers\CommentController;
     });
     Route::get('/commentsAll', [CommentController::class,'index']);
     Route::get('/commentsAllByIdproduct/{id}', [CommentController::class,'getAllCommentByProductId']);
-    Route::get('/getAllProductHaveCommentsAdmin', [CommentController::class,'getAllProductHaveComments']);
+    // Route::get('/getAllProductHaveCommentsAdmin', [CommentController::class,'getAllProductHaveComments']);
+    Route::get('/replycommentByCommentID/{id}', [CommentController::class,'getReplyCommenproductByIdComment']);
 ?>
