@@ -25,7 +25,6 @@ class CommentCollection extends ResourceCollection
                     'product_id'       => $value->product_id,
                     'role_id'       => $value->user->role_id,
                     'role'          => $value->user->role->name,
-                    'product'       => $value->product,
                     'content'       => $value->content,
                     'rep_coment' => $value->getRepcomnentByCommentID,
                     'status_text' => $value->is_active = 1 ? 'Đã duyệt' : 'Chưa duyệt',
