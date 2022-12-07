@@ -80,6 +80,7 @@ class FileController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Upload file(s) thành công !',
+            'url' => env('FILE_URL').$upload['name'],
         ]);
     }
 
