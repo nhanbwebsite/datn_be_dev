@@ -336,14 +336,14 @@ class AuthController extends Controller
                     if(empty($check)){
                         SmsRequest::create([
                             'phone' => $input['phone'],
-                            'code_expired' => date('Y-m-d H:i:s', time()+2*60),
+                            'code_expired' => date('Y-m-d H:i:s', time()+60),
                         ]);
                     }
                     else{
                         if(date('Y-m-d H-i-s', time()) < $check->code_expired){
                             return response()->json([
                                 'status' => 'error',
-                                'message' => 'Vui lòng đợi 2 phút để yêu cầu mã mới !',
+                                'message' => 'Vui lòng đợi 1 phút để yêu cầu mã mới !',
                             ], 400);
                         }
                     }
