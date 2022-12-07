@@ -220,6 +220,11 @@ class AuthController extends Controller
                     'message' => 'Chưa đăng nhập !',
                 ], 401);
             }
+
+            $clear_request = User::find($user->id);
+            $clear_request->request_code_at = null;
+            $clear_request->save();
+
             $user->currentAccessToken()->delete();
             if(!empty($user->session)){
                 $sessionDel =  UserSession::where('user_id', $user->id);
