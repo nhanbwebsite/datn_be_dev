@@ -37,7 +37,7 @@ class Comment extends Model
     }
 
     public function product(){
-        return $this->belongsTo(Post::class, 'product', 'id');
+        return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 
     public function parentCmt($id){
@@ -55,6 +55,14 @@ class Comment extends Model
 
     public function repComment(){
         return $this->hasOne(Rep_comment::class, 'id_comment', 'id');
+    }
+
+    public function getAllCommentByProduct(){
+        $data = DB::table('products')
+                ->join('comments','products.id','comments.product_id')
+                ->join('rep_comments','comments.id','rep_comments.id_comment')
+                ->get();
+        return $data;
     }
 
 }

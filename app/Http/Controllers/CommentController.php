@@ -183,22 +183,32 @@ class CommentController extends Controller
     public function update(Request $request, $id, CommentUpdateValidator $validator)
     {
         $input = $request->all();
-        $validator->validate($input);
+        $user = $request->user();
+
         try {
             DB::beginTransaction();
 
             if(!empty($request->rep_id_comment)){
                 $comment = Rep_comment::find($request->rep_id_comment);
-                $comment->rep_comment = $request->rep_comment;
-                $comment->save();
-            } else{
+                if($comment){
+                    $comment->rep_comment = $request->rep_comment;
+                    $comment->is_active = $request->is_active;
+                    $comment->updated_by = $user->id;
+                    $comment->save();
+                } else{
+                     return response()->json([
+                        'status' => 'error',
+                        'message' => 'Bình luận không tồn tại !',
+                    ], 404);
+                }
 
-            $user = $request->user();
+            } else{
+            $validator->validate($input);
             $comment = Comment::find($id);
             if(empty($comment)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Người dùng không tồn tại !',
+                    'message' => 'Bình luận không tồn tại !',
                 ], 404);
             }
 
@@ -296,4 +306,6 @@ class CommentController extends Controller
         }
         return response()->json($resource);
     }
+
+
 }
