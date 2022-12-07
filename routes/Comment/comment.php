@@ -10,4 +10,5 @@ use App\Http\Controllers\CommentController;
         Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-comment']);
     });
     Route::get('/commentsAll', [CommentController::class,'index']);
+    Route::get('/commentsAllByIdproduct/{id}', [CommentController::class,'getAllCommentByProductId']);
 ?>
