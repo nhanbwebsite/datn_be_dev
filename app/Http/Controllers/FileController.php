@@ -177,8 +177,7 @@ class FileController extends Controller
                     'message' => 'Chỉ hỗ trợ định dạng: !'.implode(",", $allow_ext),
                 ]);
             }
-            $fileNameCheck = explode('.', $fileOriginalName)[0];
-            $checkFileExists = File::where('name', $fileNameCheck)->first();
+            $checkFileExists = File::where('name', $fileOriginalName)->first();
             if(!empty($checkFileExists)){
                 $fileOriginalName = explode('.', $fileOriginalName)[0].'_'.time().'.'.$fileOriginalExtension;
             }
