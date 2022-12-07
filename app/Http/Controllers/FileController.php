@@ -8,10 +8,8 @@ use App\Http\Validators\File\FileUploadValidator;
 use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File as FacadesFile;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Spatie\Dropbox\Client;
 class FileController extends Controller
 {
     /**
@@ -153,7 +151,7 @@ class FileController extends Controller
             $data->deleted_by = $user->id;
             $data->save();
 
-            Storage::disk('dropbox')->delete(PATH_DROPBOX.$data->name);
+            Storage::disk('public')->delete(PATH_UPLOAD.$data->name);
             $data->delete();
 
             DB::commit();
@@ -195,7 +193,7 @@ class FileController extends Controller
                 $fileOriginalName = explode('.', $fileOriginalName)[0].'_'.time().'.'.$fileOriginalExtension;
             }
 
-            if(Storage::disk('dropbox')->putFileAs(PATH_DROPBOX, $file, $fileOriginalName)){
+            if(Storage::disk('public')->putFileAs(PATH_UPLOAD, $file, $fileOriginalName)){
                 $fileData['name'] = $fileOriginalName ?? null;
                 $fileData['extension'] = $fileOriginalExtension ?? null;
             }
@@ -212,5 +210,29 @@ class FileController extends Controller
         }
 
         return $fileData ?? null;
+    }
+
+    public function viewFile($fileName){
+        try{
+            $data = File::where('name', $fileName)->first();
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Không tìm thấy file !',
+                ], 404);
+            }
+            $file = public_path('/storage/images/'.$fileName);
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->file($file, ['Content-type' => 'application/image']);
     }
 }

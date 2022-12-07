@@ -21,7 +21,8 @@ define('ORDER_STATUS_CAN_CANCEL', [10, 11]);
 
 define('ORDER_STATUS_PROCESS', [10, 11, 12, 13, 14]);
 
-define('PATH_DROPBOX', '/DATN/');
+define('PATH_UPLOAD', '/images/');
+define('PATH_VỈEW', '/storage/images/');
 
 define('ACTION_SMS', [
     'login' => 'LOGIN',
