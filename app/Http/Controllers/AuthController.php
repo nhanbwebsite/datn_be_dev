@@ -346,11 +346,15 @@ class AuthController extends Controller
                     }
                     else{
                         if($check->is_used == 0){
-                            if($check->code_expired > date('Y-m-d H-i-s', time()-60)){
+                            if($check->code_expired > date('Y-m-d H:i:s', time()-60)){
                                 return response()->json([
                                     'status' => 'error',
                                     'message' => 'Vui lòng đợi 1 phút để yêu cầu mã mới !',
                                 ], 400);
+                            }
+                            else{
+                                $check->code_expired = date('Y-m-d H:i:s', time());
+                                $check->save();
                             }
                         }
                     }
