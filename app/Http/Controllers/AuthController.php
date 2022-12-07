@@ -7,6 +7,7 @@ use App\Http\Validators\Auth\LoginValidator;
 use App\Http\Validators\Auth\RegisterValidator;
 use App\Http\Validators\SMS\SMSValidator;
 use App\Models\RolePermission;
+use App\Models\SmsRequest;
 use App\Models\User;
 use App\Models\UserSession;
 use GuzzleHttp\Client;
@@ -125,6 +126,21 @@ class AuthController extends Controller
         try{
             DB::beginTransaction();
 
+            $new_sms = SmsRequest::where('phone', $input['phone'])->first();
+            if(empty($new_sms)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Số điện thoại chưa có yêu cầu mã !',
+                ], 404);
+            }
+
+            if(date('Y-m-d H:i:s', time()) > $new_sms->code_expired){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Mã đã hết hiệu lực !',
+                ], 400);
+            }
+
             $userCreate = User::create([
                 'name' => $input['name'],
                 'address' => $input['address'],
@@ -132,7 +148,8 @@ class AuthController extends Controller
                 'district_id' => $input['district_id'],
                 'province_id' => $input['province_id'],
                 'phone' => $input['phone'],
-                // 'password' => Hash::make($input['password']),
+                'request_code_at' => date('Y-m-d H:i:s', time()+60),
+                'password' => Hash::make($input['password']),
             ]);
 
             DB::commit();
@@ -305,6 +322,7 @@ class AuthController extends Controller
     // public function sendSMS(string $phone, $msg, SMSValidator $validator){
         $input = $request->all();
         $validator->validate($input);
+        $input['action'] = strtoupper($input['action']);
 
         try{
             DB::beginTransaction();
@@ -314,13 +332,43 @@ class AuthController extends Controller
             switch($input['action']){
                 case ACTION_SMS['register']:
                     $message = $code.' la ma xac minh dang ky Baotrixemay cua ban';
-                    break;
-                case ACTION_SMS['reset_password']:
-                    $message = $code.' la ma dat lai mat khau Baotrixemay cua ban';
+                    $check = SmsRequest::where('phone', $input['phone'])->first();
+                    if(empty($check)){
+                        SmsRequest::create([
+                            'phone' => $input['phone'],
+                            'code_expired' => date('Y-m-d H:i:s', time()+2*60),
+                        ]);
+                    }
+                    else{
+                        if(date('Y-m-d H-i-s', time()) < $check->code_expired){
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'Vui lòng đợi 2 phút để yêu cầu mã mới !',
+                            ], 400);
+                        }
+                    }
                     break;
 
                 default:
                     $message = $code.' la ma xac minh dang ky Baotrixemay cua ban';
+                    $user = User::where('phone', $input['phone'])->where('is_active', 1)->first();
+                    if(empty($user)){
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Người dùng không tồn tại !',
+                        ], 404);
+                    }
+                    if($user->request_code_at > date('Y-m-d H:i:s', time()-60)){
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Vui lòng đợi 1 phút để yêu cầu mã mới !',
+                        ], 400);
+                    }
+
+                    $user->password = Hash::make($code);
+                    $user->request_code_at = date('Y-m-d H:i:s', time());
+                    $user->save();
+                    break;
             }
 
             $params = [
@@ -331,24 +379,6 @@ class AuthController extends Controller
                 "SmsType" => 2,
                 "Brandname" => env('SMS_BRAND_NAME', 'Baotrixemay'),
             ];
-
-            $user = User::where('phone', $input['phone'])->where('is_active', 1)->first();
-            if(empty($user)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Người dùng không tồn tại !',
-                ], 404);
-            }
-
-            if($user->request_code_at > date('Y-m-d H:i:s', time()-60)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Vui lòng đợi 1 phút để yêu cầu mã mới !',
-                ], 400);
-            }
-            $user->password = Hash::make($code);
-            $user->request_code_at = date('Y-m-d H:i:s', time());
-            $user->save();
 
             $client = new Client();
             if(env('SMS_ENABLE') == 1){
