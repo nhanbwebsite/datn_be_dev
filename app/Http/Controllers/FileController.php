@@ -93,7 +93,8 @@ class FileController extends Controller
     {
         try{
             $data = File::find($id);
-            if(empty($data)){
+            $check = Storage::disk('public')->exists(PATH_UPLOAD.$data->name);
+            if($check == false || empty($data)){
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Không tìm thấy file !'
@@ -117,18 +118,6 @@ class FileController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
@@ -141,10 +130,11 @@ class FileController extends Controller
             DB::beginTransaction();
 
             $data = File::find($id);
-            if(empty($data)){
+            $check = Storage::disk('public')->exists(PATH_UPLOAD.$data->name);
+            if($check == false || empty($data)){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'File không tồn tại !'
+                    'message' => 'Không tìm thấy file !'
                 ], 404);
             }
 
@@ -233,6 +223,6 @@ class FileController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        return response()->file($file, ['Content-type' => 'application/image']);
+        return response()->file($file);
     }
 }
