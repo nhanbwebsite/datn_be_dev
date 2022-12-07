@@ -25,6 +25,7 @@ class CommentCollection extends ResourceCollection
                     'product_id'       => $value->product_id,
                     'role_id'       => $value->user->role_id,
                     'role'          => $value->user->role->name,
+                    'product'       => $value->product,
                     'content'       => $value->content,
                     'rep_coment' => $value->getRepcomnentByCommentID,
                     'status_text' => $value->is_active = 1 ? 'Đã duyệt' : 'Chưa duyệt',
@@ -38,7 +39,7 @@ class CommentCollection extends ResourceCollection
                 // 'rep_user_name' => $value->repComment->createdBy->name,
                 foreach($result['data'][$key]['rep_coment'] as $key2 => $value2) {
 
-                    $value2->rep_user_name = Rep_comment::getUserName($value2['created_by']);
+                    $value2->rep_user_name = Rep_comment::getUserName($value2['created_by'])->where('is_active',1);
                 }
             }
             $result['paginator'] = [
