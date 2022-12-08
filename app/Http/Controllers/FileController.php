@@ -49,50 +49,19 @@ class FileController extends Controller
         $user = $request->user();
         try{
             DB::beginTransaction();
-            if(is_array($input['files'])){
-                $url = [];
-                foreach($input['files'] as $file){
-                    $upload = $this->uploadFile($file);
-                    if(!empty($upload)){
-                        File::create([
-                            'name' => $upload['name'],
-                            'extension' => $upload['extension'],
-                            'created_by' => $user->id,
-                            'updated_by' => $user->id,
-                        ]);
 
-                        $url[] = env('FILE_URL').$upload['name'];
-                    }
-                    else{
-                        throw new HttpException(400, 'Lỗi upload file');
-                    }
-                }
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Upload file(s) thành công !',
-                    'url' => $url,
+            $upload = $this->uploadFile($input['files']);
+            if(!empty($upload)){
+                $create = File::create([
+                    'name' => $upload['name'],
+                    'extension' => $upload['extension'],
+                    'created_by' => $user->id,
+                    'updated_by' => $user->id,
                 ]);
             }
             else{
-                $upload = $this->uploadFile($input['files']);
-                if(!empty($upload)){
-                    $create = File::create([
-                        'name' => $upload['name'],
-                        'extension' => $upload['extension'],
-                        'created_by' => $user->id,
-                        'updated_by' => $user->id,
-                    ]);
-                }
-                else{
-                    throw new HttpException(400, 'Lỗi upload file');
-                }
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Upload file(s) thành công !',
-                    'url' => env('FILE_URL').$create->name,
-                ]);
+                throw new HttpException(400, 'Lỗi upload file');
             }
-
 
             DB::commit();
         }
@@ -107,6 +76,11 @@ class FileController extends Controller
                 ],
             ], $e->getStatusCode());
         }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Upload file thành công !',
+            'url' => env('FILE_URL').$create->name,
+        ]);
     }
 
     /**
