@@ -44,23 +44,36 @@ class FileController extends Controller
      */
     public function store(Request $request, FileUploadValidator $uploadValidator)
     {
-        $input['files'] = $request->file('files');
-        $uploadValidator->validate($input);
-        $user = $request->user();
+        $uploadValidator->validate($request->all());
         try{
             DB::beginTransaction();
 
-            $upload = $this->uploadFile($input['files']);
-            if(!empty($upload)){
-                $create = File::create([
-                    'name' => $upload['name'],
-                    'extension' => $upload['extension'],
-                    'created_by' => $user->id,
-                    'updated_by' => $user->id,
-                ]);
-            }
-            else{
-                throw new HttpException(400, 'Lỗi upload file');
+            if($request->has('files')){
+                foreach($request->file('files') as $file){
+                    if($file->getSize() > 20480){
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'File vượt quá 20MB !',
+                        ], 422);
+                    }
+                    if(!in_array($file->getClientOriginalExtension(), EXTENSION_UPLOAD)){
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Chỉ hỗ trợ định dạng '. implode(", ", EXTENSION_UPLOAD),
+                        ], 422);
+                    }
+
+                    $extension = $file->getClientOriginalExtension();
+                    $fileName = $file->getClientOriginalName() . '_' . time() . '.' . $extension;
+                    $file->storeAs(PATH_UPLOAD, $fileName, 'public');
+
+                    File::create([
+                        'name' => $fileName,
+                        'extension' => $extension,
+                        'created_by' => $request->user()->id,
+                        'updated_by' => $request->user()->id,
+                    ]);
+                }
             }
 
             DB::commit();
@@ -76,11 +89,49 @@ class FileController extends Controller
                 ],
             ], $e->getStatusCode());
         }
+
         return response()->json([
             'status' => 'success',
-            'message' => 'Upload file thành công !',
-            'url' => env('FILE_URL').$create->name,
+            'message' => 'Upload file(s) thành công !',
         ]);
+
+        // $input['files'] = $request->file('files');
+        // $uploadValidator->validate($input);
+        // $user = $request->user();
+        // try{
+        //     DB::beginTransaction();
+
+        //     $upload = $this->uploadFile($input['files']);
+        //     if(!empty($upload)){
+        //         $create = File::create([
+        //             'name' => $upload['name'],
+        //             'extension' => $upload['extension'],
+        //             'created_by' => $user->id,
+        //             'updated_by' => $user->id,
+        //         ]);
+        //     }
+        //     else{
+        //         throw new HttpException(400, 'Lỗi upload file');
+        //     }
+
+        //     DB::commit();
+        // }
+        // catch(HttpException $e){
+        //     DB::rollBack();
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => [
+        //             'error' => $e->getMessage(),
+        //             'file' => $e->getFile(),
+        //             'line' => $e->getLine(),
+        //         ],
+        //     ], $e->getStatusCode());
+        // }
+        // return response()->json([
+        //     'status' => 'success',
+        //     'message' => 'Upload file thành công !',
+        //     'url' => env('FILE_URL').$create->name,
+        // ]);
     }
 
     /**
@@ -163,40 +214,40 @@ class FileController extends Controller
         ]);
     }
 
-    public function uploadFile($file){
-        try{
-            $fileOriginalName = $file->getClientOriginalName();
-            if(!explode(' ', $fileOriginalName)){
-                $fileOriginalName = Str::slug($fileOriginalName);
-            }
-            $fileOriginalExtension = $file->getClientOriginalExtension();
-            if(!in_array($fileOriginalExtension, EXTENSION_UPLOAD)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Chỉ hỗ trợ định dạng: !'.implode(",", EXTENSION_UPLOAD),
-                ]);
-            }
-            $checkFileExists = File::where('name', $fileOriginalName)->first();
-            if(!empty($checkFileExists)){
-                $fileOriginalName = explode('.', $fileOriginalName)[0].'_'.time().'.'.$fileOriginalExtension;
-            }
-            $file->storeAs(PATH_UPLOAD, $fileOriginalName, 'public');
-            $fileData['name'] = $fileOriginalName ?? null;
-            $fileData['extension'] = $fileOriginalExtension ?? null;
-        }
-        catch(HttpException $e){
-            return response()->json([
-                'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
-        }
+    // public function uploadFile($file){
+    //     try{
+    //         $fileOriginalName = $file->getClientOriginalName();
+    //         if(!explode(' ', $fileOriginalName)){
+    //             $fileOriginalName = Str::slug($fileOriginalName);
+    //         }
+    //         $fileOriginalExtension = $file->getClientOriginalExtension();
+    //         if(!in_array($fileOriginalExtension, EXTENSION_UPLOAD)){
+    //             return response()->json([
+    //                 'status' => 'error',
+    //                 'message' => 'Chỉ hỗ trợ định dạng: !'.implode(",", EXTENSION_UPLOAD),
+    //             ]);
+    //         }
+    //         $checkFileExists = File::where('name', $fileOriginalName)->first();
+    //         if(!empty($checkFileExists)){
+    //             $fileOriginalName = explode('.', $fileOriginalName)[0].'_'.time().'.'.$fileOriginalExtension;
+    //         }
+    //         $file->storeAs(PATH_UPLOAD, $fileOriginalName, 'public');
+    //         $fileData['name'] = $fileOriginalName ?? null;
+    //         $fileData['extension'] = $fileOriginalExtension ?? null;
+    //     }
+    //     catch(HttpException $e){
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => [
+    //                 'error' => $e->getMessage(),
+    //                 'file' => $e->getFile(),
+    //                 'line' => $e->getLine(),
+    //             ],
+    //         ], $e->getStatusCode());
+    //     }
 
-        return $fileData ?? null;
-    }
+    //     return $fileData ?? null;
+    // }
 
     public function viewFile($fileName){
         try{
