@@ -47,10 +47,9 @@ class FileController extends Controller
         $uploadValidator->validate($request->all());
         try{
             DB::beginTransaction();
-
             if($request->has('files')){
                 foreach($request->file('files') as $file){
-                    if($file->getSize() > 20480){
+                    if(round(($file->getSize()/1024)/1024, 4) > 20){
                         return response()->json([
                             'status' => 'error',
                             'message' => 'File vượt quá 20MB !',
