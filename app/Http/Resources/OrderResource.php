@@ -38,7 +38,6 @@ class OrderResource extends JsonResource
                 'status'                => $this->status,
                 'status_code'           => $this->getStatus->code,
                 'status_name'           => $this->getStatus->name,
-                'address_note_id'       => $this->address_note_id,
                 'address'               => $this->address,
                 'ward_id'               => $this->ward_id,
                 'ward'                  => $this->ward->name,
