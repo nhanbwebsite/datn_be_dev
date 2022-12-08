@@ -76,7 +76,7 @@ class FileController extends Controller
             else{
                 $upload = $this->uploadFile($input['files']);
                 if(!empty($upload)){
-                    File::create([
+                    $create = File::create([
                         'name' => $upload['name'],
                         'extension' => $upload['extension'],
                         'created_by' => $user->id,
@@ -89,7 +89,7 @@ class FileController extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Upload file(s) thành công !',
-                    'url' => env('FILE_URL').$upload['name'],
+                    'url' => env('FILE_URL').$create->name,
                 ]);
             }
 
