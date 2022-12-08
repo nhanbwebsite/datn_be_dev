@@ -33,7 +33,7 @@ abstract class ValidatorBase {
 
         Validator::extend('check_action_sms', function($attribute, $value, $parameters, $validator){
             if(empty(ACTION_SMS[$value])){
-                $validator->addReplacer('unique_deleted_at_null', function($message, $attribute, $rule, $parameters){
+                $validator->addReplacer('check_action_sms', function($message, $attribute, $rule, $parameters){
                     return str_replace(':attribute', $attribute, $message);
                 });
                 return false;

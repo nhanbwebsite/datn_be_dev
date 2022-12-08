@@ -28,7 +28,6 @@ define('PATH_VIEW', '/storage/images/');
 define('ACTION_SMS', [
     'login' => 'LOGIN',
     'register' => 'REGISTER',
-    'reset_password' => 'RESET_PASSWORD',
 ]);
 
 define('VNPAY_COMMAND_PAY', 'pay');
