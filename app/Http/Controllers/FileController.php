@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Support\Str;
 class FileController extends Controller
 {
     /**
@@ -43,12 +44,13 @@ class FileController extends Controller
      */
     public function store(Request $request, FileUploadValidator $uploadValidator)
     {
-        $input = $request->all();
+        $input['files'] = $request->file('files');
         $uploadValidator->validate($input);
         $user = $request->user();
         try{
             DB::beginTransaction();
             if(is_array($input['files'])){
+                $url = [];
                 foreach($input['files'] as $file){
                     $upload = $this->uploadFile($file);
                     if(!empty($upload)){
@@ -58,11 +60,18 @@ class FileController extends Controller
                             'created_by' => $user->id,
                             'updated_by' => $user->id,
                         ]);
+
+                        $url[] = env('FILE_URL').$upload['name'];
                     }
                     else{
                         throw new HttpException(400, 'Lỗi upload file');
                     }
                 }
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Upload file(s) thành công !',
+                    'url' => $url,
+                ]);
             }
             else{
                 $upload = $this->uploadFile($input['files']);
@@ -77,6 +86,11 @@ class FileController extends Controller
                 else{
                     throw new HttpException(400, 'Lỗi upload file');
                 }
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Upload file(s) thành công !',
+                    'url' => env('FILE_URL').$upload['name'],
+                ]);
             }
 
 
@@ -93,11 +107,6 @@ class FileController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Upload file(s) thành công !',
-            'url' => env('FILE_URL').$upload['name'],
-        ]);
     }
 
     /**
@@ -183,8 +192,8 @@ class FileController extends Controller
     public function uploadFile($file){
         try{
             $fileOriginalName = $file->getClientOriginalName();
-            if(explode(' ', $fileOriginalName)){
-
+            if(!explode(' ', $fileOriginalName)){
+                $fileOriginalName = Str::slug($fileOriginalName);
             }
             $fileOriginalExtension = $file->getClientOriginalExtension();
             if(!in_array($fileOriginalExtension, EXTENSION_UPLOAD)){
@@ -197,11 +206,9 @@ class FileController extends Controller
             if(!empty($checkFileExists)){
                 $fileOriginalName = explode('.', $fileOriginalName)[0].'_'.time().'.'.$fileOriginalExtension;
             }
-            $fileSystem = Storage::disk('public');
-            if($fileSystem->putFileAs(PATH_UPLOAD, $file, $fileOriginalName)){
-                $fileData['name'] = $fileOriginalName ?? null;
-                $fileData['extension'] = $fileOriginalExtension ?? null;
-            }
+            $file->storeAs(PATH_UPLOAD, $fileOriginalName, 'public');
+            $fileData['name'] = $fileOriginalName ?? null;
+            $fileData['extension'] = $fileOriginalExtension ?? null;
         }
         catch(HttpException $e){
             return response()->json([
@@ -226,7 +233,8 @@ class FileController extends Controller
                     'message' => 'Không tìm thấy file !',
                 ], 404);
             }
-            $file = public_path('/storage/images/'.$fileName);
+            // $file = public_path('/storage/images/'.$fileName);
+            $file = Storage::disk('public')->get(PATH_UPLOAD.$fileName);
         }
         catch(HttpException $e){
             return response()->json([
@@ -238,6 +246,6 @@ class FileController extends Controller
                 ],
             ], $e->getStatusCode());
         }
-        return response()->file($file);
+        return !empty($file) ? response($file)->header('Content-type', 'image/'.$data->extension) : null;
     }
 }
