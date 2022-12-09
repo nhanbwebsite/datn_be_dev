@@ -45,34 +45,61 @@ class FileController extends Controller
     public function store(Request $request, FileUploadValidator $uploadValidator)
     {
         $uploadValidator->validate($request->all());
+        $returnFileName = '';
         try{
             DB::beginTransaction();
-            if($request->has('files')){
+            if(is_array($request->file('files'))){
                 foreach($request->file('files') as $file){
+                    $extension = $file->getClientOriginalExtension();
                     if(round(($file->getSize()/1024)/1024, 4) > 20){
                         return response()->json([
                             'status' => 'error',
                             'message' => 'File vượt quá 20MB !',
                         ], 422);
                     }
-                    if(!in_array($file->getClientOriginalExtension(), EXTENSION_UPLOAD)){
+                    if(!in_array(strtolower($extension), EXTENSION_UPLOAD)){
                         return response()->json([
                             'status' => 'error',
                             'message' => 'Chỉ hỗ trợ định dạng '. implode(", ", EXTENSION_UPLOAD),
                         ], 422);
                     }
 
-                    $extension = $file->getClientOriginalExtension();
                     $fileName = $file->getClientOriginalName() . '_' . time() . '.' . $extension;
                     $file->storeAs(PATH_UPLOAD, $fileName, 'public');
 
-                    File::create([
+                    $create = File::create([
                         'name' => $fileName,
                         'extension' => $extension,
                         'created_by' => $request->user()->id,
                         'updated_by' => $request->user()->id,
                     ]);
                 }
+            }
+            else{
+                $file = $request->file('files');
+                $extension = $file->getClientOriginalExtension();
+                if(round(($file->getSize()/1024)/1024, 4) > 20){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'File vượt quá 20MB !',
+                    ], 422);
+                }
+                if(!in_array(strtolower($extension), EXTENSION_UPLOAD)){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Chỉ hỗ trợ định dạng '. implode(", ", EXTENSION_UPLOAD),
+                    ], 422);
+                }
+
+                $fileName = $file->getClientOriginalName() . '_' . time() . '.' . $extension;
+                $file->storeAs(PATH_UPLOAD, $fileName, 'public');
+
+                $create = File::create([
+                    'name' => $fileName,
+                    'extension' => $extension,
+                    'created_by' => $request->user()->id,
+                    'updated_by' => $request->user()->id,
+                ]);
             }
 
             DB::commit();
@@ -93,6 +120,7 @@ class FileController extends Controller
             'status' => 'success',
             'message' => 'Upload file(s) thành công !',
         ]);
+
 
         // $input['files'] = $request->file('files');
         // $uploadValidator->validate($input);
