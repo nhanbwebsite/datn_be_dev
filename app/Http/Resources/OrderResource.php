@@ -23,7 +23,7 @@ class OrderResource extends JsonResource
                 $dataDetails[$key]['variant_name'] = $detail->variant->variant->variant_name;
                 $dataDetails[$key]['color_id'] = $detail->color_id;
                 $dataDetails[$key]['color_name'] = $detail->variant->pro_variant->color->name;
-                $dataDetails[$key]['product_image'] = $detail->product->image;
+                $dataDetails[$key]['product_image'] = $detail->product->url_image;
                 $dataDetails[$key]['price'] = $detail->price;
                 $dataDetails[$key]['quantity'] = $detail->quantity;
             }
