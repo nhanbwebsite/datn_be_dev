@@ -22,6 +22,7 @@ class LoadPostByCateResouce extends JsonResource
                     $posts[$key]['subcategory_id'] = $postsByCate->subcategory_id;
                     $posts[$key]['user_id'] = $postsByCate->user_id;
                     $posts[$key]['title'] = $postsByCate->title;
+                    $posts[$key]['image'] = $postsByCate->image;
                     $posts[$key]['short_des'] = $postsByCate->short_des;
                     $posts[$key]['content_post'] = $postsByCate->content_post;
                     $posts[$key]['meta_title'] = $postsByCate->meta_title;
