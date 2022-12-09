@@ -9,5 +9,5 @@ use App\Http\Controllers\FooterContentController;
         Route::delete('/{id}',[FooterContentController::class,'destroy']);
     });
     Route::get('/client/footer-content/load-all',[FooterContentController::class,'loadAll']);
-    Route::get('load-footer-content/{id}',[FooterContentController::class,'loadClient']);
+    Route::get('client/load-footer-content/{id}',[FooterContentController::class,'loadClient']);
 
