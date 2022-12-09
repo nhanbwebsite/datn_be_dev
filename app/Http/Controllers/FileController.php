@@ -63,7 +63,7 @@ class FileController extends Controller
                         ], 422);
                     }
 
-                    $fileName = Str::slug($file->getClientOriginalName() . '_' . time() . '.' . $extension);
+                    $fileName = Str::slug(explode(".", $file->getClientOriginalName())[0]) . '_' . time() . '.' . $extension;
                     $file->storeAs(PATH_UPLOAD, $fileName, 'public');
 
                     $create = File::create([
@@ -90,7 +90,7 @@ class FileController extends Controller
                     ], 422);
                 }
 
-                $fileName = Str::slug($file->getClientOriginalName() . '_' . time() . '.' . $extension);
+                $fileName = Str::slug(explode(".", $file->getClientOriginalName())[0]) . '_' . time() . '.' . $extension;
                 $file->storeAs(PATH_UPLOAD, $fileName, 'public');
 
                 $create = File::create([
