@@ -240,5 +240,34 @@ class FooterContentController extends Controller
         return response()->json(new LoadFooterContentClientCollection($data));
     }
 
+    public function loadClient($id)
+    {
+        try{
+            DB::beginTransaction();
+            $data = FooterContent::find($id);
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Bài viết không tồn tại !'
+                ], 404);
+            }
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new FooterContentResource($data),
+        ]);
+    }
 
 }

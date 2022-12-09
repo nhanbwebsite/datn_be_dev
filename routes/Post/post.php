@@ -9,3 +9,5 @@ use App\Http\Controllers\PostController;
         Route::delete('/{id}',[PostController::class,'destroy']);
     });
     Route::get('/load-posts-by-view',[PostController::class,'loadByViews']);
+    Route::get('load-post/',[PostController::class,'loadAllPostClient']);
+    Route::get('load-post/{id}',[PostController::class,'loaPostClient']);

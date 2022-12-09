@@ -246,4 +246,69 @@ class PostController extends Controller
         }
         return response()->json(new PostCollection($data));
     }
+
+    public function loadAllPostClient(Request $request)
+    {
+        $input = $request->all();
+        $input['limit'] = $request->limit;
+        try{
+            $data = Post::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input) {
+                if(!empty($input['title'])){
+                    $query->where('title', 'like', '%'.$input['title'].'%');
+                }
+                if(!empty($input['slug'])){
+                    $query->where('slug', $input['slug']);
+                }
+                if(!empty($input['user_id'])){
+                    $query->where('user_id', $input['user_id']);
+                }
+                if(!empty($input['subcategory_id'])){
+                    $query->where('subcategory_id', $input['subcategory_id']);
+                }
+            })->orderBy('created_at', 'desc')->paginate($input['limit'] ?? 10);
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new PostCollection($data));
+    }
+
+    public function loaPostClient($id)
+    {
+        try{
+            DB::beginTransaction();
+            $data = Post::find($id);
+            if(empty($data)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Bài viết không tồn tại !'
+                ], 404);
+            }
+            $data->views = $data->views + 1;
+            $data->save();
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new PostResource($data),
+        ]);
+    }
 }
