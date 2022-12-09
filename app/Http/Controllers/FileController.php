@@ -74,7 +74,7 @@ class FileController extends Controller
                         'updated_by' => $request->user()->id,
                     ]);
 
-                    $url[] = $create->name;
+                    $url[] = env('FILE_URL').$create->name;
                 }
             }
             else{
@@ -103,7 +103,7 @@ class FileController extends Controller
                     'updated_by' => $request->user()->id,
                 ]);
 
-                $url[] = $create->name;
+                $url[] = env('FILE_URL').$create->name;
             }
 
             DB::commit();
