@@ -280,7 +280,7 @@ class PostController extends Controller
         return response()->json(new PostCollection($data));
     }
 
-    public function loaPostClient($id)
+    public function loadPostClient($id)
     {
         try{
             DB::beginTransaction();
