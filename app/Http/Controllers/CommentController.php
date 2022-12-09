@@ -250,19 +250,26 @@ class CommentController extends Controller
         try{
             DB::beginTransaction();
             $user = $request->user();
-            if(!is_array($id)){
+            dd($user);
                 $data = Comment::find($id);
-                if(empty($data)){
+
+                    if(empty($data)){
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Không tìm thấy bình luận !',
+                        ], 404);
+                    }
+                if($user->role_id == 4 || $user->role_id == 1 || $user->id == $data->user_id){
+                    $data->deleted_by = $user->id;
+                    $data->save();
+                    $data->delete();
+                } else{
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'Không tìm thấy bình luận !',
-                    ], 404);
+                        'message' => 'Bạn không có quyền xóa bình luận này !',
+                    ], 401);
                 }
-                $data->deleted_by = $user->id;
-                $data->save();
 
-                $data->delete();
-            }
             DB::commit();
         }
         catch(HttpException $e){

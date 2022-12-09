@@ -7,7 +7,7 @@ use App\Http\Controllers\CommentController;
         Route::post('/', 'store');
         Route::get('/{id}', 'show')->middleware(['checkAction:all,view-comment']);
         Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-comment']);
+        Route::delete('/{id}', 'destroy');
     });
     Route::get('/commentsAll', [CommentController::class,'index']);
     Route::get('/commentsAllByIdproduct/{id}', [CommentController::class,'getAllCommentByProductId']);
