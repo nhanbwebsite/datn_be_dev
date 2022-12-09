@@ -250,7 +250,7 @@ class CommentController extends Controller
         try{
             DB::beginTransaction();
             $user = $request->user();
-            dd($user);
+
                 $data = Comment::find($id);
 
                     if(empty($data)){
