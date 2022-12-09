@@ -45,7 +45,6 @@ class FileController extends Controller
     public function store(Request $request, FileUploadValidator $uploadValidator)
     {
         $uploadValidator->validate($request->all());
-        $returnFileName = '';
         try{
             DB::beginTransaction();
             if(is_array($request->file('files'))){
@@ -64,7 +63,7 @@ class FileController extends Controller
                         ], 422);
                     }
 
-                    $fileName = $file->getClientOriginalName() . '_' . time() . '.' . $extension;
+                    $fileName = Str::slug($file->getClientOriginalName() . '_' . time() . '.' . $extension);
                     $file->storeAs(PATH_UPLOAD, $fileName, 'public');
 
                     $create = File::create([
@@ -91,7 +90,7 @@ class FileController extends Controller
                     ], 422);
                 }
 
-                $fileName = $file->getClientOriginalName() . '_' . time() . '.' . $extension;
+                $fileName = Str::slug($file->getClientOriginalName() . '_' . time() . '.' . $extension);
                 $file->storeAs(PATH_UPLOAD, $fileName, 'public');
 
                 $create = File::create([
