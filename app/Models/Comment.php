@@ -54,7 +54,7 @@ class Comment extends Model
 
 
     public function repComment(){
-        return $this->hasOne(Rep_comment::class, 'id_comment', 'id');
+        return $this->hasMany(Rep_comment::class, 'id_comment', 'id');
     }
 
 
