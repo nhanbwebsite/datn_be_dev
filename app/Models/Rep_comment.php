@@ -26,6 +26,10 @@ class Rep_comment extends Model
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by', 'id');
+    }
+
     public static function getUserName($userId){
         $data = DB::table('users')
                 ->where('users.id',$userId)
