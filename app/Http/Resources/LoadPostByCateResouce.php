@@ -41,7 +41,7 @@ class LoadPostByCateResouce extends JsonResource
                 'brand_id'=>$this->brand_id,
                 'slug'=>$this->slug,
                 'is_active'=>$this->is_active,
-                'post' => $posts?? null,
+                'post' => $posts ?? null,
                 'created_at' => $this->created_at->format('d-m-Y H:i:s'),
                 'updated_at' => $this->updated_at->format('d-m-Y H:i:s'),
                 'created_by'    => $this->createdBy->name ?? null,
