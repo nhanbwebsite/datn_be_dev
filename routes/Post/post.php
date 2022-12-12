@@ -10,4 +10,4 @@ use App\Http\Controllers\PostController;
     });
     Route::get('client/load-posts-by-view',[PostController::class,'loadByViews']);
     Route::get('client/load-post/',[PostController::class,'loadAllPostClient']);
-    Route::get('client/load-post/{id}',[PostController::class,'loadPostClient']);
+    Route::get('client/load-post/{id}',[PostController::class,'loadDetailPostClient']);

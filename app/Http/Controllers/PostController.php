@@ -158,7 +158,7 @@ class PostController extends Controller
                 ], 404);
             }
 
-            $data->subcategory_id = $input['category_id'] ?? $data->subcategory_id;
+            $data->subcategory_id = $input['subcategory_id'] ?? $data->subcategory_id;
             $data->title = $input['title'] ?? $data->title;
             $data->short_des = $input['short_des'] ?? $data->short_des;
             $data->content_post = $input['content_post'] ?? $data->content_post;
@@ -279,8 +279,7 @@ class PostController extends Controller
         }
         return response()->json(new PostCollection($data));
     }
-
-    public function loadPostClient($id)
+    public function loadDetailPostClient($id)
     {
         try{
             DB::beginTransaction();
@@ -311,4 +310,6 @@ class PostController extends Controller
             'data' => new PostResource($data),
         ]);
     }
-}
+
+    }
+
