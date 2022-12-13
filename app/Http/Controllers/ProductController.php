@@ -215,7 +215,7 @@ class ProductController extends Controller
         $validator->validate($input);
         try {
             DB::beginTransaction();
-
+            $collection_images = implode(',',$request->collection_images);
             $product = Product::find($id);
             if(empty($product)){
                 return response()->json([
@@ -231,8 +231,8 @@ class ProductController extends Controller
             $product->slug = Str::slug($request->name);
             $product->description = $request->description ?? $product->description;
             $product->url_image = $request->url_image ?? $product->url_image;
+            $product->collection_images = $collection_images ?? null;
             $product->specification_infomation = $request->specification_infomation ?? $product->specification_infomation;
-
             $product->subcategory_id = $request->subcategory_id ?? $product->subcategory_id;
             // $product->price = $request->price ?? $product->price;
             // $product->discount = $request->discount ?? $product->discount;
