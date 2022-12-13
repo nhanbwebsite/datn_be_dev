@@ -314,7 +314,7 @@ class CommentController extends Controller
     {
         // $input['limit'] = $request->limit;
         try{
-            $data = Comment::where('product_id',$pro_id)->where('is_active',1)->paginate(9);
+            $data = Comment::where('product_id',$pro_id)->where('deleted_at',null)->paginate(9);
             // $data = Comment::where('is_active', !empty($input['is_active']) ? $input['is_active'] : 1)->where(function($query) use($input){
             //     if(!empty($input['user_id'])){
             //         $query->where('user_id', $input['user_id']);
@@ -340,7 +340,7 @@ class CommentController extends Controller
                 ->join('comments','rep_comments.id_comment','comments.id')
                 ->join('users','comments.user_id','users.id')
                 ->where('rep_comments.id_comment',$id)
-                ->where('rep_comments.is_active',1)
+                ->where('rep_comments.deleted_at',null)
                 ->get();
 
         return response()->json([
