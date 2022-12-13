@@ -10,7 +10,7 @@ class FooterContentCreateValidator extends ValidatorBase
         return [
             'category_id' => 'required|exists:footer_category,id',
             'title' => 'required|max:255',
-            'slug' => 'string|max:255|unique_deleted_at_null:footer_content,slug',
+            'slug' => 'string|max:255',
             'content'=>'required',
             'is_active'=> 'numeric',
         ];
@@ -24,7 +24,6 @@ class FooterContentCreateValidator extends ValidatorBase
             'title.max' => ':attribute đã vượt qua độ dài cho phép !',
             'slug.string' => ':attribute phải là chuỗi !',
             'slug.max' => ':attribute tối đa 255 ký tự !',
-            'slug.unique_deleted_at_null' => ':attribute đã tồn tại !',
             'content.required'=> ':attribute không được để trống !',
             'is_active.numeric' => ':attribute phải là số !',
         ];
