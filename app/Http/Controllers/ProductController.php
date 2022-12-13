@@ -32,6 +32,7 @@ class ProductController extends Controller
        foreach($dataProducts as $key => $value){
 
                 $value ->create_by_name = product::getNameCreated($value->created_by)->created_by_name;
+                $value->collection_images = explode(',',$value->collection_images);
                 $value-> cartegory_id = product::category($value->id)->cartegory_id;
                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
@@ -93,6 +94,7 @@ class ProductController extends Controller
 
         $input= $request->all();
         $user = $request->user();
+        $collection_images = implode(',',$request->collection_images);
         $validator->validate($input);
         try {
             DB::beginTransaction();
@@ -106,6 +108,7 @@ class ProductController extends Controller
                 'slug' => !empty($input['slug']) ? Str::slug($input['slug']) : Str::slug($input['name']),
                 'description' => $input['description'] ?? null,
                 'url_image' => $input['url_image'],
+                'collection_images' => $collection_images,
                 // 'price' => $input['price'],
                 // 'discount' => $input['discount'],
                 'specification_infomation' => $input['specification_infomation'] ?? null,

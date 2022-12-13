@@ -20,6 +20,7 @@ class Product extends Model
         'slug',
         'description',
         'url_image',
+        'collection_images',
         'price',
         'discount',
         'specification_infomation',

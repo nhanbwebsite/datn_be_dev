@@ -26,6 +26,7 @@ class ProductResource extends JsonResource
                 'meta_description' => $this->meta_description,
                 'description'   => $this->description,
                 'url_image'     => $this->url_image,
+                'collection_images' => explode(',',$this->collection_images) ?? null,
                 // 'price'         => $this->price,
                 // 'price_formatted' => number_format($this->price ?? 0).'đ',
                 // 'discount'      => $this->discount,
