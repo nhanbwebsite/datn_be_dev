@@ -304,14 +304,14 @@ class SubcategoryController extends Controller
     public function loadPostByViewOfCate($id)
     {
         try{
-            $data = SubCategory::find($id);
-            if(empty($data)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Danh mục không tồn tại, vui lòng kiểm tra lại'
-                ], 404);
+            $data = SubCategory::where('is_active', 1)
+            ->where('id',$id)
+            ->get();
+            foreach( $data as $value){
+                // push object contact
+                $value->posts = SubCategory::postViewByCategoryID($value->id);
             }
-        } catch(HttpException $e){
+        }  catch(HttpException $e){
             return response()->json([
                 'status' => 'error',
                 'message' => [
@@ -322,8 +322,8 @@ class SubcategoryController extends Controller
             ], $e->getStatusCode());
         }
         return response()->json([
-            'status' => 'success',
-            'data' => new LoadPostByCateResouce($data),
+            'status'=>'success',
+            'data' =>$data
         ]);
     }
 

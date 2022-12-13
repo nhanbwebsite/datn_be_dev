@@ -7,7 +7,10 @@ use App\Http\Controllers\PostController;
         Route::get('/{id}',[PostController::class,'show']);
         Route::put('/{id}',[PostController::class,'update']);
         Route::delete('/{id}',[PostController::class,'destroy']);
+        Route::get('/statistical',[PostController::class,'statisticalTotalPost']);
     });
     Route::get('client/load-posts-by-view',[PostController::class,'loadByViews']);
     Route::get('client/load-post/',[PostController::class,'loadAllPostClient']);
     Route::get('client/load-post/{id}',[PostController::class,'loadDetailPostClient']);
+
+    Route::get('admin/statistical',[PostController::class,'statisticalTotalPost']);

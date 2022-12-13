@@ -51,6 +51,10 @@ class SubCategory extends Model
     public function post(){
         return $this->hasMany(FooterContent::class, 'category_id', 'id');
     }
+    public static function postViewByCategoryID($subcategory_id){
+        $data = Post::where('subcategory_id',$subcategory_id)->orderBy('views','desc')->get();
+        return $data;
+    }
 }
 
 
