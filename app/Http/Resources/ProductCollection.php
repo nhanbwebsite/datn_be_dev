@@ -18,7 +18,7 @@ class ProductCollection extends ResourceCollection
         if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $value){
-                dd($value);
+
                 $result['data'][] = [
                     'id'            => $value->id,
                     'code'          => $value->code,
@@ -29,6 +29,7 @@ class ProductCollection extends ResourceCollection
                     'meta_description' => $value->meta_description,
                     'description'   => $value->description,
                     'url_image'     => $value->url_image,
+                    'collection_images' => explode(',', $value->collection_images) ?? null,
                     'price'         => $value->price,
                     'price_formatted' => number_format($value->price ?? 0).'đ',
                     'discount'      => $value->discount,

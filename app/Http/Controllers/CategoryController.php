@@ -31,7 +31,7 @@ class CategoryController extends Controller
                 if(!empty($input['slug'])){
                     $query->where('slug', $input['slug']);
                 }
-            })->orderBy('created_at', 'desc')->paginate($input['limit']);
+            })->orderBy('created_at', 'desc')->paginate($input['limit'] ?? 9);
         } catch(Exception $e){
             return response()->json([
                 'status' => 'error',
@@ -260,7 +260,7 @@ class CategoryController extends Controller
         try{
             $data = Category::where('is_active', 1)
             ->where('is_post',0)
-            ->get();
+            ->paginate(9);
             foreach( $data as $value){
                 // push object subscategories
                 $value->subs = Category::subByCategoryID($value->id);
@@ -285,7 +285,7 @@ class CategoryController extends Controller
         try{
             $data = Category::where('is_active', 1)
             ->where('is_post',1)
-            ->get();
+            ->paginate(9);
             foreach( $data as $value){
                 // push object subscategories
                 $value->subs = Category::subByCategoryID($value->id);
