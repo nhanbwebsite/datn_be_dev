@@ -255,6 +255,8 @@ class CommentController extends Controller
                 $data = Rep_comment::find($request->rep_id_comment);
                 if($user->role_id == 4 || $user->role_id == 1 || $user->id == $data->created_by){
                     if($data){
+                        $data->is_active = 0;
+                        $data->save();
                         $data->delete();
                     } else{
                         return response()->json([
@@ -262,7 +264,6 @@ class CommentController extends Controller
                             'message' => 'Không tìm thấy bình luận !',
                         ], 404);
                     }
-
                 }
 
             } else{
@@ -277,7 +278,9 @@ class CommentController extends Controller
                 }
                 if($user->role_id == 4 || $user->role_id == 1 || $user->id == $data->user_id){
                     $data->deleted_by = $user->id;
+                    $data->is_active = 0;
                     $data->save();
+
                     $data->delete();
                     } else{
                         return response()->json([
