@@ -340,7 +340,7 @@ class CommentController extends Controller
                 ->join('comments','rep_comments.id_comment','comments.id')
                 ->join('users','comments.user_id','users.id')
                 ->where('rep_comments.id_comment',$id)
-                ->where('is_active',1)
+                ->where('rep_comments.is_active',1)
                 ->get();
 
         return response()->json([
