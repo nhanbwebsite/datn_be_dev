@@ -249,7 +249,7 @@ class ProductController extends Controller
 
             if(isset($request->variant_ids)){
                 $deleted = DB::table('productVariant')->where('product_id', $product->id)->get();
-                dd($deleted);
+
                 foreach($request->variant_ids as $key => $valueVariant) {
 
                     $dataWaitUpdate = ProductVariantDetail::where('product_id',$product->id)
