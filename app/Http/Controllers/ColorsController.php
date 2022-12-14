@@ -15,12 +15,27 @@ class ColorsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $data = Color::all();
+        $input = $request->all();
+        $dataReturn = '';
+        $data = Color::where('is_active',$input['is_active'] ?? 1)->where('deleted_at',null)->where(function ($query) use ($input){
+            if(!empty($input['name'])){
+                $query->where('name', 'like', '%'.$input['name'].'%');
+            }
+            if(!empty($input['slug'])){
+                $query->where('slug', 'like', '%'.$input['slug'].'%');
+            }
+        });
+
+        if(isset($input['paginate'])) {
+          $dataReturn =  $data->paginate($input['paginate']);
+        } else{
+            $dataReturn = $data->get();
+        }
         return response()->json([
             'status' => 'success',
-            'data'  => $data,
+            'data'  => $dataReturn,
         ],200);
     }
 
