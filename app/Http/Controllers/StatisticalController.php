@@ -14,7 +14,7 @@ class StatisticalController extends Controller
     public function index()
     {
         $data = productAmountByWarehouse::all();
-        dd($data);
+
     }
 
     /**

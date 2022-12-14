@@ -82,7 +82,8 @@ class SubcategoryController extends Controller
                 'category_id' => $request->category_id,
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
-                'brand_id' => $request->brand_id
+                'brand_id' => $request->brand_id,
+                'is_post' => $request->is_post ?? null
             ]);
            } else{
             $create = SubCategory::create([
@@ -325,6 +326,26 @@ class SubcategoryController extends Controller
             'status'=>'success',
             'data' =>$data
         ]);
+    }
+
+
+    public function getSubcatePosts(Request $request){
+        $input = $request->all();
+        $data = SubCategory::where('is_active', 1)
+        ->where('is_post',1)
+        ->where('deleted_at',null)->where(function ($query) use ($input) {
+            if(!empty($input['name'])){
+                $query->where('name', 'like', '%'.$input['name'].'%');
+            }
+            if(!empty($input['slug'])){
+                $query->where('slug', 'like', '%'.$input['slug'].'%');
+            }
+       })->paginate($input['limit'] ?? 9);
+        return response()->json([
+            'message' => 'SubCategories Posts',
+            'data' => $data
+         ],200);
+
     }
 
 }
