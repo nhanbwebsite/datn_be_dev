@@ -238,18 +238,26 @@ class OrderController extends Controller
                 foreach($update->details as $detail){
                     $prod_variant = ProductVariantDetail::where('product_id', $detail->product_id)->where('variant_id', $detail->variant_id)->where('is_active', 1)->first();
                     $prod = productAmountByWarehouse::where('product_id', $detail->product_id)->where('pro_variant_id', $prod_variant->id)->where('color_id', $detail->color_id)->first();
+                    $product = Product::where('id', $detail->product_id)->where('is_active', 1)->first();
+                    $variant = ProductVariant::where('id', $detail->variant_id)->where('is_active', 1)->first();
+                    $color = ProductVariant::where('id', $detail->color_id)->where('is_active', 1)->first();
                     if(empty($prod)){
-                        $product = Product::where('id', $detail->product_id)->where('is_active', 1)->first();
-                        $variant = ProductVariant::where('id', $detail->variant_id)->where('is_active', 1)->first();
-                        $color = ProductVariant::where('id', $detail->color_id)->where('is_active', 1)->first();
                         return response()->json([
                             'status' => 'error',
                             'message' => '['.$product->name.'] Không tồn tại biến thể ['.$variant->variant_name.'] ['.$color->name.'] !',
                         ], 404);
                     }
 
-                    $prod->product_amount = $prod->product_amount - $detail->quantity;
-                    $prod->save();
+                    if($prod->product_amount > $detail->quantity){
+                        $prod->product_amount = $prod->product_amount - $detail->quantity;
+                        $prod->save();
+                    }
+                    else{
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => '['.$product->name.'] ['.$variant->variant_name.'] ['.$color->name.'] Số lượng còn lại trong kho không đủ !'
+                        ], 400);
+                    }
                 }
             }
 
