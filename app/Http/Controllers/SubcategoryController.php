@@ -89,7 +89,8 @@ class SubcategoryController extends Controller
             $create = SubCategory::create([
                 'category_id' => $request->category_id,
                 'name' => $request->name,
-                'slug' => Str::slug($request->name)
+                'slug' => Str::slug($request->name),
+                'is_post' => $request->is_post ?? null
             ]);
            }
 

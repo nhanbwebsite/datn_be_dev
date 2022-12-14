@@ -9,7 +9,7 @@ Route::prefix('products')->middleware('auth:sanctum')->group(function (){
     Route::post('/',[ProductController::class,'store']);
     Route::put('/update/{id}',[ProductController::class,'update']);
     Route::delete('/{id}',[ProductController::class,'destroy']);
-
+    Route::get('/',[ProductController::class,'index']);
 
     // delete variant of product
 });
@@ -25,7 +25,7 @@ Route::prefix('variant_of_product')->middleware('auth:sanctum')->group(function 
 });
 // public route products
 Route::get('/client/products/{id}',[ProductController::class,'show']);
-Route::get('/client/products',[ProductController::class,'index']);
+Route::get('/client/products',[ProductController::class,'productsAllForClient']);
 
 Route::get('findProductByStore',[ProductController::class,'productByStore']);
 Route::get('productsBySubcate/{subId}',[ProductController::class,'producstBySubcategoryId']);

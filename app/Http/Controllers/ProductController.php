@@ -25,7 +25,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $input = $request->all();
+       $input = $request->all();
        $dataProducts = Product::where('is_active',$input['is_active'] ?? 1)->where('deleted_at',null)->where(function ($query) use ($input) {
             if(!empty($input['name'])){
                 $query->where('name', 'like', '%'.$input['name'].'%');
@@ -653,6 +653,34 @@ class ProductController extends Controller
         $data = new ProductsHaveComemntCollection($data);
         return response()->json(
              $data,200);
+
+    }
+
+
+    public function productsAllForClient(Request $request){
+        // $input = $request->all();
+        $dataProducts = Product::where('is_active',$input['is_active'] ?? 1)->where('deleted_at',null)->get();
+
+        $dataReturn = [];
+        foreach($dataProducts as $key => $value){
+
+                 $value ->create_by_name = product::getNameCreated($value->created_by)->created_by_name;
+                 $value->collection_images = explode(',',$value->collection_images);
+                 $value-> cartegory_id = product::category($value->id)->cartegory_id;
+                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
+                 // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
+                 $value->variants = Product::productVariants($value->id);
+                 array_push($dataReturn,[
+                     "product" =>  $value,
+                 ]);
+        }
+     //    return response()->json([
+     //     'data' => $dataReturn
+     //    ]);
+         return response()->json([
+             "data" => $dataProducts
+         ]);
+
 
     }
 
