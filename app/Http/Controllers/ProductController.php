@@ -25,8 +25,15 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // $input = $request->all();
-       $dataProducts = Product::all();
+        $input = $request->all();
+       $dataProducts = Product::where('is_active',$input['is_active'] ?? 1)->where('deleted_at',null)->where(function ($query) use ($input) {
+            if(!empty($input['name'])){
+                $query->where('name', 'like', '%'.$input['name'].'%');
+            }
+            if(!empty($input['slug'])){
+                $query->where('slug', 'like', '%'.$input['slug'].'%');
+            }
+       })->paginate($input['limit'] ?? 9);
 
        $dataReturn = [];
        foreach($dataProducts as $key => $value){
