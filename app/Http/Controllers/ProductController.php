@@ -101,7 +101,7 @@ class ProductController extends Controller
 
         $input= $request->all();
         $user = $request->user();
-        $collection_images = implode(',',$request->collection_images);
+       $collection_images = isset($request->collection_images) ? implode(',',$request->collection_images) : null;
         $validator->validate($input);
         try {
             DB::beginTransaction();
@@ -222,7 +222,7 @@ class ProductController extends Controller
         $validator->validate($input);
         try {
             DB::beginTransaction();
-            $collection_images = implode(',',$request->collection_images);
+            $collection_images = isset($request->collection_images) ? implode(',',$request->collection_images) : null;
             $product = Product::find($id);
             if(empty($product)){
                 return response()->json([
