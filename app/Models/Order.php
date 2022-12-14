@@ -28,6 +28,7 @@ class Order extends Model
         'shipping_method_id',
         'status',
         'cancel_reason',
+        'cancel_by',
         'created_at',
         'updated_at',
         'deleted_at',

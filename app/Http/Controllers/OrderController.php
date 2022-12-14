@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderCollection;
 use App\Http\Resources\OrderResource;
+use App\Http\Validators\Order\CancelOrderValidator;
 use App\Http\Validators\Order\ClientCancelOrderValidator;
 use App\Http\Validators\Order\OrderCreateValidator;
 use App\Http\Validators\Order\OrderDetailCreateValidator;
 use App\Http\Validators\Order\OrderUpdateValidator;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Product;
+use App\Models\productAmountByWarehouse;
+use App\Models\ProductVariant;
+use App\Models\ProductVariantDetail;
 use App\Models\VNPayOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -197,7 +202,7 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, OrderUpdateValidator $validator)
+    public function update(Request $request, $id, OrderUpdateValidator $validator, CancelOrderValidator $cancelValidator)
     {
         $input = $request->all();
         $validator->validate($input);
@@ -213,8 +218,39 @@ class OrderController extends Controller
                 ], 404);
             }
 
-            if(!empty($input['coupon_id'])){
-                $orderUser = Order::where('user_id', $user->id)->get()->toArray();
+            if($input['status'] == ORDER_STATUS_CANCELED){
+                if(!in_array($update->status, ORDER_STATUS_CAN_CANCEL)){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Đơn hàng đã ở trạng thái không thể hủy !',
+                    ], 400);
+                }
+                $cancelValidator->validate($input);
+                $update->cancel_by = $user->id;
+            }
+
+            if($input['status'] == ORDER_STATUS_RETURNED){
+                $cancelValidator->validate($input);
+                $update->cancel_by = $user->id;
+            }
+
+            if($input['status'] == ORDER_STATUS_COMPLETED){
+                foreach($update->details as $detail){
+                    $prod_variant = ProductVariantDetail::where('product_id', $detail->product_id)->where('variant_id', $detail->variant_id)->where('is_active', 1)->first();
+                    $prod = productAmountByWarehouse::where('product_id', $detail->product_id)->where('pro_variant_id', $prod_variant->id)->where('color_id', $detail->color_id)->first();
+                    if(empty($prod)){
+                        $product = Product::where('id', $detail->product_id)->where('is_active', 1)->first();
+                        $variant = ProductVariant::where('id', $detail->variant_id)->where('is_active', 1)->first();
+                        $color = ProductVariant::where('id', $detail->color_id)->where('is_active', 1)->first();
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => '['.$product->name.'] Không tồn tại biến thể ['.$variant->variant_name.'] ['.$color->name.'] !',
+                        ], 404);
+                    }
+
+                    $prod->product_amount = $prod->product_amount - $detail->quantity;
+                    $prod->save();
+                }
             }
 
             $update->status = $input['status'] ?? $update->status;
@@ -325,6 +361,7 @@ class OrderController extends Controller
 
             $data->cancel_reason = $input['cancel_reason'];
             $data->status = ORDER_STATUS_CANCELED;
+            $data->cancel_by = $user->id;
             $data->updated_by = $user->id;
             $data->save();
 
