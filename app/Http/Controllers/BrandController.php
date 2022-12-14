@@ -13,10 +13,22 @@ class BrandController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try{
-            $data = Brands::where('is_post',0)->paginate(9);
+            $input = $request->all();
+            $data = Brands::where('is_post',0)
+            ->where('is_active',1)
+            ->where('deleted_at',null)
+            ->where(function ($query) use ($input) {
+                if(!empty($input['name'])){
+                    $query->where('brand_name', 'like', '%'.$input['name'].'%');
+                }
+                if(!empty($input['slug'])){
+                    $query->where('slug', 'like', '%'.$input['slug'].'%');
+                }
+            })
+            ->paginate(9);
             return response()->json([
                 'status' => 'success',
                 'data' => $data
