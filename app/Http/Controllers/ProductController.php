@@ -688,9 +688,43 @@ class ProductController extends Controller
 
     }
 
+    public function getVariantByVarriantID($id){
+        $data = DB::table('variants')
+        ->where('is_active',1)
+        ->where('deleted_at',null)
+        ->where('variants.id',$id)->first();
+        return  $data;
+    }
 
-    public function checkProductsAmount(){
 
+    public function checkProductsAmount(Request $request){
+        $input = $request->all();
+        $data = DB::table('productAmountByWarehouse')
+        ->select('products.name','productAmountByWarehouse.product_amount','stores.name as Showroom','productAmountByWarehouse.pro_variant_id as variant_id')
+        ->leftJoin('warehouses','productAmountByWarehouse.warehouse_id','warehouses.id')
+        ->leftJoin('stores','warehouses.id','stores.warehouse_id')
+        ->leftJoin('products','productAmountByWarehouse.product_id','products.id')
+        // ->where('products.id',$request->product_id)
+        ->where('productAmountByWarehouse.warehouse_id',$request->warehouse_id)
+        ->where(function ($query) use ($input) {
+            if(!empty($input['name'])){
+                $query->where('products.name', 'like', '%'.$input['name'].'%');
+            }
+            if(!empty($input['slug'])){
+                $query->where('products.slug', 'like', '%'.$input['slug'].'%');
+            }
+         })
+        ->where('products.is_active',1)
+        ->paginate($input['paginate'] ?? 9);
+
+        foreach($data as $value){
+            $value->variant_id = $this->getVariantByVarriantID($value->variant_id)->id;
+            $value->variant_name = $this->getVariantByVarriantID($value->variant_id)->variant_name;
+        }
+
+        return response()->json([
+            'data' => $data
+        ],200);
     }
 
 
