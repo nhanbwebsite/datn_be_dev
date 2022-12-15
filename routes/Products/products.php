@@ -42,4 +42,5 @@ Route::get('client/getallproductbysubcategories',[ProductController::class,'getA
 
 //  phân quyền admin
 Route::get('/productsHaveComment',[ProductController::class,'productsHaveCommentAll']);
+Route::get('/getproductByWarehouse',[ProductController::class,'checkProductsAmount']);
 
