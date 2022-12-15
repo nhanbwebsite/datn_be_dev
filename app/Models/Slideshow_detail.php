@@ -13,6 +13,7 @@ class Slideshow_detail extends Model
         'id',
         'slideshow_id',
         'image',
+        'url',
         'is_active',
         'created_at',
         'updated_at',
