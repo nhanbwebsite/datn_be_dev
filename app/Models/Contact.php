@@ -15,7 +15,6 @@ class Contact extends Model
         'phone',
         'time',
         'category_id',
-        'slug',
         'is_active',
         'created_by',
         'updated_by',
