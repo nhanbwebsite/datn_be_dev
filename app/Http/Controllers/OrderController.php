@@ -450,11 +450,7 @@ class OrderController extends Controller
                 $variant = ProductVariant::where('id', $detail->variant_id)->where('is_active', 1)->first();
                 $color = Color::where('id', $detail->color_id)->where('is_active', 1)->first();
 
-                if(!empty($prod) && $prod->product_amount > $detail->quantity){
-                    $prod->product_amount = $prod->product_amount - $detail->quantity;
-                    $prod->save();
-                }
-                else{
+                if(empty($prod) || $prod->product_amount < $detail->quantity){
                     return response()->json([
                         'status' => 'error',
                         'message' => '['.$product->name.'] ['.$variant->variant_name.'] ['.$color->name.'] Số lượng còn lại trong kho ['.$warehouse->name.'] không đủ !',
