@@ -33,6 +33,7 @@ class ProductController extends Controller
             if(!empty($input['slug'])){
                 $query->where('slug', 'like', '%'.$input['slug'].'%');
             }
+
        })->paginate($input['limit'] ?? 9);
 
        $dataReturn = [];
@@ -368,11 +369,11 @@ class ProductController extends Controller
         // dd($request->all());
         //  sản phẩm theo địa chỉ tỉnh thành và quận huyện của cửa hàng
         if(!empty($request->province_id) && !empty($request->district_id)){
-            $data = DB::table('productAmountByWarehouse')
+            $data = DB::table('products')
             ->select('products.name','productAmountByWarehouse.product_amount','stores.name as Showroom')
             ->leftJoin('warehouses','productAmountByWarehouse.warehouse_id','warehouses.id')
             ->leftJoin('stores','warehouses.id','stores.warehouse_id')
-            ->leftJoin('products','productAmountByWarehouse.product_id','products.id')
+            ->leftJoin('productAmountByWarehouse','products.id','productAmountByWarehouse.product_id')
             ->where('products.id',$request->product_id)
             ->where('stores.province_id',$request->province_id)
             ->where('stores.district_id',$request->district_id)
@@ -384,7 +385,7 @@ class ProductController extends Controller
         }
         //  sảm phẩm  theo địa chỉ tỉnh thành cuửa hàng
         if(!empty($request->province_id)) {
-            $data = DB::table('productAmountByWarehouse')
+            $data = DB::table('products')
             ->select('products.name','productAmountByWarehouse.product_amount','stores.name as Showroom')
             ->leftJoin('warehouses','productAmountByWarehouse.warehouse_id','warehouses.id')
             ->leftJoin('stores','warehouses.id','stores.warehouse_id')
@@ -400,7 +401,7 @@ class ProductController extends Controller
 
         //  nối nhiều bảng dùng Query Builder cho đỡ rối ^^
         // tìm 1 sản phẩm (id sản phẩm) còn hàng nếu không truyền tỉnh thành phố và quận huyện
-        $data = DB::table('productAmountByWarehouse')
+        $data = DB::table('products')
         ->select('products.name','productAmountByWarehouse.product_amount','stores.name as Showroom')
         ->leftJoin('warehouses','productAmountByWarehouse.warehouse_id','warehouses.id')
         ->leftJoin('stores','warehouses.id','stores.warehouse_id')
