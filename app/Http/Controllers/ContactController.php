@@ -58,7 +58,6 @@ class ContactController extends Controller
     public function store(Request $request, ContactCreateValidator $validator  )
     {
         $input = $request->all();
-        $input['slug']=  Str::slug($input['name']) ?? null;
         $validator->validate($input);
         $user = $request->user();
         try {
@@ -68,7 +67,6 @@ class ContactController extends Controller
                 'phone'=>$input['phone'],
                 'time' =>$input['time'],
                 'category_id'=>$input['category_id'],
-                'slug' => $input['slug'],
                 'is_active' => $input['is_active'] ?? 1,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
@@ -130,7 +128,6 @@ class ContactController extends Controller
         public function update(Request $request, $id, ContactCreateValidator $validator)
     {
         $input = $request->all();
-        $input['slug'] = Str::slug($input['name']) ?? null;
         $validator->validate($input);
         $user = $request->user();
         try {
@@ -147,7 +144,6 @@ class ContactController extends Controller
                 'name' => mb_strtoupper(mb_substr($input['name'], 0, 1)).mb_substr($input['name'], 1),
                 'phone' => $input['phone'],
                 'time' => $input['time'],
-                'slug' => $input['slug'],
                 'updated_by' => $user->id,
             ]);
 
