@@ -229,10 +229,16 @@ class StoreController extends Controller
 
     public function getAllIDSotre(){
         $data = DB::table('stores')
-        ->select('stores.id as store_id','stores.province_id')->get();
+        ->select('stores.province_id')->get();
+
+        $arr = [];
+        foreach($data as $value){
+        array_push($arr, $value->province_id);
+        }
+        // dd($arr);
         return response()->json([
             'status' => 'success',
-            'data' => $data,
+            'data' => $arr,
         ]);
     }
 }
