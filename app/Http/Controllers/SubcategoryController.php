@@ -349,4 +349,23 @@ class SubcategoryController extends Controller
 
     }
 
+    public function getSubcateproducts(Request $request){
+        $input = $request->all();
+        $data = SubCategory::where('is_active', 1)
+        ->where('is_post',null)
+        ->where('deleted_at',null)->where(function ($query) use ($input) {
+            if(!empty($input['name'])){
+                $query->where('name', 'like', '%'.$input['name'].'%');
+            }
+            if(!empty($input['slug'])){
+                $query->where('slug', 'like', '%'.$input['slug'].'%');
+            }
+       })->paginate($input['limit'] ?? 9);
+        return response()->json([
+            'message' => 'SubCategories Posts',
+            'data' => $data
+         ],200);
+
+    }
+
 }

@@ -13,6 +13,7 @@ Route::prefix('admin')->group(function (){
 
     Route::delete('/subcategories/{id}',[SubcategoryController::class,'destroy']);
     Route::get('subcategoriesIsPosts',[SubcategoryController::class,'getSubcatePosts']);
+    Route::get('subcategoriesProducts',[SubcategoryController::class,'getSubcateproducts']);
 });
     Route::get('client/subcategories/loadPostByCate/{id}',[SubcategoryController::class,'loadByCate']);
 
