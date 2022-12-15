@@ -38,22 +38,25 @@ class SlideshowController extends Controller
     {
         $rules = [
             'title' => 'required',
-            'images' => 'required'
+            'images' => 'required',
+            'links' => 'required',
         ];
 
         $messages = [
             'title.required' => ':attribute không được để trống',
-            'images.required' => ':attribute không được để trống'
+            'images.required' => ':attribute không được để trống',
+            'links.required' => ':attribute không được để trống'
         ];
 
         $attributes = [
             'title' => 'Tiêu đề slideshow',
-            'images' => 'hình'
+            'images' => 'hình slideshow',
+            'links' => 'Đường dẫn cho slideshow'
         ];
 
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->only(['title','images']), $rules, $messages, $attributes);
+            $validator = Validator::make($request->only(['title','images','links']), $rules, $messages, $attributes);
             if($validator->fails()){
                 return response()->json([
                     'status' => 'error',
@@ -67,11 +70,12 @@ class SlideshowController extends Controller
                 'created_by' => auth('sanctum')->user()->id
             ]);
 
-            if(!empty($request->images)){
+            if(!empty($request->images) && !empty($request->links)){
                 foreach($request->images as $key => $value){
                     Slideshow_detail::create([
                         'slideshow_id' => $create->id,
                         'image' => $value,
+                        'url' => $request->links[$key],
                         'created_by' => auth('sanctum')->user()->id
                     ]);
                 }
