@@ -24,6 +24,7 @@ class ProductImportSlipController extends Controller
     public function index(Request $request)
     {
         $input = $request->all();
+        $dataReturn = '';
         try{
             $data = ProductImportSlipModel::where(function ($query) use ($input){
                 if(!empty($input['name'])){
@@ -37,6 +38,11 @@ class ProductImportSlipController extends Controller
                 }
                 if(!empty($input['status'])){
                     $query->where('status', $input['status']);
+                }
+                if(auth('sanctum')->user()){
+                    if(auth('sanctum')->user()->store_id){
+                        $query->where('store_id', auth('sanctum')->user()->store_id);
+                    }
                 }
             })->orderBy('created_at', 'desc')->paginate($input['limit'] ?? 10);
         }
