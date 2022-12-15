@@ -7,5 +7,7 @@
         Route::get('/{id}',[StoreController::class,'show'])->middleware(['checkAction:all,view-store']);
         Route::put('/{id}',[StoreController::class,'update'])->middleware(['checkAction:all,update-store']);
         Route::delete('/{id}',[StoreController::class,'destroy'])->middleware(['checkAction:all,delete-store']);
+
     });
+    route::get('allStoreID',[StoreController::class,'getAllIDSotre']);
     Route::get('/getStore',[StoreController::class,'index']);

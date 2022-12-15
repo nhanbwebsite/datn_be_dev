@@ -226,4 +226,13 @@ class StoreController extends Controller
             'message' => 'Đã xóa thành công cửa hàng '. "[$data->name]"
         ]);
     }
+
+    public function getAllIDSotre(){
+        $data = DB::table('stores')
+        ->select('stores.id as store_id','stores.province_id')->get();
+        return response()->json([
+            'status' => 'success',
+            'data' => $data,
+        ]);
+    }
 }
