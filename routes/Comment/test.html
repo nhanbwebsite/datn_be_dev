@@ -1,0 +1,38 @@
+<script>
+    let a = [
+    {
+      "id": 1,
+      "name": " Hà Nội"
+    },
+    {
+      "id": 2,
+      "name": " Hà Giang"
+    },
+    {
+      "id": 3,
+      "name": " Cao Bằng"
+    },
+    {
+      "id": 4,
+      "name": " Bắc Kạn"
+    },
+    {
+      "id": 5,
+      "name": " Tuyên Quang"
+    },
+    {
+      "id": 6,
+      "name": " Lào Cai"
+    }]
+
+    let b = [1,2,3,10,100,200]
+
+    let c = a.filter((item) => {
+        if(b.includes(item.id)){
+            return item.id
+        }
+    })
+
+    console.log(c);
+
+</script>
