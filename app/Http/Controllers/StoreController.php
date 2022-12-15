@@ -22,6 +22,7 @@ class StoreController extends Controller
     public function index(Request $request)
     {
         $input = $request->all();
+        $dataReturn = '';
         $input['limit'] = $request->limit;
         try {
             $data = Store::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input){

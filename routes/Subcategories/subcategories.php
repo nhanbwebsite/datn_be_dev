@@ -12,8 +12,9 @@ Route::prefix('admin')->group(function (){
     Route::patch('/subcategories/{id}',[SubcategoryController::class,'update']);
 
     Route::delete('/subcategories/{id}',[SubcategoryController::class,'destroy']);
+    Route::get('subcategoriesIsPosts',[SubcategoryController::class,'getSubcatePosts']);
 });
     Route::get('client/subcategories/loadPostByCate/{id}',[SubcategoryController::class,'loadByCate']);
 
     Route::get('client/subcategories/load-view-by-cate/{id}',[SubcategoryController::class,'loadPostByViewOfCate']);
-    Route::get('client/subcategoriesIsPosts',[SubcategoryController::class,'getSubcatePosts']);
+
