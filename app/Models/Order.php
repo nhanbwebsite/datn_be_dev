@@ -18,6 +18,7 @@ class Order extends Model
         'ward_id',
         'district_id',
         'province_id',
+        'warehouse_id',
         'phone',
         'email',
         'total',
@@ -83,5 +84,9 @@ class Order extends Model
 
     public function province(){
         return $this->belongsTo(Province::class, 'province_id', 'id');
+    }
+
+    public function warehouse(){
+        return $this->belongsTo(Warehouse::class, 'warehouse_id', 'id');
     }
 }

@@ -45,6 +45,8 @@ class OrderResource extends JsonResource
                 'district'              => $this->district->name,
                 'province_id'           => $this->province_id,
                 'province'              => $this->province->name,
+                'warehouse_id'          => $this->warehouse_id ?? null,
+                'warehouse'             => $this->warehouse->name ?? null,
                 'total'                 => $this->total,
                 'total_formatted'       => number_format($this->total).'đ',
                 'discount'              => $this->discount,

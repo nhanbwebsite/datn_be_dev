@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderCollection;
 use App\Http\Resources\OrderResource;
+use App\Http\Validators\Order\ApproveOrderValidator;
 use App\Http\Validators\Order\CancelOrderValidator;
 use App\Http\Validators\Order\ClientCancelOrderValidator;
 use App\Http\Validators\Order\OrderCreateValidator;
 use App\Http\Validators\Order\OrderDetailCreateValidator;
 use App\Http\Validators\Order\OrderUpdateValidator;
+use App\Models\Color;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
@@ -16,6 +18,7 @@ use App\Models\productAmountByWarehouse;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantDetail;
 use App\Models\VNPayOrder;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -235,27 +238,31 @@ class OrderController extends Controller
             }
 
             if($input['status'] == ORDER_STATUS_COMPLETED){
+                if($update->status == ORDER_STATUS_NEW){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Đơn hàng chưa xác nhận !',
+                    ], 400);
+                }
                 foreach($update->details as $detail){
-                    $prod_variant = ProductVariantDetail::where('product_id', $detail->product_id)->where('variant_id', $detail->variant_id)->where('is_active', 1)->first();
-                    $prod = productAmountByWarehouse::where('product_id', $detail->product_id)->where('pro_variant_id', $prod_variant->id)->where('color_id', $detail->color_id)->first();
+                    $prod = productAmountByWarehouse::where('product_id', $detail->product_id)->where('pro_variant_id', $detail->variant_id)->where('color_id', $detail->color_id)->where('warehouse_id', $update->warehouse_id)->first();
                     $product = Product::where('id', $detail->product_id)->where('is_active', 1)->first();
                     $variant = ProductVariant::where('id', $detail->variant_id)->where('is_active', 1)->first();
-                    $color = ProductVariant::where('id', $detail->color_id)->where('is_active', 1)->first();
+                    $color = Color::where('id', $detail->color_id)->where('is_active', 1)->first();
                     if(empty($prod)){
                         return response()->json([
                             'status' => 'error',
                             'message' => '['.$product->name.'] Không tồn tại biến thể ['.$variant->variant_name.'] ['.$color->name.'] !',
                         ], 404);
                     }
-
-                    if($prod->product_amount > $detail->quantity){
+                    if(!empty($prod) && $prod->product_amount > $detail->quantity){
                         $prod->product_amount = $prod->product_amount - $detail->quantity;
                         $prod->save();
                     }
                     else{
                         return response()->json([
                             'status' => 'error',
-                            'message' => '['.$product->name.'] ['.$variant->variant_name.'] ['.$color->name.'] Số lượng còn lại trong kho không đủ !'
+                            'message' => '['.$product->name.'] ['.$variant->variant_name.'] ['.$color->name.'] Số lượng còn lại trong kho ['.$update->warehouse->name.'] không đủ !'
                         ], 400);
                     }
                 }
@@ -420,5 +427,70 @@ class OrderController extends Controller
             ], $e->getStatusCode());
         }
         return response()->json(new OrderCollection($data));
+    }
+
+    public function approveOrder($code, Request $request, ApproveOrderValidator $validator){
+        $input = $request->all();
+        $validator->validate($input);
+        $user = $request->user();
+        try{
+            DB::beginTransaction();
+
+            $order = Order::where('code', $code)->first();
+            if(empty($order)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Đơn hàng không tồn tại !',
+                ], 404);
+            }
+            foreach($order->details as $detail){
+                $prod = productAmountByWarehouse::where('product_id', $detail->product_id)->where('pro_variant_id', $detail->variant_id)->where('color_id', $detail->color_id)->where('warehouse_id', $input['warehouse_id'])->first();
+                $warehouse = Warehouse::find($input['warehouse_id']);
+                $product = Product::where('id', $detail->product_id)->where('is_active', 1)->first();
+                $variant = ProductVariant::where('id', $detail->variant_id)->where('is_active', 1)->first();
+                $color = Color::where('id', $detail->color_id)->where('is_active', 1)->first();
+
+                if(!empty($prod) && $prod->product_amount > $detail->quantity){
+                    $prod->product_amount = $prod->product_amount - $detail->quantity;
+                    $prod->save();
+                }
+                else{
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => '['.$product->name.'] ['.$variant->variant_name.'] ['.$color->name.'] Số lượng còn lại trong kho ['.$warehouse->name.'] không đủ !',
+                    ], 400);
+                }
+            }
+
+            if($order->status == ORDER_STATUS_NEW){
+                $order->status = ORDER_STATUS_APPROVED;
+                $order->warehouse_id = $input['warehouse_id'];
+                $order->updated_by = $user->id;
+                $order->save();
+            }
+            else{
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Đơn hàng đã ở trạng thái xác nhận !',
+                ], 400);
+            }
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xác nhận đơn hàng ['.$order->code.']',
+        ]);
     }
 }

@@ -48,6 +48,8 @@ class OrderCollection extends ResourceCollection
                     'district'              => $value->district->name,
                     'province_id'           => $value->province_id,
                     'province'              => $value->province->name,
+                    'warehouse_id'          => $value->warehouse_id ?? null,
+                    'warehouse'             => $value->warehouse->name ?? null,
                     'total'                 => $value->total,
                     'total_formatted'       => number_format($value->total).'đ',
                     'discount'              => $value->discount,
