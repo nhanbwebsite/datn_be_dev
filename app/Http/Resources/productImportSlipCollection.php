@@ -18,6 +18,11 @@ class productImportSlipCollection extends ResourceCollection
         if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $value){
+
+                foreach($value->details as $value2){
+                    $value2->product_info->name;
+                }
+
                 $result['data'][] = [
                     'id'            => $value->id,
                     'code'          => $value->code,

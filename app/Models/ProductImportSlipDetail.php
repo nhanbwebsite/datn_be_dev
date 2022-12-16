@@ -32,4 +32,8 @@ class ProductImportSlipDetail extends Model
     public function updatedBy(){
         return $this->belongsTo(User::class, 'updated_by', 'id');
     }
+
+    public function product_info(){
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
 }
