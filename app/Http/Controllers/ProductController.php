@@ -128,9 +128,7 @@ class ProductController extends Controller
             ]);
         //    $productInfo = Product::where('code',$create['code'])->first();
             if(isset($request->variant_ids)){
-
                 foreach($request->variant_ids as $key => $variant_id){
-
                    $proVariant = ProductVariantDetail::create([
                         'variant_id' => $variant_id,
                         'product_id' => $create->id,
@@ -251,106 +249,54 @@ class ProductController extends Controller
             $product->is_active = $request->is_active ?? $product->is_active;
             $product->updated_by = $user->id;
             $product->save();
-            // dd($product->id);
+
             if(isset($request->variant_ids)){
+                $dataVariants = DB::table('productVariant')->where('product_id', $product->id)->get();
 
 
-                foreach($request->variant_ids as $key => $value){
+
+                foreach($request->variant_ids as $key => $valueVariant) {
+
                     $dataWaitUpdate = ProductVariantDetail::where('product_id',$product->id)
-                                                          ->where('variant_id',$value)->first();
-                                                        //   dd($dataWaitUpdate);
-                    if(!$dataWaitUpdate){
+                                                          ->where('variant_id',$valueVariant)->first();
 
-                        $proVariant = ProductVariantDetail::create([
-                                         'variant_id' => $value,
-                                         'product_id' => $product->id,
-                                     ]);
+
+                    if($dataWaitUpdate){
+                        $dataWaitUpdate->update([
+                            "variant_id" => $valueVariant
+                        ]);
+
+                        $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->get();
+
                         foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
-                            ProductVariantDetailById::create([
-                                "pro_variant_id" => $proVariant->id,
+                            // dd($dataVarianDetails[2]);
+                              $upDetails =  $dataVarianDetails[$key]->update([
+                                "pro_variant_id" => $dataWaitUpdate->id,
                                 "color_id" => $valueColor,
                                 "price" => $request->prices_by_variant_id[$key][$keyColors],
-                                "discount" => $request->discount_by_variant_id[$key][$keyColors]
+                                "discount" => $request->discount_by_variant_id[$key][$keyColors],
                             ]);
+
                         }
-
                     } else{
-                        foreach($request->colors_by_variant_id[$key] as $key2 => $value) {
-                            // dd($value);
-                            $data =  ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->get()[$key2]->first();
-                         $up =   $data->update([
-                                "pro_variant_id" => $dataWaitUpdate->id,
-                                'color_id' => $value,
-                                'price' =>  $request->prices_by_variant_id[$key][$key2],
-                                "discount" => $request->discount_by_variant_id[$key][$key2]
-                            ]);
+                        $proVariant = ProductVariantDetail::create([
+                            'variant_id' => $valueVariant,
+                            'product_id' => $product->id,
+                        ]);
+                        if(isset($request->colors_by_variant_id) && isset($request->discount_by_variant_id) ) {
 
+                            foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
+                            $create = ProductVariantDetailById::create([
+                                    "pro_variant_id" => $proVariant->id,
+                                    "color_id" => $valueColor,
+                                    "price" => $request->prices_by_variant_id[$key][$keyColors],
+                                    "discount" => $request->discount_by_variant_id[$key][$keyColors],
+                                ]);
+
+                            }
                         }
                     }
                 }
-
-
-
-                // $dataVariants = DB::table('productVariant')->where('product_id', $product->id)->get();
-
-                // foreach($request->variant_ids as $key => $valueVariant) {
-
-                //     $dataWaitUpdate = ProductVariantDetail::where('product_id',$product->id)
-                //                                           ->where('variant_id',$valueVariant)->first();
-
-                //     // dd($dataWaitUpdate);
-                //     if($dataWaitUpdate){
-                //         // dd($dataWaitUpdate);
-                //         $dataWaitUpdate->update([
-                //             "variant_id" => $valueVariant
-                //         ]);
-                //         // dd($dataWaitUpdate->variant_id);
-                //         // dd($dataWaitUpdate);
-                //         foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
-                //             if($dataWaitUpdate->variant_id == $valueColor){
-
-                //                 $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)
-                //                                                             ->where('color_id',$valueColor)
-                //                                                             ->update([
-                //                                                                 "pro_variant_id" => $dataWaitUpdate->id,
-                //                                                                 "color_id" => $valueColor,
-                //                                                                 "price" => $request->prices_by_variant_id[$key][$keyColors],
-                //                                                                 "discount" => $request->discount_by_variant_id[$key][$keyColors]
-                //                                                             ]);
-                //                                                             // dd($dataVarianDetails);
-                //             }
-
-
-                //             // dd($request->colors_by_variant_id[0][2]);
-                //             // dd($dataVarianDetails[0]);
-                //             //     $dataVarianDetails[$key]->update([
-                //             //     "pro_variant_id" => $dataWaitUpdate->id,
-                //             //     "color_id" => $valueColor,
-                //             //     "price" => $request->prices_by_variant_id[$key][$keyColors],
-                //             //     "discount" => $request->discount_by_variant_id[$key][$keyColors],
-                //             //     "quantity" => $dataVarianDetails[$key]->quantity
-                //             // ]);
-                //         }
-
-                //     } else{
-                //         $proVariant = ProductVariantDetail::create([
-                //             'variant_id' => $valueVariant,
-                //             'product_id' => $product->id,
-                //         ]);
-                //         if(isset($request->colors_by_variant_id) && isset($request->discount_by_variant_id) ) {
-
-                //             foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
-                //             $create = ProductVariantDetailById::create([
-                //                     "pro_variant_id" => $proVariant->id,
-                //                     "color_id" => $valueColor,
-                //                     "price" => $request->prices_by_variant_id[$key][$keyColors],
-                //                     "discount" => $request->discount_by_variant_id[$key][$keyColors],
-                //                 ]);
-
-                //             }
-                //         }
-                //     }
-                // }
             }
 
             DB::commit();
