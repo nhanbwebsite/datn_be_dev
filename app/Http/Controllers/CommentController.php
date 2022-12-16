@@ -50,7 +50,7 @@ class CommentController extends Controller
      */
     public function store(Request $request, CommentCreateValidator $validator)
     {
-        // dd(auth('sanctum')->user());
+
 
         try{
             DB::beginTransaction();
