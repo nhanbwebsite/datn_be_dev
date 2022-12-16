@@ -408,6 +408,9 @@ class OrderController extends Controller
                 if(!empty($input['status'])){
                     $query->where('status', $input['status']);
                 }
+                if(!empty($input['code'])){
+                    $query->where('code', $input['code']);
+                }
                 if(!empty($input['from'])){
                     $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', strtotime($input['from'])));
                     if(!empty($input['to'])){
