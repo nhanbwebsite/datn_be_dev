@@ -54,6 +54,7 @@ class ProductsHaveComemntCollection extends ResourceCollection
             //         $value3->createdBy->name;
             //        }
             //    }
+
             $cmt = [];
                 foreach($value->comments as $key => $item){
                     $cmt[$key]['id'] = $item->id;
@@ -84,7 +85,6 @@ class ProductsHaveComemntCollection extends ResourceCollection
                     'meta_keywords' => $value->meta_keywords,
                     'meta_description' => $value->meta_description,
                     'countComment'  => count($value->comments),
-                    'comments' => $cmt,
                     'is_active'     => $value->is_active,
                     'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
