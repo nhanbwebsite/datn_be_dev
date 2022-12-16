@@ -16,7 +16,7 @@ class SlideshowCollectionClient extends ResourceCollection
     {
         if(!$this->collection->isEmpty()){
             // $request not empty
-            // dd($this->collection);
+
             foreach($this->collection as $value){
                 $result['data'][] = [
                     'id'            => $value->id,
