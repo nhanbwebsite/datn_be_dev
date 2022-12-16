@@ -14,7 +14,9 @@ class ColorCollection extends ResourceCollection
      */
     public function toArray($request)
     {
+
         if(!$this->collection->isEmpty()){
+
             // $request not empty
             foreach($this->collection as $value){
 
@@ -29,16 +31,20 @@ class ColorCollection extends ResourceCollection
                     'updated_by'    => $value->updatedBy->name ?? null,
                 ];
             }
+                if($request->paginate){
+                    $result['paginator'] = [
+                        'currentPage' => $this->currentPage(),
+                        'totalPages' => $this->lastPage(),
+                        'perPage' => $this->perPage(),
+                        'count' => $this->count(),
+                        'total' => $this->total(),
+                        'nextPageUrl' => $this->nextPageUrl(),
+                        'prevPageUrl' => $this->previousPageUrl(),
+                    ];
+                }
 
-            $result['paginator'] = [
-                'currentPage' => $this->currentPage(),
-                'totalPages' => $this->lastPage(),
-                'perPage' => $this->perPage(),
-                'count' => $this->count(),
-                'total' => $this->total(),
-                'nextPageUrl' => $this->nextPageUrl(),
-                'prevPageUrl' => $this->previousPageUrl(),
-            ];
+
+
             return $result;
         }
 
