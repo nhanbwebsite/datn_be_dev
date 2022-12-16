@@ -23,6 +23,7 @@ class ColorCollection extends ResourceCollection
                 $result['data'][] = [
                     'id'            => $value->id,
                     'name'          => $value->name,
+                    'color_code'    => $value->color_code,
                     'slug'          => $value->slug,
                     'is_active'     => $value->is_active,
                     'created_at'    => $value->created_at->format('Y-m-d H:i:s'),

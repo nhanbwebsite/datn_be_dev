@@ -34,6 +34,7 @@ class ColorsController extends Controller
         } else{
             $dataReturn = $data->get();
         }
+
         return response()->json([
             'status' => 'success',
             'data'  => new ColorCollection($dataReturn),
