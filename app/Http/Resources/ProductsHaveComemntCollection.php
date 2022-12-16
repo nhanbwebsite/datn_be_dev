@@ -18,7 +18,6 @@ class ProductsHaveComemntCollection extends ResourceCollection
         if(!$this->collection->isEmpty()){
             // $request not empty
             foreach($this->collection as $key => $value){
-                // dd($value);
 
 
                 // foreach($value->comments as $key => $value2 ){
