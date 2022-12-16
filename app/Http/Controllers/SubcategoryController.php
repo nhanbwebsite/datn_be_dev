@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
+use App\Http\Resources\subcateGoryCollection;
 class SubcategoryController extends Controller
 {
     /**
@@ -26,7 +26,7 @@ class SubcategoryController extends Controller
             $data = SubCategory::paginate(9);
             return response()->json([
                 'message' => 'SubCategories',
-                'data' => $data
+                'data' => new subcateGoryCollection($data)
             ],200);
 
         } catch (Exception $e) {

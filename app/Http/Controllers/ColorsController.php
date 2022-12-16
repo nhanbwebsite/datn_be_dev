@@ -8,6 +8,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\ColorCollection;
 class ColorsController extends Controller
 {
     /**
@@ -35,7 +36,7 @@ class ColorsController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'data'  => $dataReturn,
+            'data'  => new ColorCollection($dataReturn),
         ],200);
     }
 
