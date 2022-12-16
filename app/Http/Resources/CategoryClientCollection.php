@@ -19,7 +19,7 @@ class CategoryClientCollection extends ResourceCollection
             // $request not empty
             $dataTest = [];
             foreach($this->collection as $key1 => $value){
-                dd($this->collection);
+
                 foreach($value->subs as $key => $item){
                         $subcategoryData[$key]['id'] = $item->id;
                         $subcategoryData[$key]['category_id'] = $value->id;

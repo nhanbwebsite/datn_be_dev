@@ -58,7 +58,7 @@ class ProductCollection extends ResourceCollection
                 'nextPageUrl' => $this->nextPageUrl(),
                 'prevPageUrl' => $this->previousPageUrl(),
             ];
-             dd($this->collection);
+
             return $result;
         }
 

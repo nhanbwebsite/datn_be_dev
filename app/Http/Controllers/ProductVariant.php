@@ -170,7 +170,7 @@ class ProductVariant extends Controller
         try {
             DB::beginTransaction();
             $data = ProductVariantModel::find($id);
-            dd($data);
+
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
