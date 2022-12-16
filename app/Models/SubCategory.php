@@ -55,6 +55,14 @@ class SubCategory extends Model
         $data = Post::where('subcategory_id',$subcategory_id)->orderBy('views','desc')->get();
         return $data;
     }
+
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by', 'id');
+    }
 }
 
 
