@@ -8,8 +8,8 @@ Route::controller(AddressNoteController::class)->middleware(['auth:sanctum'])->p
     Route::get('/{id}', 'show')->middleware(['checkAction:all,view-address-note']);
     Route::put('/{id}', 'update')->middleware(['checkAction:all,update-address-note']);
     Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-address-note']);
-
-    Route::get('/client/get-data', 'getAddressNoteByCurrentUser')->middleware(['checkAction:all,view-address-note']);
 });
+
+Route::get('/client/get-address-notes', [AddressNoteController::class, 'getAddressNoteByCurrentUser'])->middleware(['auth:sanctum', 'checkAction:all,view-address-note']);
 
 ?>
