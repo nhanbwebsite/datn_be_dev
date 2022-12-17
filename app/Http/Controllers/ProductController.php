@@ -314,7 +314,7 @@ class ProductController extends Controller
                 } else{
                     // bằng nhau, variant không thay đổi, chỉ cập nhật giá trị như giá, giảm giá,.... không thay đổi màu sắc
                     $compare =  array_diff($request->variant_ids,$arrOld);
-                    // xử lý mảng bằng nhưng có phát sinh giá trị trong mảng khác nhau
+
                     foreach($request->variant_ids as $key => $valueVariant) {
 
                         $dataWaitUpdate = ProductVariantDetail::where('product_id',$product->id)
@@ -325,20 +325,29 @@ class ProductController extends Controller
                                 "variant_id" => $valueVariant
                             ]);
 
-                            $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->get();
-                            // dd($dataVarianDetails);
+
+
+
                             foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
-                            //    dd( $request->colors_by_variant_id[$key][1]);
+                                $dataVarianDetail = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->variant_id)
+                                ->where('color_id',$valueColor)->first();
+                               if($dataVarianDetail){
+                                    $upDetails =  $dataVarianDetail->update([
+                                        "pro_variant_id" => $dataWaitUpdate->id,
+                                        "color_id" => $valueColor,
+                                        "price" => $request->prices_by_variant_id[$key][$keyColors],
+                                        "discount" => $request->discount_by_variant_id[$key][$keyColors],
+                                    ]);
+
+                               }
+
                                 // dd($dataVarianDetails[2]);
-                                  $upDetails =  $dataVarianDetails[$key]->update([
-                                    "pro_variant_id" => $dataWaitUpdate->variant_id,
-                                    "color_id" => $valueColor,
-                                    "price" => $request->prices_by_variant_id[$key][$keyColors],
-                                    "discount" => $request->discount_by_variant_id[$key][$keyColors],
-                                ]);
+
 
                             }
+                              // xử lý mảng bằng nhưng có phát sinh có giá trị trong mảng khác nhau
                         }
+
                         // else{
                         //     $proVariant = ProductVariantDetail::create([
                         //         'variant_id' => $valueVariant,
