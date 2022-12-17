@@ -74,6 +74,7 @@ class Product extends Model
         ->join('products', 'productVariant.product_id', '=', 'products.id')
         ->join('variants', 'productVariant.variant_id', '=', 'variants.id')
         ->where('productVariant.is_active',1)
+        ->where('deleted_at',null)
         ->where('products.id',$id)
         ->get();
         return $variantByProducts;
@@ -105,6 +106,7 @@ class Product extends Model
         ->join('variants','productVariant.variant_id','variants.id')
         ->join('colors','productVariantDetails.color_id','colors.id')
         ->where('productVariantDetails.is_active',"=",1)
+        ->where('deleted_at',null)
         ->where('products.id',$id)->get();
         return $data;
     }
