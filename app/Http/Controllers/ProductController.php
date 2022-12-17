@@ -338,7 +338,7 @@ class ProductController extends Controller
                                     ]);
 
                                } else{
-                                $dataVarianDetail = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->get()[$keyColors];
+                                $dataVarianDetail = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->get();
 
                                     $proVariant = ProductVariantDetail::create([
                                         'variant_id' => $valueVariant,
