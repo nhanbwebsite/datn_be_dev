@@ -272,7 +272,7 @@ class ProductController extends Controller
                             ->get();
                             foreach($dataVariantsDelete as $keyDetails => $valueDetails){
 
-                                $dataVarianDetailsDelete = ProductVariantDetailById::where('pro_variant_id',$valueDetails->id)->get();
+                                $dataVarianDetailsDelete = ProductVariantDetailById::where('pro_variant_id',$valueDetails->id)->delete();
                                 // dd($dataVarianDetailsDelete);
                                 $valueDetails->delete();
                             }
