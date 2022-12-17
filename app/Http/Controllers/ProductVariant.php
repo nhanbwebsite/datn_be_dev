@@ -18,7 +18,7 @@ class ProductVariant extends Controller
     public function index()
     {
         // không phân trang
-        $data = ProductVariantModel::all();
+        $data = ProductVariantModel::where('is_active',1)->where('deleted_at',null);
         return response()->json([
             'status' => 'success',
             'data' => $data
