@@ -273,7 +273,7 @@ class ProductController extends Controller
                             foreach($dataVariantsDelete as $keyDetails => $valueDetails){
 
                                 $dataVarianDetailsDelete = ProductVariantDetailById::where('pro_variant_id',$valueDetails->id)->get();
-                                dd($dataVarianDetailsDelete);
+                                // dd($dataVarianDetailsDelete);
                                 $valueDetails->delete();
                             }
                         }
