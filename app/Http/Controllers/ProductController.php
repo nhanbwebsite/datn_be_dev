@@ -358,16 +358,16 @@ class ProductController extends Controller
 
                                 // dd($dataVarianDetails[2]);
                                 // dd($request->colors_by_variant_id[1]);
-                                $test = $dataVarianDetail = ProductVariantDetailById::where('pro_variant_id',$valueVariant)
-                                ->where('color_id',$request->colors_by_variant_id[$keyColors][$valueColor])
-                                ->where('is_active',1)
-                                ->where('deleted_at',null)
-                                ->get();
+                                // $test = $dataVarianDetail = ProductVariantDetailById::where('pro_variant_id',$valueVariant)
+                                // ->where('color_id',$request->colors_by_variant_id[$keyColors][$valueColor])
+                                // ->where('is_active',1)
+                                // ->where('deleted_at',null)
+                                // ->get();
 
-                                $arr = [];
-                                foreach($test as $keyDelete => $valueDelete){
-                                    array_push($arr,$valueDelete);
-                                }
+                                // $arr = [];
+                                // foreach($test as $keyDelete => $valueDelete){
+                                //     array_push($arr,$valueDelete);
+                                // }
 
                                 // $compare =  array_diff($request->colors_by_variant_id[$key],$arr);
 
