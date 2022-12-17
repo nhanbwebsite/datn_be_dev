@@ -345,7 +345,6 @@ class ProductController extends Controller
                             }
                               // xử lý mảng bằng nhưng có phát sinh có giá trị trong mảng khác nhau
                         }
-
                         else{
                             $proVariant = ProductVariantDetail::create([
                                 'variant_id' => $valueVariant,
