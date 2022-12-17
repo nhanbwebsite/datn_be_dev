@@ -346,28 +346,25 @@ class ProductController extends Controller
                               // xử lý mảng bằng nhưng có phát sinh có giá trị trong mảng khác nhau
                         }
 
-                        // else{
-                        //     $proVariant = ProductVariantDetail::create([
-                        //         'variant_id' => $valueVariant,
-                        //         'product_id' => $product->id,
-                        //     ]);
-                        //     if(isset($request->colors_by_variant_id) && isset($request->discount_by_variant_id) ) {
+                        else{
+                            $proVariant = ProductVariantDetail::create([
+                                'variant_id' => $valueVariant,
+                                'product_id' => $product->id,
+                            ]);
+                            if(isset($request->colors_by_variant_id) && isset($request->discount_by_variant_id) ) {
+                                foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
+                                $create = ProductVariantDetailById::create([
+                                        "pro_variant_id" => $proVariant->id,
+                                        "color_id" => $valueColor,
+                                        "price" => $request->prices_by_variant_id[$key][$keyColors],
+                                        "discount" => $request->discount_by_variant_id[$key][$keyColors],
+                                    ]);
 
-                        //         foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
-                        //         $create = ProductVariantDetailById::create([
-                        //                 "pro_variant_id" => $proVariant->id,
-                        //                 "color_id" => $valueColor,
-                        //                 "price" => $request->prices_by_variant_id[$key][$keyColors],
-                        //                 "discount" => $request->discount_by_variant_id[$key][$keyColors],
-                        //             ]);
-
-                        //         }
-                        //     }
-                        // }
+                                }
+                            }
+                        }
                     }
                 }
-
-
 
             }
 
