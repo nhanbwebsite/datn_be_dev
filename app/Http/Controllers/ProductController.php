@@ -278,13 +278,39 @@ class ProductController extends Controller
                             }
                         }
                     } catch(HttpException $e){
-
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => [
+                                'error' => $e->getMessage(),
+                                'file' => $e->getFile(),
+                                'line' => $e->getLine(),
+                            ],
+                        ], $e->getStatusCode());
                     }
 
                 } else if(count($arrOld) < count($request->variant_ids)){
-                    // thêm biến thể
-                    // dd('thêm');
+
                     $compare =  array_diff($request->variant_ids,$arrOld);
+                    // thêm biến thể
+                    foreach($compare as $key => $value){
+
+                        $proVariant = ProductVariantDetail::create([
+                            'variant_id' => $value,
+                            'product_id' => $product->id,
+                        ]);
+
+                        foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
+                                     $create = ProductVariantDetailById::create([
+                                             "pro_variant_id" => $proVariant->id,
+                                             "color_id" => $valueColor,
+                                             "price" => $request->prices_by_variant_id[$key][$keyColors],
+                                             "discount" => $request->discount_by_variant_id[$key][$keyColors],
+                                         ]);
+
+                                     }
+
+                     }
+
                 } else{
                     // bằng nhau, variant không thay đổi, chỉ cập nhật giá trị như giá, giảm giá,.... không thay đổi màu sắc
                     $compare =  array_diff($request->variant_ids,$arrOld);
@@ -302,6 +328,7 @@ class ProductController extends Controller
                             $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->get();
 
                             foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
+
                                 // dd($dataVarianDetails[2]);
                                   $upDetails =  $dataVarianDetails[$key]->update([
                                     "pro_variant_id" => $dataWaitUpdate->id,
