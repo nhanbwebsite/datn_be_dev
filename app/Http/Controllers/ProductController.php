@@ -339,16 +339,15 @@ class ProductController extends Controller
 
                                } else{
                                 $dataWaitUpdate = ProductVariantDetail::where('product_id',$product->id)->get();
+
                                     if(isset($request->colors_by_variant_id) && isset($request->discount_by_variant_id) ) {
-                                        foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
                                         $create = ProductVariantDetailById::create([
                                                 "pro_variant_id" => $dataWaitUpdate[$key]->id,
-                                                "color_id" => $valueColor,
+                                                "color_id" => $request->colors_by_variant_id[$key][$keyColors],
                                                 "price" => $request->prices_by_variant_id[$key][$keyColors],
                                                 "discount" => $request->discount_by_variant_id[$key][$keyColors],
                                             ]);
 
-                                        }
                                     }
 
                                }
