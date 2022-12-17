@@ -247,16 +247,7 @@ class ProductController extends Controller
             $product->is_active = $request->is_active ?? $product->is_active;
             $product->updated_by = $user->id;
             $product->save();
-        //  xóa biến thể chi tiết
-            if(isset($request->delete_variant_details)){
-                if(!empty($request->delete_variant_details)){
-                    $arrDeleteVariantDetails = $request->delete_variant_details;
-                    foreach($arrDeleteVariantDetails as $key => $value){
-                       $dataDelete = ProductVariantDetailById::find($value);
-                       $dataDelete->delete();
-                    }
-                }
-            }
+
 
             if(isset($request->variant_ids)){
                 $dataVariants = ProductVariantDetail::where('product_id', $product->id)->get();
@@ -399,6 +390,16 @@ class ProductController extends Controller
 
 
 
+            }
+            //  xóa biến thể chi tiết
+            if(isset($request->delete_variant_details)){
+                if(!empty($request->delete_variant_details)){
+                    $arrDeleteVariantDetails = $request->delete_variant_details;
+                    foreach($arrDeleteVariantDetails as $key => $value){
+                       $dataDelete = ProductVariantDetailById::find($value);
+                       $dataDelete->delete();
+                    }
+                }
             }
 
             DB::commit();
