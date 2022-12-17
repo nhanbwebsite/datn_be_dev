@@ -254,13 +254,12 @@ class ProductController extends Controller
                     $arrDeleteVariantDetails = $request->delete_variant_details;
                     foreach($arrDeleteVariantDetails as $key => $value){
                        $dataDelete = ProductVariantDetailById::find($value);
-                       $dataDelete->delete();
+                       $dataDelete->is_active = 0;
+                       $dataDelete->save();
+                      $delete = $dataDelete->delete();
                     }
                 }
             }
-
-
-
             if(isset($request->variant_ids)){
                 $dataVariants = ProductVariantDetail::where('product_id', $product->id)->get();
                 // dd($dataVariants);
