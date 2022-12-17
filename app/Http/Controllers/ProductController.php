@@ -337,7 +337,14 @@ class ProductController extends Controller
                                         "discount" => $request->discount_by_variant_id[$key][$keyColors],
                                     ]);
 
-                               }
+                               } else {
+                                        $create = ProductVariantDetailById::create([
+                                                        "pro_variant_id" => $dataWaitUpdate->id,
+                                                        "color_id" => $valueColor,
+                                                        "price" => $request->prices_by_variant_id[$key][$keyColors],
+                                                        "discount" => $request->discount_by_variant_id[$key][$keyColors],
+                                                    ]);
+                                    }
 
                                 // dd($dataVarianDetails[2]);
 
