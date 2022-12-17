@@ -19,7 +19,7 @@ class ProductVariant extends Controller
     {
         // không phân trang
         $data = ProductVariantModel::where('is_active',1)->where('deleted_at',null)->get();
-        dd($data);
+        // dd($data);
         return response()->json([
             'status' => 'success',
             'data' => $data
