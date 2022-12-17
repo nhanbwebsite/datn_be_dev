@@ -273,7 +273,7 @@ class ProductController extends Controller
                             foreach($dataVariantsDelete as $keyDetails => $valueDetails){
 
                                 $dataVarianDetailsDelete = ProductVariantDetailById::where('pro_variant_id',$valueDetails->id)->get();
-                                dd($dataVarianDetailsDelete);
+                                // dd($dataVarianDetailsDelete);
                                 $valueDetails->delete();
                             }
                         }
@@ -283,7 +283,7 @@ class ProductController extends Controller
 
                 } else if(count($arrOld) < count($request->variant_ids)){
                     // thêm biến thể
-                    dd('thêm');
+                    // dd('thêm');
                     $compare =  array_diff($request->variant_ids,$arrOld);
                 } else{
                     // bằng nhau, variant không thay đổi, chỉ cập nhật giá trị như giá, giảm giá,.... không thay đổi màu sắc
