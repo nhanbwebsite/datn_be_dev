@@ -326,12 +326,12 @@ class ProductController extends Controller
                             ]);
 
                             $dataVarianDetails = ProductVariantDetailById::where('pro_variant_id',$dataWaitUpdate->id)->get();
-
+                            // dd($dataVarianDetails);
                             foreach($request->colors_by_variant_id[$key] as $keyColors => $valueColor){
-
+                            //    dd( $request->colors_by_variant_id[$key][1]);
                                 // dd($dataVarianDetails[2]);
                                   $upDetails =  $dataVarianDetails[$key]->update([
-                                    "pro_variant_id" => $dataWaitUpdate->id,
+                                    "pro_variant_id" => $dataWaitUpdate->variant_id,
                                     "color_id" => $valueColor,
                                     "price" => $request->prices_by_variant_id[$key][$keyColors],
                                     "discount" => $request->discount_by_variant_id[$key][$keyColors],
