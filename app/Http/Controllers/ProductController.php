@@ -248,6 +248,19 @@ class ProductController extends Controller
             $product->updated_by = $user->id;
             $product->save();
 
+            //  xóa biến thể chi tiết
+            if(isset($request->delete_variant_details)){
+                if(!empty($request->delete_variant_details)){
+                    $arrDeleteVariantDetails = $request->delete_variant_details;
+                    foreach($arrDeleteVariantDetails as $key => $value){
+                       $dataDelete = ProductVariantDetailById::find($value);
+                       $dataDelete->delete();
+                    }
+                }
+            }
+
+
+
             if(isset($request->variant_ids)){
                 $dataVariants = ProductVariantDetail::where('product_id', $product->id)->get();
                 // dd($dataVariants);
@@ -347,9 +360,25 @@ class ProductController extends Controller
                                     }
 
                                 // dd($dataVarianDetails[2]);
+                                // dd($request->colors_by_variant_id[1]);
+                                $test = $dataVarianDetail = ProductVariantDetailById::where('pro_variant_id',$valueVariant)
+                                ->where('color_id',$request->colors_by_variant_id[$keyColors][$valueColor])
+                                ->where('is_active',1)
+                                ->where('deleted_at',null)
+                                ->get();
 
+                                $arr = [];
+                                foreach($test as $keyDelete => $valueDelete){
+                                    array_push($arr,$valueDelete);
+                                }
+
+                                // $compare =  array_diff($request->colors_by_variant_id[$key],$arr);
 
                             }
+                            //  xử lý xóa chi tiết của biến thể
+
+
+
                               // xử lý mảng bằng nhưng có phát sinh có giá trị trong mảng khác nhau
                         }else{
                             // $proVariant = ProductVariantDetail::create([
@@ -370,6 +399,8 @@ class ProductController extends Controller
                         }
                     }
                 }
+
+
 
             }
 
