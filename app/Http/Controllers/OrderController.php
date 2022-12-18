@@ -503,7 +503,7 @@ class OrderController extends Controller
                 'message' => 'Không tìm thấy đơn hàng !',
             ], 404);
         }
-        $pdf = Pdf::loadView('export/export_bill', ['data' => $order]);
+        $pdf = Pdf::loadView('Export/export_bill', ['data' => $order]);
         return $pdf->download('Bill_'.$order->code.'.pdf');
     }
 }
