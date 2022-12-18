@@ -8,3 +8,4 @@ use App\Http\Controllers\LogoController;
         Route::put('/{id}',[LogoController::class,'update']);
         Route::delete('/{id}',[LogoController::class,'destroy']);
     });
+    Route::get('client/logo/',[LogoController::class,'index']);
