@@ -13,4 +13,5 @@ use App\Http\Controllers\PostController;
     Route::get('client/load-post/',[PostController::class,'loadAllPostClient']);
     Route::get('client/load-post/{id}',[PostController::class,'loadDetailPostClient']);
 
-    Route::get('admin/statistical',[PostController::class,'statisticalTotalPost']);
+    Route::get('client/get-firts-new-post',[PostController::class,'getFirtsNewPost']);
+    Route::get('client/get-two-post-after-new',[PostController::class,'getTwoPostAfterNew']);
