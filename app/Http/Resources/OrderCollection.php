@@ -63,8 +63,8 @@ class OrderCollection extends ResourceCollection
                     'fee_ship'              => $value->fee_ship,
                     'fee_ship_formatted'    => number_format($value->fee_ship).'đ',
                     'payment_method_id'     => $value->payment_method_id,
-                    'payment_method_code'   => $value->getPaymentMetyhod->code,
-                    'payment_method_name'   => $value->getPaymentMetyhod->name,
+                    'payment_method_code'   => $value->getPaymentMethod->code,
+                    'payment_method_name'   => $value->getPaymentMethod->name,
                     'shipping_method_id'    => $value->shipping_method_id,
                     'shipping_method'       => $value->getShippingMethod->name,
 

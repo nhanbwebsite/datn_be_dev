@@ -60,8 +60,8 @@ class OrderResource extends JsonResource
                 'fee_ship'              => $this->fee_ship,
                 'fee_ship_formatted'    => number_format($this->fee_ship).'đ',
                 'payment_method_id'     => $this->payment_method_id,
-                'payment_method_code'   => $this->getPaymentMetyhod->code,
-                'payment_method_name'   => $this->getPaymentMetyhod->name,
+                'payment_method_code'   => $this->getPaymentMethod->code,
+                'payment_method_name'   => $this->getPaymentMethod->name,
                 'shipping_method_id'    => $this->shipping_method_id,
                 'shipping_method'       => $this->getShippingMethod->name,
 

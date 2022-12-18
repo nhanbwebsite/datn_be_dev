@@ -9,6 +9,7 @@ Route::controller(OrderController::class)->middleware('auth:sanctum')->prefix('o
     Route::put('/{id}', 'update')->middleware('checkAction:all,update-order');
     // Route::delete('/{id}', 'destroy')->middleware('checkAction:all');
     Route::post('/approve-order/{code}', 'approveOrder')->middleware('checkAction:all,update-order');
+    Route::get('/export-bill/{order_code}', 'exportOrdeBillr');
 });
 // Route::post('/approve-order', [OrderController::class, 'approveOrder'])->middleware(['auth:sanctum', 'checkAction:all,update-order']);
 

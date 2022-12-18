@@ -19,6 +19,7 @@ use App\Models\ProductVariant;
 use App\Models\ProductVariantDetail;
 use App\Models\VNPayOrder;
 use App\Models\Warehouse;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -491,5 +492,18 @@ class OrderController extends Controller
             'status' => 'success',
             'message' => 'Đã xác nhận đơn hàng ['.$order->code.']',
         ]);
+    }
+
+
+    public function exportOrdeBillr($order_code){
+        $order = Order::where('code', $order_code)->first();
+        if(empty($order)){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Không tìm thấy đơn hàng !',
+            ], 404);
+        }
+        $pdf = Pdf::loadView('export/export_bill', ['data' => $order]);
+        return $pdf->download('Bill_'.$order->code.'.pdf');
     }
 }
