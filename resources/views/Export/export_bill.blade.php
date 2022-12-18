@@ -36,7 +36,7 @@
             <thead>
                 <tr style="text-align: center;">
                     <td colspan="2">
-                        <img style="width:100%;" src="{{asset('test.logo.png')}}" alt="logo">
+                        <img style="width:100%;" src="{{public_path('test_logo.png')}}" alt="logo">
                     </td>
                     <td colspan="3" style="text-align: left">
                         <p style="font-size: 12px;">Công ty Cổ phần DIAMONDS</p>
@@ -46,7 +46,7 @@
                         <p style="font-size: 16px;">HÓA ĐƠN BÁN HÀNG</p>
                     </td>
                     <td>
-                        <img style="width:150%;" src="{{asset('stamp_paid2.png')}}" alt="logo">
+                        <img style="width:150%;" src="{{public_path('stamp_paid2.png')}}" alt="paid">
                     </td>
                 </tr>
                 <tr>
