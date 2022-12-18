@@ -341,5 +341,43 @@ class PostController extends Controller
             'data' =>$data,
         ]);
     }
+    public function getFirtsNewPost(Request $request)
+    {
+        $input = $request->all();
+        $input['limit'] = $request->limit;
+        try{
+            $data = Post::where('is_active', $input['is_active'] ?? 1)->orderBy('created_at', 'desc')->limit(1)->get();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json($data);
+    }
+    public function getTwoPostAfterNew(Request $request)
+    {
+        $input = $request->all();
+        $input['limit'] = $request->limit;
+        try{
+            $data = Post::where('is_active', $input['is_active'] ?? 1)->orderBy('created_at', 'desc')->offset(2)->limit(2)->get();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json($data);
+    }
     }
 
