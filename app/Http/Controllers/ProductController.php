@@ -176,6 +176,13 @@ class ProductController extends Controller
             $dataByproduct = Product::find($id);
             // $dataVariants = Product::productVariants($id);
             $dataTest = Product::variantDetailsProductByProId($id);
+
+            foreach($dataTest as $item){
+                $item->discount_value = number_format( round($item->price - ($item->price * $item->discount )/100,0) ) . " VNĐ";
+                $item->discount_value_ = round($item->price - ($item->price * $item->discount )/100,0);
+                $item->price_ = round($item->price - ($item->price * $item->discount )/100,0);
+            }
+
             // $dataByproduct->variantsssssss = Product::productVariants($id);
             $dataByproduct->variants = Product::productVariants($id);
 
@@ -780,6 +787,11 @@ class ProductController extends Controller
                  $value->collection_images = explode(',',$value->collection_images);
                  $value-> cartegory_id = product::category($value->id)->cartegory_id;
                  $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
+                foreach($value->variantsDetailsByProduct as $item) {
+                    $item->price_ = number_format(round( $item->price,0));
+                    $item->discount_value =  number_format( round($item->price - ($item->price * $item->discount )/100,0) ) . " VNĐ";
+                    $item->discount_value_ = round($item->price - ($item->price * $item->discount )/100,0);
+                }
                  // $value->variantsByProduct = Product::variantDetailsProductByProId($value->id);
                  $value->variants = Product::productVariants($value->id);
                  array_push($dataReturn,[
