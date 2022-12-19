@@ -8,5 +8,5 @@
         Route::put('/{id}', 'update');
         Route::delete('/{id}', 'destroy');
     });
-
+    Route::get('clients/slideshow/{id}', [SlideshowController::class,'show'] );
     Route::get('/slideshowclient',[SlideshowController::class,'getclientslideshowDetails']);
