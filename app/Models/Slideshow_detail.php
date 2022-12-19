@@ -22,4 +22,7 @@ class Slideshow_detail extends Model
         'updated_by',
         'deleted_by',
     ];
+    public function slide(){
+        return $this->belongsTo(Slideshow::class, 'slideshow_id', 'id');
+    }
 }
