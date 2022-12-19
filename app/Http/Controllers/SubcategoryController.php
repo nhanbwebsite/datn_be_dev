@@ -303,7 +303,8 @@ class SubcategoryController extends Controller
             'data' => new LoadPostByCateResouce($data),
         ]);
     }
-    public function loadPostByViewOfCate($id)
+
+    public function getFirtsNewPostByCate($id)
     {
         try{
             $data = SubCategory::where('is_active', 1)
@@ -312,6 +313,33 @@ class SubcategoryController extends Controller
             foreach( $data as $value){
                 // push object contact
                 $value->posts = SubCategory::postViewByCategoryID($value->id);
+            }
+        }  catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status'=>'success',
+            'data' =>$data
+        ]);
+    }
+
+
+    public function loadPostByViewOfCate($id)
+    {
+        try{
+            $data = SubCategory::where('is_active', 1)
+            ->where('id',$id)
+            ->get();
+            foreach( $data as $value){
+                // push object contact
+                $value->posts = SubCategory::firtsNewPostByCategoryID($value->id);
             }
         }  catch(HttpException $e){
             return response()->json([

@@ -311,36 +311,8 @@ class PostController extends Controller
             'data' => new PostResource($data),
         ]);
     }
-    //Thống kê số lượng bài viết
-    public function statisticalTotalPost()
-    {
-        try{
-            DB::beginTransaction();
-            $data = Post::count();
-            if(empty($data)){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Bài viết không tồn tại !'
-                ], 404);
-            }
-            DB::commit();
-        }
-        catch(HttpException $e){
-            DB::rollBack();
-            return response()->json([
-                'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
-        }
-        return response()->json([
-            'status' => 'success',
-            'data' =>$data,
-        ]);
-    }
+
+
     public function getFirtsNewPost(Request $request)
     {
         $input = $request->all();
@@ -360,12 +332,13 @@ class PostController extends Controller
         }
         return response()->json($data);
     }
+
     public function getTwoPostAfterNew(Request $request)
     {
         $input = $request->all();
         $input['limit'] = $request->limit;
         try{
-            $data = Post::where('is_active', $input['is_active'] ?? 1)->orderBy('created_at', 'desc')->offset(2)->limit(2)->get();
+            $data = Post::where('is_active', $input['is_active'] ?? 1)->orderBy('created_at', 'desc')->offset(1)->limit(2)->get();
         }
         catch(HttpException $e){
             return response()->json([

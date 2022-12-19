@@ -19,3 +19,4 @@ Route::prefix('admin')->group(function (){
 
     Route::get('client/subcategories/load-view-by-cate/{id}',[SubcategoryController::class,'loadPostByViewOfCate']);
 
+    Route::get('client/subcategories/get-firts-new-post-by-cate/{id}',[SubcategoryController::class,'loadPostByViewOfCate']);
