@@ -312,7 +312,33 @@ class SubcategoryController extends Controller
             ->get();
             foreach( $data as $value){
                 // push object contact
-                $value->posts = SubCategory::postViewByCategoryID($value->id);
+                $value->posts = SubCategory::firtsNewPostByCategoryID($value->id);
+            }
+        }  catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status'=>'success',
+            'data' =>$data
+        ]);
+    }
+
+    public function getTwoPostAfterNew($id)
+    {
+        try{
+            $data = SubCategory::where('is_active', 1)
+            ->where('id',$id)
+            ->get();
+            foreach( $data as $value){
+                // push object contact
+                $value->posts = SubCategory::twoPostAfterNewByCategoryID($value->id);
             }
         }  catch(HttpException $e){
             return response()->json([
@@ -339,7 +365,7 @@ class SubcategoryController extends Controller
             ->get();
             foreach( $data as $value){
                 // push object contact
-                $value->posts = SubCategory::firtsNewPostByCategoryID($value->id);
+                $value->posts = SubCategory::postViewByCategoryID($value->id);
             }
         }  catch(HttpException $e){
             return response()->json([
