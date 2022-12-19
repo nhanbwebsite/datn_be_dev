@@ -13,5 +13,5 @@ use App\Http\Controllers\PostController;
     Route::get('client/load-post/',[PostController::class,'loadAllPostClient']);
     Route::get('client/load-post/{id}',[PostController::class,'loadDetailPostClient']);
 
-    Route::get('client/get-firts-new-post',[PostController::class,'getFirtsNewPost']);
-    Route::get('client/get-two-post-after-new',[PostController::class,'getTwoPostAfterNew']);
+    Route::get('client/posts/get-firts-new-post',[PostController::class,'getFirtsNewPost']);
+    Route::get('client/posts/get-two-post-after-new',[PostController::class,'getTwoPostAfterNew']);
