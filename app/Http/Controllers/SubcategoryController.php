@@ -396,10 +396,8 @@ class SubcategoryController extends Controller
                 $query->where('slug', 'like', '%'.$input['slug'].'%');
             }
        })->paginate($input['limit'] ?? 9);
-        return response()->json([
-            'message' => 'SubCategories Posts',
-            'data' => $data
-         ],200);
+
+        return response()->json(new subcateGoryCollection($data),200);
 
     }
 
@@ -415,10 +413,7 @@ class SubcategoryController extends Controller
                 $query->where('slug', 'like', '%'.$input['slug'].'%');
             }
        })->paginate($input['limit'] ?? 9);
-        return response()->json([
-            'message' => 'SubCategories Posts',
-            'data' => $data
-         ],200);
+       return response()->json(new subcateGoryCollection($data),200);
 
     }
 
