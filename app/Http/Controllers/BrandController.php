@@ -19,7 +19,6 @@ class BrandController extends Controller
         try{
             $input = $request->all();
             $data = Brands::where('is_post',0)
-            ->where('is_active',1)
             ->where('deleted_at',null)
             ->where(function ($query) use ($input) {
                 if(!empty($input['name'])){
