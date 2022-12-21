@@ -21,6 +21,10 @@ class productImportSlipCollection extends ResourceCollection
 
                 foreach($value->details as $value2){
                     $value2->product_info->name;
+                    $value2->product_info->variant;
+                    $value2->color;
+                    $value2->variant->variant_product;
+
                 }
 
                 $result['data'][] = [
@@ -30,7 +34,7 @@ class productImportSlipCollection extends ResourceCollection
                     'warehouse_id'  => $value->warehouse_id,
                     'warehouse'     => $value->warehouse->name,
                     'note'          => $value->note ?? null,
-                    'details'       => $value->details,
+                    'details'       => $value->details[0],
                     'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
                     'created_by'    => $value->createdBy->name ?? null,
