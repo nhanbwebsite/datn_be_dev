@@ -105,9 +105,7 @@ class SlideshowController extends Controller
      */
     public function show($id, Request $request)
     {
-        $data_un_active = $request->un_active;
-        $un_active = Slideshow::find($data_un_active);
-        $un_active->is_active = 0;
+
         $data = Slideshow::find($id);
         if (empty($data)) {
             return response()->json([
