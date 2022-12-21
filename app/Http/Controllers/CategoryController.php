@@ -79,12 +79,16 @@ class CategoryController extends Controller
                 $categoryCreate = Category::create([
                     'name' => $request->name,
                     'slug' => Str::slug($request->name),
-                    'is_post' => 1
+                    'is_post' => 1,
+                    'created_by' => auth('sanctum')->user()->id,
+                    'updated_by' => auth('sanctum')->user()->id
                 ]);
             } else {
                 $categoryCreate = Category::create([
                     'name' => $request->name,
-                    'slug' => Str::slug($request->name)
+                    'slug' => Str::slug($request->name),
+                    'created_by' => auth('sanctum')->user()->id,
+                    'updated_by' => auth('sanctum')->user()->id
                 ]);
             }
 

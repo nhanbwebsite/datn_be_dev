@@ -106,7 +106,10 @@ class SlideshowController extends Controller
     public function show($id, Request $request)
     {
 
-        $data = Slideshow::find($id);
+        $id = DB::table('slideshow')->where('is_active',1)->first();
+        // $update = Slideshow::select('')
+        // dd($id->id);
+        $data = Slideshow::find($id->id);
         if (empty($data)) {
             return response()->json([
                 'message' =>  'Không tìm thấy slideshow !'
