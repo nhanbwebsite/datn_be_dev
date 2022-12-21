@@ -162,7 +162,10 @@ class OrderController extends Controller
         }
         return response()->json([
             'status' => 'success',
-            'message' => 'Đặt hàng thành công ! Mã đơn hàng của bạn là: '.$create->code
+            'message' => 'Đặt hàng thành công !',
+            'data' => [
+                'order_code' => $create->code,
+            ],
         ]);
     }
 
