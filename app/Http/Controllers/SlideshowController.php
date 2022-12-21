@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Http\Resources\SlideshowResource;
 use App\Http\Resources\SlideshowCollection;
 use App\Http\Resources\SlideshowCollectionClient;
+
 class SlideshowController extends Controller
 {
     /**
@@ -25,7 +26,7 @@ class SlideshowController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => new SlideshowCollection($data)
-        ],200);
+        ], 200);
     }
 
     /**
@@ -56,22 +57,22 @@ class SlideshowController extends Controller
 
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->only(['title','images','links']), $rules, $messages, $attributes);
-            if($validator->fails()){
+            $validator = Validator::make($request->only(['title', 'images', 'links']), $rules, $messages, $attributes);
+            if ($validator->fails()) {
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors(),
                 ], 422);
             }
 
-          $create = Slideshow::create([
+            $create = Slideshow::create([
                 'title' => $request->title,
                 'slug' => Str::slug($request->title),
                 'created_by' => auth('sanctum')->user()->id
             ]);
 
-            if(!empty($request->images) && !empty($request->links)){
-                foreach($request->images as $key => $value){
+            if (!empty($request->images) && !empty($request->links)) {
+                foreach ($request->images as $key => $value) {
                     Slideshow_detail::create([
                         'slideshow_id' => $create->id,
                         'image' => $value,
@@ -82,13 +83,13 @@ class SlideshowController extends Controller
             }
 
             DB::commit();
-        } catch(HttpException $e) {
+        } catch (HttpException $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
                 'line' => $e->getLine(),
-            ],$e->getStatusCode()); //
+            ], $e->getStatusCode()); //
         }
         return response()->json([
             'status' => 'Created successfully',
@@ -102,19 +103,22 @@ class SlideshowController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
+        $data_un_active = $request->un_active;
+        $un_active = Slideshow::find($data_un_active);
+        $un_active->is_active = 0;
         $data = Slideshow::find($id);
-        if(empty($data)){
+        if (empty($data)) {
             return response()->json([
                 'message' =>  'Không tìm thấy slideshow !'
-            ],400);
+            ], 400);
         }
 
         return response()->json([
             'status' => 'success',
             'data' => new SlideshowResource($data)
-        ],200);
+        ], 200);
     }
 
     /**
@@ -143,8 +147,8 @@ class SlideshowController extends Controller
 
         try {
             DB::beginTransaction();
-            $validator = Validator::make($request->only(['title','images']), $rules, $messages, $attributes);
-            if($validator->fails()){
+            $validator = Validator::make($request->only(['title', 'images']), $rules, $messages, $attributes);
+            if ($validator->fails()) {
                 return response()->json([
                     'status' => 'error',
                     'message' => $validator->errors(),
@@ -152,10 +156,10 @@ class SlideshowController extends Controller
             }
 
             $data = Slideshow::find($id);
-            if(empty( $data)){
+            if (empty($data)) {
                 return response()->json([
                     'message' => 'Slideshow không tồn tại'
-                ],400);
+                ], 400);
             }
             $data->title = $request->title;
             $data->title = Str::slug($request->title);
@@ -163,17 +167,17 @@ class SlideshowController extends Controller
             $data->updated_by = auth('sanctum')->user()->id;
             $data->save;
             DB::commit();
-        } catch(HttpException $e) {
+        } catch (HttpException $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
                 'line' => $e->getLine(),
-            ],$e->getStatusCode()); //
+            ], $e->getStatusCode()); //
         }
         return response()->json([
             'status' => 'Cập nhật slideshow thành công',
-        ],200);
+        ], 200);
     }
 
     /**
@@ -189,17 +193,16 @@ class SlideshowController extends Controller
             DB::beginTransaction();
 
             $data = Slideshow::find($id);
-            if(empty( $data)){
+            if (empty($data)) {
                 return response()->json([
                     'message' => 'Slideshow không tồn tại'
-                ],400);
+                ], 400);
             }
             $data->deleted_by = auth('sanctum')->user()->id;
             $data->delete();
 
             DB::commit();
-
-        } catch(HttpException $e) {
+        } catch (HttpException $e) {
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -213,7 +216,7 @@ class SlideshowController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Xóa slideshow thành công'
-        ],200);
+        ], 200);
     }
 
     public function getclientslideshowDetails()
@@ -222,6 +225,6 @@ class SlideshowController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => new SlideshowCollectionClient($data)
-        ],200);
+        ], 200);
     }
 }

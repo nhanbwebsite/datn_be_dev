@@ -36,4 +36,12 @@ class ProductImportSlipDetail extends Model
     public function product_info(){
         return $this->belongsTo(Product::class, 'product_id', 'id');
     }
+
+    public function variant(){
+        return $this->belongsTo(ProductVariantDetail::class, 'pro_variant_id', 'id');
+    }
+
+    public function color(){
+        return $this->belongsTo(Color::class, 'color_id', 'id');
+    }
 }
