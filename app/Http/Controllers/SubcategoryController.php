@@ -83,14 +83,18 @@ class SubcategoryController extends Controller
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
                 'brand_id' => $request->brand_id,
-                'is_post' => $request->is_post ?? null
+                'is_post' => $request->is_post ?? null,
+                'created_by' => auth('sanctum')->user()->id,
+                'updated_by' => auth('sanctum')->user()->id,
             ]);
            } else{
             $create = SubCategory::create([
                 'category_id' => $request->category_id,
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
-                'is_post' => $request->is_post ?? null
+                'is_post' => $request->is_post ?? null,
+                'created_by' => auth('sanctum')->user()->id,
+                'updated_by' => auth('sanctum')->user()->id,
             ]);
            }
 
