@@ -25,4 +25,13 @@ class Brands extends Model
     protected $attributes = [
         'is_active' => 1,
     ];
+
+    public function createdBy(){
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function updatedBy(){
+        return $this->belongsTo(User::class, 'updated_by', 'id');
+    }
+
 }

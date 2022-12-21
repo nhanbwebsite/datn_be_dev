@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use  App\Http\Resources\BrandCollection;
 use App\Models\Brands;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -30,10 +30,7 @@ class BrandController extends Controller
                 }
             })
             ->paginate(9);
-            return response()->json([
-                'status' => 'success',
-                'data' => $data
-            ]);
+            return response()->json(new BrandCollection($data));
 
         } catch(Exception $e){
                 return response()->json([
@@ -79,7 +76,9 @@ class BrandController extends Controller
                 $create =   Brands::create([
                     'brand_name' => $request->brand_name,
                     'slug' => Str::slug($request->brand_name),
-                    'is_post' => $request->is_post
+                    'is_post' => $request->is_post,
+                    'created_by' => auth('sanctum')->user()->id,
+                    'updated_by' => auth('sanctum')->user()->id,
                 ]);
 
                 if($create) {
@@ -91,7 +90,9 @@ class BrandController extends Controller
             } else{
                 $create =   Brands::create([
                     'brand_name' => $request->brand_name,
-                    'slug' => Str::slug($request->brand_name)
+                    'slug' => Str::slug($request->brand_name),
+                    'created_by' => auth('sanctum')->user()->id,
+                    'updated_by' => auth('sanctum')->user()->id,
                 ]);
 
                 if($create) {
@@ -125,8 +126,8 @@ class BrandController extends Controller
             $data = Brands::find($id);
             if(empty($data)) {
                 return response()->json([
-                    'status' => 'Error',
-                    'message' => 'Not Found'
+                    'status' => 'Lỗi',
+                    'message' => 'Không tìm thấy thương hiệu !'
                 ]); //
             }
 
