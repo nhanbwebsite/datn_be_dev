@@ -31,7 +31,7 @@ class CartResource extends JsonResource
                     $dataDetail[$key]['product_id'] = $detail->product_id;
                     $dataDetail[$key]['product_name'] = $detail->product->name;
                     $dataDetail[$key]['variant_id'] = $detail->variant_id;
-                    $dataDetail[$key]['variant_name'] = $variant->variant->variant_name;
+                    $dataDetail[$key]['variant_name'] = $detail->variant->variant_product->variant_name;
                     $dataDetail[$key]['color_id'] = $detail->color_id;
                     $dataDetail[$key]['color_name'] = $color->color->name;
                     $dataDetail[$key]['product_image'] = $detail->product->url_image ?? null;
