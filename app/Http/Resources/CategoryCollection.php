@@ -21,6 +21,7 @@ class CategoryCollection extends ResourceCollection
                 $subcategoryData = [];
                 if(!$value->subs->isEmpty()){
                     foreach($value->subs as $k => $item){
+                        dd($item);
                         $subcategoryData[$k]['id'] = $item->id;
                         $subcategoryData[$k]['category_id'] = $value->id;
                         $subcategoryData[$k]['name'] = $item->name;
