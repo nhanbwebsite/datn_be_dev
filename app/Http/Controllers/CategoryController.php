@@ -280,10 +280,7 @@ class CategoryController extends Controller
             ], $e->getStatusCode());
         }
 
-        return response()->json([
-            'status'=>'success',
-            'data' =>$data
-        ]);
+        return response()->json(new CategoryCollection($data));
     }
     public function getCategory_is_post(){
         try{
@@ -305,10 +302,7 @@ class CategoryController extends Controller
             ], $e->getStatusCode());
         }
 
-        return response()->json([
-            'status'=>'success',
-            'data' =>$data
-        ]);
+        return response()->json(new CategoryCollection($data));
     }
 
 }

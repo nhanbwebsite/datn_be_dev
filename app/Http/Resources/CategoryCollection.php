@@ -30,8 +30,8 @@ class CategoryCollection extends ResourceCollection
                         $subcategoryData[$k]['is_active'] = $item->is_active;
                         $subcategoryData[$k]['created_at'] = $item->created_at->format('Y-m-d H:i:s');
                         $subcategoryData[$k]['updated_at'] = $item->updated_at->format('Y-m-d H:i:s');
-                        $subcategoryData[$k]['created_by'] = $item->created_by;
-                        $subcategoryData[$k]['updated_by'] = $item->updated_by;
+                        $subcategoryData[$k]['created_by'] = $item->createdBy->name;
+                        $subcategoryData[$k]['updated_by'] = $item->updatedBy->name;
                     }
                 }
                 $result['data'][] = [
