@@ -6,6 +6,7 @@ use App\Models\Brands;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\BrandResource;
 class BrandController extends Controller
 {
     /**
@@ -129,10 +130,7 @@ class BrandController extends Controller
                 ]); //
             }
 
-            return response()->json([
-                'status' => 'Successfully',
-                'data' => $data
-            ]);
+            return response()->json(['data' => new BrandResource($data)]);
 
 
         } catch(Exception $e) {
