@@ -42,7 +42,7 @@ class SubCategory extends Model
 
 
     public function posts(){
-        return $this->hasMany(Post::class, 'subcategory_id', 'id');
+        return $this->hasMany(Post::class, 'subcategory_id', 'id')->orderBy('created_at','desc');
     }
     public static function postByCategoryID($subcategory_id){
         $data = Post::where('subcategory_id',$subcategory_id)->get();
