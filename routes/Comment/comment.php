@@ -14,4 +14,5 @@ use App\Http\Controllers\ReplyCommentController;
     // Route::get('/getAllProductHaveCommentsAdmin', [CommentController::class,'getAllProductHaveComments']);
     Route::get('/replycommentByCommentID/{id}', [CommentController::class,'getReplyCommenproductByIdComment']);
     Route::delete('deleteRepcomment/{id}', [ReplyCommentController::class,'destroy']);
+    Route::get('comment_is_un_active',[CommentController::class,'getCommentUnactive']);
 ?>

@@ -347,4 +347,13 @@ class CommentController extends Controller
             'data' => $data,
         ],200);
     }
+
+    public function getCommentUnactive(){
+        $data = DB::table('comments')
+        ->select(DB::raw('count(*) as total'))
+        ->where('comments.is_active',0)
+        ->first();
+        return response()->json( $data,200);
+    }
+
 }
