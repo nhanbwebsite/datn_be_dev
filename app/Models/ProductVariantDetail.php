@@ -32,4 +32,5 @@ class ProductVariantDetail extends Model
     public function variant_product(){
         return $this->belongsTo(ProductVariant::class, 'variant_id', 'id');
     }
+
 }

@@ -21,4 +21,11 @@ class ProductVariant extends Model
         'updated_by',
         'deleted_by',
     ];
+
+
+
+    public function color(){
+        return $this->belongsTo(Color::class, 'color_id', 'id');
+    }
+
 }

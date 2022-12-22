@@ -20,12 +20,13 @@ class OrderCollection extends ResourceCollection
             foreach($this->collection as $value){
 
                 foreach($value->details as $key => $detail){
+
                     $dataDetails[$key]['product_id'] = $detail->product_id;
                     $dataDetails[$key]['product_name'] = $detail->product->name ?? null;
                     $dataDetails[$key]['variant_id'] = $detail->variant_id;
-                    $dataDetails[$key]['variant_name'] = $detail->variant->variant->variant_name ?? null;
+                    $dataDetails[$key]['variant_name'] = $detail->variant->variant_name ?? null;
                     $dataDetails[$key]['color_id'] = $detail->color_id;
-                    $dataDetails[$key]['color_name'] = $detail->variant->pro_variant->color->name ?? null;
+                    $dataDetails[$key]['color_name'] = $detail->color->name ?? null;
                     $dataDetails[$key]['product_image'] = $detail->product->url_image ?? null;
                     $dataDetails[$key]['price'] = $detail->price;
                     $dataDetails[$key]['quantity'] = $detail->quantity;
