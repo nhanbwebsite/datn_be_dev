@@ -32,7 +32,7 @@ class ColorsController extends Controller
         if(isset($input['paginate'])) {
           $dataReturn =  $data->paginate($input['paginate']);
         } else{
-            $dataReturn = $data->paginatte(9);
+            $dataReturn = $data->paginate(9);
         }
 
         return response()->json([
