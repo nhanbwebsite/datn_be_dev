@@ -17,7 +17,6 @@ class ProductsHaveComemntCollection extends ResourceCollection
 
         if(!$this->collection->isEmpty()){
             // $request not empty
-            $result = [];
             foreach($this->collection as $key => $value){
 
 
@@ -55,23 +54,23 @@ class ProductsHaveComemntCollection extends ResourceCollection
             //        }
             //    }
 
-
+            $cmt = [];
                 foreach($value->comments as $key => $item){
-                    $result['id'] = $item->id;
-                    $result['user_id'] = $item->user_id;
-                    $result['product_id'] = $item->product_id;
-                    $result['content'] = $item->content;
-                    $result['is_active'] = $item->is_active;
-                    $result['created_by'] = $item->createdBy->name ?? null;
-                    $result['updated_by'] = $item->updatedBy->name ?? null;
+                    $cmt[$key]['id'] = $item->id;
+                    $cmt[$key]['user_id'] = $item->user_id;
+                    $cmt[$key]['product_id'] = $item->product_id;
+                    $cmt[$key]['content'] = $item->content;
+                    $cmt[$key]['is_active'] = $item->is_active;
+                    $cmt[$key]['created_by'] = $item->createdBy->name ?? null;
+                    $cmt[$key]['updated_by'] = $item->updatedBy->name ?? null;
 
-                    $result['rep_comment'] = [];
+                    $cmt[$key]['replyComments'] = [];
                     foreach($item->repComment as $k => $rep){
-                        $result['rep_comment'][$k]['id'] = $rep->id;
-                        $result['rep_comment'][$k]['rep_comment'] = $rep->rep_comment;
-                        $result['rep_comment'][$k]['is_active'] = $rep->is_active;
-                        $result['rep_comment'][$k]['created_by'] = $rep->createdBy->name ?? null;
-                        $result['rep_comment'][$k]['updated_by'] = $rep->updatedBy->name ?? null;
+                        $cmt[$key]['replyComments'][$k]['id'] = $rep->id;
+                        $cmt[$key]['replyComments'][$k]['replyComments'] = $rep->rep_comment;
+                        $cmt[$key]['replyComments'][$k]['is_active'] = $rep->is_active;
+                        $cmt[$key]['replyComments'][$k]['created_by'] = $rep->createdBy->name ?? null;
+                        $cmt[$key]['replyComments'][$k]['updated_by'] = $rep->updatedBy->name ?? null;
                     }
                 }
 
@@ -85,6 +84,7 @@ class ProductsHaveComemntCollection extends ResourceCollection
                     'meta_keywords' => $value->meta_keywords,
                     'meta_description' => $value->meta_description,
                     'countComment'  => count($value->comments),
+                    'comments'  => $value->comments,
                     'is_active'     => $value->is_active,
                     'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
                     'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
