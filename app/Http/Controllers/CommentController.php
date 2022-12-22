@@ -354,9 +354,11 @@ class CommentController extends Controller
         $data_comment = DB::table('comments')
         ->select(DB::raw('count(*) as total'))
         ->where('comments.is_active',0)
+        ->where('comments.deleted_at',null)
         ->first()->total;
         $data_rep_comment = DB::table('rep_comments')
         ->select(DB::raw('count(*) as total'))
+        ->where('rep_comments.deleted_at',null)
         ->where('rep_comments.is_active',0)
         ->first()->total;
         $data = $data_comment + $data_rep_comment;
