@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Models\Rep_comment;
+use Faker\Core\Number;
+
 class CommentController extends Controller
 {
     /**
@@ -349,11 +351,16 @@ class CommentController extends Controller
     }
 
     public function getCommentUnactive(){
-        $data = DB::table('comments')
+        $data_comment = DB::table('comments')
         ->select(DB::raw('count(*) as total'))
         ->where('comments.is_active',0)
-        ->first();
-        return response()->json( $data,200);
+        ->first()->total;
+        $data_rep_comment = DB::table('rep_comments')
+        ->select(DB::raw('count(*) as total'))
+        ->where('rep_comments.is_active',0)
+        ->first()->total;
+        $data = $data_comment + $data_rep_comment;
+        return response()->json( ['data' => $data],200);
     }
 
 }
