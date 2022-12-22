@@ -768,7 +768,7 @@ class ProductController extends Controller
     }
 
     public function productsHaveCommentAll(){
-        $data = Product::where('is_active',1)->paginate(9);
+        $data = Product::paginate(9);
         $data = new ProductsHaveComemntCollection($data);
         return response()->json(
              $data,200);
