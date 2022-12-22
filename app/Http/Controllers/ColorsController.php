@@ -27,12 +27,12 @@ class ColorsController extends Controller
             if(!empty($input['slug'])){
                 $query->where('slug', 'like', '%'.$input['slug'].'%');
             }
-        })->paginate(9);
+        });
 
         if(isset($input['paginate'])) {
           $dataReturn =  $data->paginate($input['paginate']);
         } else{
-            $dataReturn = $data->get();
+            $dataReturn = $data->paginatte(9);
         }
 
         return response()->json([
