@@ -56,7 +56,7 @@ class SlideshowController extends Controller
         ];
 
         try {
-            // DB::beginTransaction();
+            DB::beginTransaction();
             // $validator = Validator::make($request->only(['title', 'images', 'links']), $rules, $messages, $attributes);
             // if ($validator->fails()) {
             //     return response()->json([
