@@ -26,8 +26,8 @@ class productImportSlipResource extends JsonResource
                 'status_name'   => $this->status == "X" ? "Chưa nhập" : "Đã nhập",
                 'note'          => $this->note ?? null,
                 'details'       => $this->details,
-                'created_at'    => $this->created_at->format('Y-m-d H:i:s'),
-                'updated_at'    => $this->updated_at->format('Y-m-d H:i:s'),
+                'created_at'    => $this->created_at->format('d-m-Y H:i:s'),
+                'updated_at'    => $this->updated_at->format('d-m-Y H:i:s'),
                 'created_by'    => $this->createdBy->name ?? null,
                 'updated_by'    => $this->updatedBy->name ?? null,
             ];

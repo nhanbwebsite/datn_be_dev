@@ -31,8 +31,8 @@ class AddressNoteResource extends JsonResource
                 'ward'          => $this->ward->name,
                 'is_default'    => $this->is_default,
                 'is_active'     => $this->is_active,
-                'created_at'    => $this->created_at->format('Y-m-d H:i:s'),
-                'updated_at'    => $this->updated_at->format('Y-m-d H:i:s'),
+                'created_at'    => $this->created_at->format('d-m-Y H:i:s'),
+                'updated_at'    => $this->updated_at->format('d-m-Y H:i:s'),
                 'created_by'    => $this->createdBy->name ?? null,
                 'updated_by'    => $this->updatedBy->name ?? null,
             ];

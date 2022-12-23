@@ -27,8 +27,8 @@ class CategoryClientCollection extends ResourceCollection
                         $subcategoryData[$key]['slug'] = $item->slug;
                         $subcategoryData[$key]['url_img'] = $item->url_img ?? null;
                         $subcategoryData[$key]['is_active'] = $item->is_active;
-                        $subcategoryData[$key]['created_at'] = $item->created_at->format('Y-m-d H:i:s');
-                        $subcategoryData[$key]['updated_at'] = $item->updated_at->format('Y-m-d H:i:s');
+                        $subcategoryData[$key]['created_at'] = $item->created_at->format('d-m-Y H:i:s');
+                        $subcategoryData[$key]['updated_at'] = $item->updated_at->format('d-m-Y H:i:s');
                         $subcategoryData[$key]['created_by'] = $item->created_by;
                         $subcategoryData[$key]['updated_by'] = $item->updated_by;
                 }
@@ -40,8 +40,8 @@ class CategoryClientCollection extends ResourceCollection
                     'url_img'       => $value->url_img,
                     'is_active'     => $value->is_active,
                     'subs'          => $subcategoryData ?? null,
-                    'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
-                    'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
+                    'created_at'    => $value->created_at->format('d-m-Y H:i:s'),
+                    'updated_at'    => $value->updated_at->format('d-m-Y H:i:s'),
                     'created_by'    => $value->createdBy->name ?? null,
                     'updated_by'    => $value->updatedBy->name ?? null,
                 ];

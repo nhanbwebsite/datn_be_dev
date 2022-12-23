@@ -23,7 +23,7 @@ class LoadFooterContentResource extends JsonResource
                     $contentFooter[$key]['content'] = $footerContent->content;
                     $contentFooter[$key]['slug'] = $footerContent->slug;
                     $contentFooter[$key]['is_active'] = $footerContent->is_active;
-                    $contentFooter[$key]['updated_at'] = $footerContent->updated_at->format('Y-m-d H:i:s');
+                    $contentFooter[$key]['updated_at'] = $footerContent->updated_at->format('d-m-Y H:i:s');
                     $contentFooter[$key]['updated_by'] = $footerContent->updateBy->name ?? null;
                 }
             }

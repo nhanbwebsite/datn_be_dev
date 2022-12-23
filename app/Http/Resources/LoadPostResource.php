@@ -32,7 +32,7 @@ class LoadPostResource extends JsonResource
                     $postData[$key]['view'] = $post->view;
                     $postData[$key]['is_feature'] = $post->is_feature;
                     $postData[$key]['is_active'] = $post->is_active;
-                    $postData[$key]['updated_at'] = $post->updated_at->format('Y-m-d H:i:s');
+                    $postData[$key]['updated_at'] = $post->updated_at->format('d-m-Y H:i:s');
                     $postData[$key]['updated_by'] = $post->updateBy->name ?? null;
                 }
             }
