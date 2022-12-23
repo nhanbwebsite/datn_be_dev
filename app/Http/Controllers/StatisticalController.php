@@ -115,7 +115,7 @@ class StatisticalController extends Controller
 
     public function revenueStatisticsToday(){
         try{
-            $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereDate('created_at', '=', date('Y-m-d H:i:s', time()))->get()->toArray();
+            $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereDate('created_at', '=', time())->get()->toArray();
         }
         catch(HttpException $e){
             return response()->json([
