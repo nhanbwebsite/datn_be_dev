@@ -64,12 +64,21 @@ class SlideshowController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
+            if(!empty($request->category_id)){
+                $create = Slideshow::create([
+                    'title' => $request->title,
+                    'category_id'   => $request->category_id,
+                    'slug' => Str::slug($request->title),
+                    'created_by' => auth('sanctum')->user()->id
+                ]);
+            } else {
+                $create = Slideshow::create([
+                    'title' => $request->title,
+                    'slug' => Str::slug($request->title),
+                    'created_by' => auth('sanctum')->user()->id
+                ]);
+            }
 
-            $create = Slideshow::create([
-                'title' => $request->title,
-                'slug' => Str::slug($request->title),
-                'created_by' => auth('sanctum')->user()->id
-            ]);
 
             if (!empty($request->images) && !empty($request->links)) {
                 foreach ($request->images as $key => $value) {
@@ -105,8 +114,14 @@ class SlideshowController extends Controller
      */
     public function show($id, Request $request)
     {
-
-        $id = DB::table('slideshow')->where('is_active',1)->first();
+        $input = $request->all();
+        $id = DB::table('slideshow')->where(function($query) use ($input){
+            if(!empty($input['category_id'])){
+                $query->where('slideshow.category_id',$input['category_id']);
+            } else{
+                $query->where('slideshow.category_id',null);
+            }
+        })->first();
         // $update = Slideshow::select('')
         // dd($id->id);
         $data = Slideshow::find($id->id);
