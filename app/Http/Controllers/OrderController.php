@@ -17,6 +17,7 @@ use App\Models\Product;
 use App\Models\productAmountByWarehouse;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantDetail;
+use App\Models\User;
 use App\Models\VNPayOrder;
 use App\Models\Warehouse;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -95,6 +96,9 @@ class OrderController extends Controller
             $orderDetailCreateValidator->validate($value);
         }
         $user = $request->user();
+        if(empty($user)){
+            $user = User::find($input['user_id']);
+        }
         try{
             DB::beginTransaction();
 
@@ -210,11 +214,12 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, OrderUpdateValidator $validator, CancelOrderValidator $cancelValidator)
+    public function update(Request $request, $id, OrderUpdateValidator $validator, CancelOrderValidator $cancelValidator, ApproveOrderValidator $approveValidator)
     {
         $input = $request->all();
         $validator->validate($input);
         $user = $request->user();
+
         try{
             DB::beginTransaction();
 
@@ -224,6 +229,18 @@ class OrderController extends Controller
                     'status' => 'success',
                     'message' => 'Đơn hàng không tồn tại !',
                 ], 404);
+            }
+
+            if($input['status'] == ORDER_STATUS_APPROVED){
+                if($update->status == ORDER_STATUS_APPROVED){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Đơn hàng đã được duyệt !'
+                    ], 400);
+                }
+                $input['warehouse_id'] = $user->store->warehouse->id ?? $request->warehouse_id ?? null;
+                $approveValidator->validate($input);
+                $update->warehouse_id = $input['warehouse_id'];
             }
 
             if($input['status'] == ORDER_STATUS_CANCELED){
