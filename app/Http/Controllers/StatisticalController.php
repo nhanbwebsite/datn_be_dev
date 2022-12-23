@@ -7,8 +7,11 @@ use App\Models\productAmountByWarehouse;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\User;
 use App\Models\Post;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
 class StatisticalController extends Controller
 {
     /**
@@ -110,50 +113,23 @@ class StatisticalController extends Controller
                 // ->get();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+    public function revenueStatisticsToday(){
+        try{
+            $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereDate('created_at', '=', date('Y-m-d H:i:s', time()))->get()->toArray();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'data' => $data ?? [],
+        ]);
     }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
 
 }
