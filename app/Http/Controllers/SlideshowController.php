@@ -69,7 +69,7 @@ class SlideshowController extends Controller
                     'title' => $request->title,
                     'category_id'   => $request->category_id,
                     'slug' => Str::slug($request->title),
-                    'created_by' => auth('sanctum')->user()->id
+                    'created_by' => $request->user()->id
                 ]);
             } else {
                 $create = Slideshow::create([
