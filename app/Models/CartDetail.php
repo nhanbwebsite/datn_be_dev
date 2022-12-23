@@ -42,6 +42,10 @@ class CartDetail extends Model
     }
 
     public function variant(){
-        return $this->belongsTo(ProductVariantDetail::class, 'variant_id', 'id');
+        return $this->belongsTo(ProductVariant::class, 'variant_id', 'id');
+    }
+
+    public function color(){
+        return $this->belongsTo(Color::class, 'color_id', 'id');
     }
 }

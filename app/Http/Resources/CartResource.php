@@ -24,20 +24,14 @@ class CartResource extends JsonResource
 
 
                 foreach($this->details as $key => $detail){
-                    $variant = ProductVariantDetail::where('variant_id', $detail->variant_id)->where('product_id', $detail->product_id)->first();
-                    $color = ProductVariantDetailById::where('pro_variant_id', $variant->pro_variant->pro_variant_id)->where('color_id', $detail->color_id)->first();
-
                     $totalPrice += $detail->price * $detail->quantity;
                     $dataDetail[$key]['product_id'] = $detail->product_id;
                     $dataDetail[$key]['product_name'] = $detail->product->name;
                     $dataDetail[$key]['variant_id'] = $detail->variant_id;
-                    $dataDetail[$key]['variant_name'] = $detail->variant->variant_product->variant_name;
+                    $dataDetail[$key]['variant_name'] = $detail->variant->variant_name;
                     $dataDetail[$key]['color_id'] = $detail->color_id;
-                    // test
-                    $dataDetail[$key]['color_name'] = $color->color->name;
+                    $dataDetail[$key]['color_name'] = $detail->color->name;
                     $dataDetail[$key]['product_image'] = $detail->product->url_image ?? null;
-                    $dataDetail[$key]['original_price'] = $color->price;
-                    $dataDetail[$key]['original_price_formatted'] = number_format($color->price).'đ';
                     $dataDetail[$key]['price'] = $detail->price;
                     $dataDetail[$key]['price_formatted'] = number_format($detail->price).'đ';
                     $dataDetail[$key]['quantity'] = $detail->quantity > 0 ? $detail->quantity : 0;
