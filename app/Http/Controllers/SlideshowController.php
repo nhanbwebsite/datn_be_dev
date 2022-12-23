@@ -57,13 +57,13 @@ class SlideshowController extends Controller
 
         try {
             DB::beginTransaction();
-            // $validator = Validator::make($request->only(['title', 'images', 'links']), $rules, $messages, $attributes);
-            // if ($validator->fails()) {
-            //     return response()->json([
-            //         'status' => 'error',
-            //         'message' => $validator->errors(),
-            //     ], 422);
-            // }
+            $validator = Validator::make($request->only(['title', 'images', 'links']), $rules, $messages, $attributes);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $validator->errors(),
+                ], 422);
+            }
             if(!empty($request->category_id)){
                 $create = Slideshow::create([
                     'title' => $request->title,
