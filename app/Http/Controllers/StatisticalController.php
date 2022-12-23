@@ -113,9 +113,52 @@ class StatisticalController extends Controller
                 // ->get();
     }
 
-    public function revenueStatisticsToday(){
+    public function revenueStatisticsToDay(){
+        $result = [];
         try{
-            $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereDate('created_at', '=', time())->get()->toArray();
+            $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereDay('created_at', date('d', time()))->get();
+            if(empty($data)){
+                $result['total_revenue_today'] = 0;
+                $result['total_revenue_today_formatted'] = number_format(0).'đ';
+            }
+            $total_revenue_today = 0;
+            foreach($data as $key => $value){
+                if(!empty($value)){
+                    $total_revenue_today += $value->total;
+                }
+            }
+            $result['today'] = date('d-m-Y H:i:s', time());
+            $result['total_revenue_today'] = $total_revenue_today;
+            $result['total_revenue_today_formatted'] = number_format($total_revenue_today).'đ';
+
+            $orderYesterday = Order::where('status', ORDER_STATUS_COMPLETED)->whereDay('created_at', date('d', time()-24*60*60))->get();
+            if(empty($orderYesterday)){
+                $result['total_revenue_yesterday'] = 0;
+                $result['total_revenue_yesterday_formatted'] = number_format(0).'đ';
+            }
+            $total_revenue_yesterday = 0;
+            foreach($orderYesterday as $key => $value){
+                if(!empty($value)){
+                    $total_revenue_yesterday += $value->total;
+                }
+            }
+            $result['total_revenue_yesterday'] = $total_revenue_yesterday;
+            $result['total_revenue_yesterday_formatted'] = number_format($total_revenue_yesterday).'đ';
+
+            $allCompletedOrder = Order::where('status', ORDER_STATUS_COMPLETED)->get();
+            if(empty($allCompletedOrder)){
+                $result['total_revenue'] = 0;
+                $result['total_revenue_formatted'] = number_format(0).'đ';
+            }
+            $total_revenue = 0;
+            foreach($allCompletedOrder as $key => $value){
+                if(!empty($value)){
+                    $total_revenue += $value->total;
+                }
+            }
+            $result['total_revenue'] = $total_revenue;
+            $result['total_revenue_formatted'] = number_format($total_revenue).'đ';
+
         }
         catch(HttpException $e){
             return response()->json([
@@ -128,7 +171,7 @@ class StatisticalController extends Controller
             ], $e->getStatusCode());
         }
         return response()->json([
-            'data' => $data ?? [],
+            'data' => $result,
         ]);
     }
 
