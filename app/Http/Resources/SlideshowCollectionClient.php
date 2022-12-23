@@ -23,8 +23,8 @@ class SlideshowCollectionClient extends ResourceCollection
                     'title'   => $value->title,
                     'details'          => $value->details,
                     'is_active'     => $value->is_active,
-                    'created_at'    => $value->created_at->format('Y-m-d H:i:s'),
-                    'updated_at'    => $value->updated_at->format('Y-m-d H:i:s'),
+                    'created_at'    => $value->created_at->format('d-m-Y H:i:s'),
+                    'updated_at'    => $value->updated_at->format('d-m-Y H:i:s'),
                     'created_by'    => $value->createdBy->name ?? null,
                     'updated_by'    => $value->updatedBy->name ?? null,
                 ];

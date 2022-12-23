@@ -31,8 +31,8 @@ class PostResource extends JsonResource
                 'slug'          => $this->slug,
                 'views'          => $this->views,
                 'is_active'     => $this->is_active,
-                'created_at'    => $this->created_at->format('Y-m-d H:i:s'),
-                'updated_at'    => $this->updated_at->format('Y-m-d H:i:s'),
+                'created_at'    => $this->created_at->format('d-m-Y H:i:s'),
+                'updated_at'    => $this->updated_at->format('d-m-Y H:i:s'),
                 'updated_by'    => $this->updatedBy->name ?? null,
             ];
         }

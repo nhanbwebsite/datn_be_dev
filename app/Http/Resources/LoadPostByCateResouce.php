@@ -31,7 +31,7 @@ class LoadPostByCateResouce extends JsonResource
                     $posts[$key]['is_feature'] = $postsByCate->is_feature;
                     $posts[$key]['slug'] = $postsByCate->slug;
                     $posts[$key]['is_active'] =$postsByCate->is_active;
-                    $posts[$key]['updated_at'] = $postsByCate->updated_at->format('Y-m-d H:i:s');
+                    $posts[$key]['updated_at'] = $postsByCate->updated_at->format('d-m-Y H:i:s');
                     $posts[$key]['updated_by'] = $postsByCate->updateBy->name ?? null;
                 }
             }

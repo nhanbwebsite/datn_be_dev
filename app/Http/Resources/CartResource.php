@@ -69,8 +69,8 @@ class CartResource extends JsonResource
                 'payment_method_id' => $this->payment_method_id ?? null,
                 'payment_method' => $this->paymentMethod->name ?? null,
                 'details'       => $dataDetail,
-                'created_at'    => $this->created_at->format('Y-m-d H:i:s'),
-                'updated_at'    => $this->updated_at->format('Y-m-d H:i:s'),
+                'created_at'    => $this->created_at->format('d-m-Y H:i:s'),
+                'updated_at'    => $this->updated_at->format('d-m-Y H:i:s'),
                 'created_by'    => $this->createdBy->name ?? null,
                 'updated_by'    => $this->updatedBy->name ?? null,
             ];

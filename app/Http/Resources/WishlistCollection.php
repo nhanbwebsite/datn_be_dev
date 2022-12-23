@@ -27,8 +27,8 @@ class WishlistCollection extends ResourceCollection
                     'product_price' => $value->product->price, // chưa có
                     'product_price_sale' => $value->product->price_sale, // chưa có
                     'product_image' => $value->product->image, // chưa có, sau này file url
-                    'created_at' => $value->created_at->format('Y-m-d H:i:s'),
-                    'updated_at' => $value->updated_at->format('Y-m-d H:i:s'),
+                    'created_at' => $value->created_at->format('d-m-Y H:i:s'),
+                    'updated_at' => $value->updated_at->format('d-m-Y H:i:s'),
                     'created_by' => $value->createdBy->name ?? null,
                     'updated_by' => $value->updatedBy->name ?? null,
                 ];
