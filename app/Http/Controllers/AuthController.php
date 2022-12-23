@@ -55,12 +55,12 @@ class AuthController extends Controller
                     ], 400);
                 }
             }
-            if($userData->is_active == 0){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Người dùng đã bị khóa hoặc chưa kích hoạt !',
-                ], 401);
-            }
+            // if($userData->is_active == 0){
+            //     return response()->json([
+            //         'status' => 'error',
+            //         'message' => 'Người dùng đã bị khóa hoặc chưa kích hoạt !',
+            //     ], 401);
+            // }
 
             $data = RolePermission::where([
                 ['role_id', $userData->role_id],

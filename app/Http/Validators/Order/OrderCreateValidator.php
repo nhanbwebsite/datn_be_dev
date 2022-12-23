@@ -17,7 +17,8 @@ class OrderCreateValidator extends ValidatorBase
             'province_id' => 'required|numeric|exists:provinces,id',
             'email' => 'nullable|email',
             'total' => 'required|numeric',
-            'user_id' => 'numeric|exists:users,id',
+            'user_id' => 'required|numeric|exists:users,id',
+            'user_name' => 'required|string',
             'payment_method_id' => 'required|numeric|exists:payment_methods,id',
             'shipping_method_id' => 'required|numeric|exists:shipping_methods,id',
             'discount' => 'required|numeric',
@@ -49,8 +50,10 @@ class OrderCreateValidator extends ValidatorBase
             'province_id.exists' => ':attribute không tồn tại !',
             'total.required' => ':attribute không được để trống !',
             'total.numeric' => ':attribute phải là số !',
+            'user_id.required' => ':attribute không được để trống !',
             'user_id.numeric' => ':attribute phải là số !',
             'user_id.exists' => ':attribute không tồn tại !',
+            'user_name.string' => ':attribute phải là chuỗi !',
             'payment_method_id.required' => ':attribute không được để trống !',
             'payment_method_id.numeric' => ':attribute phải là số !',
             'payment_method_id.exists' => ':attribute không tồn tại !',
@@ -85,6 +88,8 @@ class OrderCreateValidator extends ValidatorBase
             'fee_ship' => 'Phí vận chuyển',
             'coupon_id' => 'Mã giảm giá',
             'details' => 'Chi tiết đơn hàng',
+            'user_id' => 'ID người dùng',
+            'user_name' => 'Tên người dùng',
         ];
     }
 }

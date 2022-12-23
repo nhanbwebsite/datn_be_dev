@@ -10,6 +10,7 @@ use App\Models\Cart;
 use App\Models\CartDetail;
 use App\Models\Coupon;
 use App\Models\CouponOrder;
+use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\ProductVariantDetail;
 use App\Models\ProductVariantDetailById;
@@ -116,7 +117,7 @@ class CartController extends Controller
                 $message = 'Đã thêm sản phẩm vào giỏ hàng !';
             }
             else {
-                $check = CartDetail::where('product_id', $input['product_id'])->where('variant_id', $input['variant_id'])->where('color_id', $input['color_id'])->first();
+                $check = CartDetail::where('cart_id', $cart->id)->where('product_id', $input['product_id'])->where('variant_id', $input['variant_id'])->where('color_id', $input['color_id'])->first();
                 if(empty($check)){
                     $validator->validate($input);
 
@@ -250,10 +251,18 @@ class CartController extends Controller
             }
 
             if(!empty($input['details'])){
-                foreach($input['details'] as $item){
+                foreach($input['details'] as $k => $item){
                     $detailValidator->validate($item);
                     $variant2 = ProductVariantDetail::where('variant_id', $item['variant_id'])->where('product_id', $item['product_id'])->first();
                     $variantFind2 = ProductVariantDetailById::where('pro_variant_id', $variant2->id)->where('color_id', $item['color_id'])->first();
+                    if($k != 0){
+                        $checkDetail = CartDetail::where('cart_id', $data->id)->where('product_id', $item['product_id'])->where('variant_id', $item['variant_id'])->where('color_id', $item['color_id'])->first();
+                        if(!empty($checkDetail)){
+                            $checkDetail->quantity += $item['quantity'];
+                            $checkDetail->save();
+                            continue;
+                        }
+                    }
                     CartDetail::create([
                         'cart_id' => $data->id,
                         'product_id' => $item['product_id'],

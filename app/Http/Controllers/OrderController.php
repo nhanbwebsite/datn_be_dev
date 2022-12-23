@@ -100,7 +100,8 @@ class OrderController extends Controller
 
             $create = Order::create([
                 'code' => $input['code'],
-                'user_id' => $user->id,
+                'user_id' => $input['user_id'],
+                'user_name' => $input['user_name'],
                 'address' => $input['address'],
                 'ward_id' => $input['ward_id'],
                 'district_id' => $input['district_id'],
