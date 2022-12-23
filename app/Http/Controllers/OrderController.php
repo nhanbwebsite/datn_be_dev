@@ -439,8 +439,9 @@ class OrderController extends Controller
 
     public function approveOrder($code, Request $request, ApproveOrderValidator $validator){
         $input = $request->all();
-        $validator->validate($input);
         $user = $request->user();
+        $input['warehouse_id'] = $user->store->warehouse->id ?? $request->warehouse_id ?? null;
+        $validator->validate($input);
         try{
             DB::beginTransaction();
 
