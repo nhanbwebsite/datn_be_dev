@@ -11,3 +11,4 @@ Route::controller(SlideshowController::class)->middleware('auth:sanctum')->prefi
 });
 Route::get('clients/slideshow/{id}', [SlideshowController::class, 'show']);
 Route::get('/slideshowclient', [SlideshowController::class, 'getclientslideshowDetails']);
+Route::get('/showSlideBycate', [SlideshowController::class, 'showSlideBycate']);
