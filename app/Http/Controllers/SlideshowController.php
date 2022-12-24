@@ -243,4 +243,31 @@ class SlideshowController extends Controller
             'data' => new SlideshowCollectionClient($data)
         ], 200);
     }
+
+
+    public function showSlideBycate(Request $request)
+    {
+
+        // dd($request->all());
+        $input = $request->category_id;
+        if(!empty($input)){
+             $data = Slideshow::where('category_id',$input)->first();
+        // $update = Slideshow::select('')
+        // dd($id->id);
+
+        if (empty($data)) {
+            return response()->json([
+                'message' =>  'Không tìm thấy slideshow !'
+            ], 400);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => new SlideshowResource($data)
+        ], 200);
+        }
+        // dd($input);
+
+    }
+
 }
