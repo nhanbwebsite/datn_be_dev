@@ -36,7 +36,7 @@ class OrderCollection extends ResourceCollection
                     'id'                    => $value->id,
                     'code'                  => $value->code,
                     'user_id'               => $value->user_id ?? null,
-                    'user_name'             => $value->user->name ?? null,
+                    'user_name'             => $value->user_name ?? null,
                     'phone'                 => $value->phone,
                     'email'                 => $value->email ?? null,
                     'status'                => $value->status,
