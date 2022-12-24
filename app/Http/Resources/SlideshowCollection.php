@@ -20,6 +20,8 @@ class SlideshowCollection extends ResourceCollection
                 $result['data'][] = [
                     'id'            => $value->id,
                     'title'   => $value->title,
+                    'category_id' => $value->category->id,
+                    'category_name' => $value->category->name,
                     'details'       => $value->details,
                     'is_active'     => $value->is_active,
                     'created_at'    => $value->created_at->format('d-m-Y H:i:s'),
