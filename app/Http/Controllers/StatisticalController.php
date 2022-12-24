@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\NewCustomerStatistic;
+use App\Http\Resources\NewOrderStatistic;
 use Illuminate\Http\Request;
 use App\Models\productAmountByWarehouse;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\User;
 use App\Models\Post;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -127,7 +130,7 @@ class StatisticalController extends Controller
                     $total_revenue_today += $value->total;
                 }
             }
-            $result['today'] = date('d-m-Y H:i:s', time());
+            // $result['today'] = date('d-m-Y H:i:s', time());
             $result['total_revenue_today'] = $total_revenue_today;
             $result['total_revenue_today_formatted'] = number_format($total_revenue_today).'đ';
 
@@ -175,4 +178,100 @@ class StatisticalController extends Controller
         ]);
     }
 
+    public function top10PopularProduct(){
+        try{
+            $result = [];
+            $allProduct = Product::select('id', 'name', 'code')->where('is_active', 1)->get();
+            foreach($allProduct as $key => $product){
+                $count = OrderDetail::where('product_id', $product->id)->count();
+                $result[$product->code] = [
+                    'name' => $product->name,
+                    'count' => $count,
+                ];
+            }
+            $data = collect($result)->sortBy('count')->reverse()->take(10)->toArray();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'data' => $data ?? null,
+        ]);
+    }
+
+    public function newCustomer(){
+        try{
+            $data = User::whereDay('created_at', date('d', time()))->orderBy('created_at', 'desc')->take(10)->get();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new NewCustomerStatistic($data));
+    }
+
+    public function newOrder(){
+        try{
+            $data = Order::whereDay('created_at', date('d', time()))->orderBy('created_at', 'desc')->take(10)->get();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new NewOrderStatistic($data));
+    }
+
+    public function totalOrder(){
+        try{
+            $totalOrder = Order::select()->count();
+            $statusNew = Order::where('status', ORDER_STATUS_NEW)->count();
+            $statusApproved = Order::where('status', ORDER_STATUS_APPROVED)->count();
+            $statusShipping = Order::where('status', ORDER_STATUS_SHIPPING)->count();
+            $statusShipped = Order::where('status', ORDER_STATUS_SHIPPED)->count();
+            $statusCompleted = Order::where('status', ORDER_STATUS_COMPLETED)->count();
+            $statusCanceled = Order::where('status', ORDER_STATUS_CANCELED)->count();
+            $statusReturned = Order::where('status', ORDER_STATUS_RETURNED)->count();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'data' => [
+                'total_order' => $totalOrder,
+                'status_new' => $statusNew,
+                'status_approved' => $statusApproved,
+                'status_shipping' => $statusShipping,
+                'status_shipped' => $statusShipped,
+                'status_completed' => $statusCompleted,
+                'status_canceled' => $statusCanceled,
+                'status_returned' => $statusReturned,
+            ]
+        ]);
+    }
 }
