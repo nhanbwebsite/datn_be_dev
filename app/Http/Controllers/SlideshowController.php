@@ -270,4 +270,36 @@ class SlideshowController extends Controller
 
     }
 
+    // update slide by category
+
+    public function showSlideBycateUpdate(Request $request)
+    {
+
+        // dd($request->all());
+        $input = $request->id_slide_show;
+        if(!empty($input)){
+             $data = Slideshow::where('id','NOT IN',$input)->get();
+             dd($data);
+             $update_active = Slideshow::find($input);
+            //  dd($update_active);
+             $update_active->is_active = 1;
+             $update_active->save;
+        // $update = Slideshow::select('')
+        // dd($id->id);
+
+        if (empty($update_active)) {
+            return response()->json([
+                'message' =>  'Không tìm thấy slideshow !'
+            ], 400);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã cập nhật Slide thành công'
+        ], 200);
+        }
+        // dd($input);
+
+    }
+
 }
