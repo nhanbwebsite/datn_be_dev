@@ -256,9 +256,7 @@ class SlideshowController extends Controller
         // dd($id->id);
 
         if (empty($data)) {
-            return response()->json([
-                'message' =>  'Không tìm thấy slideshow !'
-            ], 400);
+           return $data = [];
         }
 
         return response()->json([
@@ -276,14 +274,15 @@ class SlideshowController extends Controller
     {
 
         // dd($request->all());
-        $input = $request->id_slide_show;
+        $input = $request->all();
         if(!empty($input)){
-             $data = Slideshow::where('id','NOT IN',$input)->get();
-             dd($data);
-             $update_active = Slideshow::find($input);
-            //  dd($update_active);
+             $data = Slideshow::where('category_id',$input['category_id'])->update([
+                'is_active' => 0
+             ]);
+            //  dd($data);
+             $update_active = Slideshow::find($input['slide_id']);
              $update_active->is_active = 1;
-             $update_active->save;
+             $update_active->save();
         // $update = Slideshow::select('')
         // dd($id->id);
 
