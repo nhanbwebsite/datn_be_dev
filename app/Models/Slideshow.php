@@ -26,5 +26,7 @@ class Slideshow extends Model
     public function details(){
         return $this->hasMany(Slideshow_detail::class, 'slideshow_id', 'id');
     }
-
+    public function category(){
+        return $this->belongsTo(Category::class, 'category_id', 'id');
+    }
 }

@@ -115,7 +115,7 @@ class SlideshowController extends Controller
     public function show($id, Request $request)
     {
         $input = $request->all();
-        $id = DB::table('slideshow')->where(function($query) use ($input){
+        $id = Slideshow::where(function($query) use ($input){
             if(!empty($input['category_id'])){
                 $query->where('slideshow.category_id',$input['category_id']);
             } else{
@@ -299,6 +299,11 @@ class SlideshowController extends Controller
         }
         // dd($input);
 
+    }
+
+    public function listSlideshowByCate(){
+        $data = Slideshow::whereNotNull('category_id')->paginate(9);
+        return response()->json( new SlideshowCollection($data), 200);
     }
 
 }
