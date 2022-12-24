@@ -11,4 +11,4 @@ Route::prefix('colors')->group(function(){
 
     Route::delete('/{id}',[ColorsController::class,'destroy'])->middleware('auth:sanctum');
 });
-Route::get('/allColor',[ColorsController::class,'index']);
+Route::get('/allColor',[ColorsController::class,'allColor']);
