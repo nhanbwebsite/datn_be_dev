@@ -260,9 +260,17 @@ class CategoryController extends Controller
             'data' =>$data
         ]);
     }
-    public function getCategoryProducts(){
+    public function getCategoryProducts(Request $request){
+        $input = $request->all();
         try{
-            $data = Category::where('is_active', 1)
+            $data = Category::where('is_active', 1)->where(function($query) use ($input){
+                if(!empty($input['name'])){
+                    $query->where('name', 'like', '%'.$input['name'].'%');
+                }
+                if(!empty($input['slug'])){
+                    $query->where('slug', $input['slug']);
+                }
+            })
             ->where('is_post',0)
             ->paginate(9);
             foreach( $data as $value){
@@ -282,9 +290,17 @@ class CategoryController extends Controller
 
         return response()->json(new CategoryCollection($data));
     }
-    public function getCategory_is_post(){
+    public function getCategory_is_post(Request $request){
+        $input = $request->all();
         try{
-            $data = Category::where('is_active', 1)
+            $data = Category::where('is_active', 1)->where(function($query) use ($input){
+                if(!empty($input['name'])){
+                    $query->where('name', 'like', '%'.$input['name'].'%');
+                }
+                if(!empty($input['slug'])){
+                    $query->where('slug', $input['slug']);
+                }
+            })
             ->where('is_post',1)
             ->paginate(9);
             foreach( $data as $value){
