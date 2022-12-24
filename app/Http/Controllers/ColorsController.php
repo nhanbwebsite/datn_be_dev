@@ -228,4 +228,26 @@ class ColorsController extends Controller
             'message' => 'Đã xóa ['.$data->name.'] !',
         ]);
     }
+
+    public function allColor(Request $request)
+    {
+        $input = $request->all();
+        $dataReturn = '';
+        $data = Color::where('is_active',$input['is_active'] ?? 1)->where('deleted_at',null)->where(function ($query) use ($input){
+            if(!empty($input['name'])){
+                $query->where('name', 'like', '%'.$input['name'].'%');
+            }
+            if(!empty($input['slug'])){
+                $query->where('slug', 'like', '%'.$input['slug'].'%');
+            }
+        })->get();
+
+
+        return response()->json([
+            'status' => 'success',
+            'data'  => $data
+        ],200);
+    }
+
 }
+
