@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\OrderStatus;
 use App\Models\User;
 use App\Models\Post;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -116,52 +117,59 @@ class StatisticalController extends Controller
                 // ->get();
     }
 
-    public function revenueStatisticsToDay(){
+    public function revenueStatisticsDay(){
         $result = [];
         try{
-            $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereDay('created_at', date('d', time()))->get();
-            if(empty($data)){
-                $result['total_revenue_today'] = 0;
-                $result['total_revenue_today_formatted'] = number_format(0).'đ';
-            }
-            $total_revenue_today = 0;
-            foreach($data as $key => $value){
-                if(!empty($value)){
-                    $total_revenue_today += $value->total;
+            // daily
+            for($i = 0; $i <= 6; $i++){
+                $day = date('d-m-Y', time()-$i*24*60*60);
+                $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereDay('created_at', date('d', time()-$i*24*60*60))->get();
+                if(!empty($data)){
+                    $total = [];
+                    $total['day'] = $day;
+                    $total['total_revenue'] = 0;
+                    foreach($data as $key => $value){
+                        if(!empty($value)){
+                            $total['total_revenue'] += $value->total;
+                        }
+                    }
                 }
+                $result['daily'][$i] = $total;
             }
-            // $result['today'] = date('d-m-Y H:i:s', time());
-            $result['total_revenue_today'] = $total_revenue_today;
-            $result['total_revenue_today_formatted'] = number_format($total_revenue_today).'đ';
 
-            $orderYesterday = Order::where('status', ORDER_STATUS_COMPLETED)->whereDay('created_at', date('d', time()-24*60*60))->get();
-            if(empty($orderYesterday)){
-                $result['total_revenue_yesterday'] = 0;
-                $result['total_revenue_yesterday_formatted'] = number_format(0).'đ';
-            }
-            $total_revenue_yesterday = 0;
-            foreach($orderYesterday as $key => $value){
-                if(!empty($value)){
-                    $total_revenue_yesterday += $value->total;
+            //monthly
+            for($j = 0; $j <= 5; $j++){
+                $month = date('m-Y', time()-$j*30*24*60*60);
+                $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereMonth('created_at', date('m', time()-$j*30*24*60*60))->get();
+                if(!empty($data)){
+                    $total = [];
+                    $total['month'] = $month;
+                    $total['total_revenue'] = 0;
+                    foreach($data as $key => $value){
+                        if(!empty($value)){
+                            $total['total_revenue'] += $value->total;
+                        }
+                    }
                 }
+                $result['monthly'][$j] = $total;
             }
-            $result['total_revenue_yesterday'] = $total_revenue_yesterday;
-            $result['total_revenue_yesterday_formatted'] = number_format($total_revenue_yesterday).'đ';
 
-            $allCompletedOrder = Order::where('status', ORDER_STATUS_COMPLETED)->get();
-            if(empty($allCompletedOrder)){
-                $result['total_revenue'] = 0;
-                $result['total_revenue_formatted'] = number_format(0).'đ';
-            }
-            $total_revenue = 0;
-            foreach($allCompletedOrder as $key => $value){
-                if(!empty($value)){
-                    $total_revenue += $value->total;
+            //yearly
+            for($k = 0; $k <= 4; $k++){
+                $year = date('Y', time()-$k*12*30*24*60*60);
+                $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereYear('created_at', date('Y', time()-$k*12*30*24*60*60))->get();
+                if(!empty($data)){
+                    $total = [];
+                    $total['year'] = $year;
+                    $total['total_revenue'] = 0;
+                    foreach($data as $key => $value){
+                        if(!empty($value)){
+                            $total['total_revenue'] += $value->total;
+                        }
+                    }
                 }
+                $result['yearly'][$k] = $total;
             }
-            $result['total_revenue'] = $total_revenue;
-            $result['total_revenue_formatted'] = number_format($total_revenue).'đ';
-
         }
         catch(HttpException $e){
             return response()->json([
@@ -174,7 +182,7 @@ class StatisticalController extends Controller
             ], $e->getStatusCode());
         }
         return response()->json([
-            'data' => $result,
+            'data' => $result ?? null,
         ]);
     }
 
@@ -264,13 +272,41 @@ class StatisticalController extends Controller
         return response()->json([
             'data' => [
                 'total_order' => $totalOrder,
-                'status_new' => $statusNew,
-                'status_approved' => $statusApproved,
-                'status_shipping' => $statusShipping,
-                'status_shipped' => $statusShipped,
-                'status_completed' => $statusCompleted,
-                'status_canceled' => $statusCanceled,
-                'status_returned' => $statusReturned,
+                'status_new' => [
+                    'id' => ORDER_STATUS_NEW,
+                    'name' => OrderStatus::find(ORDER_STATUS_NEW)->name ?? null,
+                    'value' => $statusNew,
+                ],
+                'status_approved' => [
+                    'id' => ORDER_STATUS_APPROVED,
+                    'name' => OrderStatus::find(ORDER_STATUS_APPROVED)->name ?? null,
+                    'value' => $statusApproved,
+                ],
+                'status_shipping' => [
+                    'id' => ORDER_STATUS_SHIPPING,
+                    'name' => OrderStatus::find(ORDER_STATUS_SHIPPING)->name ?? null,
+                    'value' => $statusShipping,
+                ],
+                'status_shipped' => [
+                    'id' => ORDER_STATUS_SHIPPED,
+                    'name' => OrderStatus::find(ORDER_STATUS_SHIPPED)->name ?? null,
+                    'value' => $statusShipped,
+                ],
+                'status_completed' => [
+                    'id' => ORDER_STATUS_COMPLETED,
+                    'name' => OrderStatus::find(ORDER_STATUS_COMPLETED)->name ?? null,
+                    'value' => $statusCompleted,
+                ],
+                'status_canceled' => [
+                    'id' => ORDER_STATUS_CANCELED,
+                    'name' => OrderStatus::find(ORDER_STATUS_CANCELED)->name ?? null,
+                    'value' => $statusCanceled,
+                ],
+                'status_returned' => [
+                    'id' => ORDER_STATUS_RETURNED,
+                    'name' => OrderStatus::find(ORDER_STATUS_RETURNED)->name ?? null,
+                    'value' => $statusReturned,
+                ],
             ]
         ]);
     }
