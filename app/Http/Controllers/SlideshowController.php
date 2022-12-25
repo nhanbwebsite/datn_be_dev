@@ -64,18 +64,20 @@ class SlideshowController extends Controller
                     'message' => $validator->errors(),
                 ], 422);
             }
-            if(!empty($request->category_id)){
+            if (!empty($request->category_id)) {
                 $create = Slideshow::create([
                     'title' => $request->title,
                     'category_id'   => $request->category_id,
                     'slug' => Str::slug($request->title),
-                    'created_by' => $request->user()->id
+                    'created_by' => $request->user()->id,
+
                 ]);
             } else {
                 $create = Slideshow::create([
                     'title' => $request->title,
                     'slug' => Str::slug($request->title),
-                    'created_by' => auth('sanctum')->user()->id
+                    'created_by' => auth('sanctum')->user()->id,
+
                 ]);
             }
 
@@ -115,11 +117,11 @@ class SlideshowController extends Controller
     public function show($id, Request $request)
     {
         $input = $request->all();
-        $id = Slideshow::where(function($query) use ($input){
-            if(!empty($input['category_id'])){
-                $query->where('slideshow.category_id',$input['category_id']);
-            } else{
-                $query->where('slideshow.category_id',null);
+        $id = Slideshow::where(function ($query) use ($input) {
+            if (!empty($input['category_id'])) {
+                $query->where('slideshow.category_id', $input['category_id']);
+            } else {
+                $query->where('slideshow.category_id', null);
             }
         })->first();
         // $update = Slideshow::select('')
@@ -209,11 +211,13 @@ class SlideshowController extends Controller
             DB::beginTransaction();
 
             $data = Slideshow::find($id);
+
             if (empty($data)) {
                 return response()->json([
                     'message' => 'Slideshow không tồn tại'
                 ], 400);
             }
+            $data_detail = Slideshow_detail::where('slideshow_id',$data->id)->delete();
             $data->deleted_by = auth('sanctum')->user()->id;
             $data->delete();
 
@@ -250,19 +254,19 @@ class SlideshowController extends Controller
 
         // dd($request->all());
         $input = $request->category_id;
-        if(!empty($input)){
-             $data = Slideshow::where('category_id',$input)->first();
-        // $update = Slideshow::select('')
-        // dd($id->id);
+        if (!empty($input)) {
+            $data = Slideshow::where('category_id', $input)->where('is_active', 1)->first();
+            // $update = Slideshow::select('')
+            // dd($id->id);
 
-        if (empty($data)) {
-           return $data = [];
-        }
+            if (empty($data)) {
+                return $data = [];
+            }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => new SlideshowResource($data)
-        ], 200);
+            return response()->json([
+                'status' => 'success',
+                'data' => new SlideshowResource($data)
+            ], 200);
         }
         // dd($input);
 
@@ -275,35 +279,46 @@ class SlideshowController extends Controller
 
         // dd($request->all());
         $input = $request->all();
-        if(!empty($input)){
-             $data = Slideshow::where('category_id',$input['category_id'])->update([
+        if (!empty($input)) {
+            $data = Slideshow::where('category_id', $input['category_id'])->update([
                 'is_active' => 0
-             ]);
+            ]);
             //  dd($data);
-             $update_active = Slideshow::find($input['slide_id']);
-             $update_active->is_active = 1;
-             $update_active->save();
-        // $update = Slideshow::select('')
-        // dd($id->id);
+            $update_active = Slideshow::find($input['slide_id']);
+            $update_active->is_active = 1;
+            $update_active->save();
+            // $update = Slideshow::select('')
+            // dd($id->id);
 
-        if (empty($update_active)) {
+            if (empty($update_active)) {
+                return response()->json([
+                    'message' =>  'Không tìm thấy slideshow !'
+                ], 400);
+            }
+
             return response()->json([
-                'message' =>  'Không tìm thấy slideshow !'
-            ], 400);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Đã cập nhật Slide thành công'
-        ], 200);
+                'status' => 'success',
+                'message' => 'Đã cập nhật Slide thành công'
+            ], 200);
         }
         // dd($input);
 
+        if (isset($delete_details)) {
+            $data_delete = Slideshow_detail::find($delete_details);
+            $data_delete->delete();
+        }
     }
 
-    public function listSlideshowByCate(){
+    public function listSlideshowByCate()
+    {
         $data = Slideshow::whereNotNull('category_id')->paginate(9);
-        return response()->json( new SlideshowCollection($data), 200);
+        return response()->json(new SlideshowCollection($data), 200);
     }
 
+
+    public function listSlideshowMain(){
+        $data = Slideshow::whereNull('category_id')->paginate(9);
+
+        return response()->json(new SlideshowCollectionClient($data), 200);
+    }
 }
