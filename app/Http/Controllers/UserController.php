@@ -208,9 +208,18 @@ class UserController extends Controller
      */
     public function destroy($id, Request $request)
     {
+        $user = $request->user();
         try{
             DB::beginTransaction();
             if(!is_array($id)){
+
+                if($id == $user->id){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Bạn không thể xóa tài khoản của mình !',
+                    ], 400);
+                }
+
                 $data = User::find($id);
                 if(empty($data)){
                     return response()->json([
@@ -218,7 +227,7 @@ class UserController extends Controller
                         'message' => 'Không tìm thấy người dùng !',
                     ], 404);
                 }
-                $data->deleted_by = $request->user()->id;
+                $data->deleted_by = $user->id;
                 $data->save();
 
                 $data->delete();
