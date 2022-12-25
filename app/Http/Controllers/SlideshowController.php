@@ -123,7 +123,7 @@ class SlideshowController extends Controller
             } else {
                 $query->where('slideshow.category_id', null);
             }
-        })->first();
+        })->where('is_active',1)->first();
         // $update = Slideshow::select('')
         // dd($id->id);
         $data = Slideshow::find($id->id);
@@ -244,6 +244,7 @@ class SlideshowController extends Controller
     public function getclientslideshowDetails()
     {
         $data = Slideshow::where('is_active',1)->get();
+
         return response()->json([
             'status' => 'success',
             'data' => new SlideshowCollectionClient($data)
