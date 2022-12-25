@@ -243,7 +243,7 @@ class SlideshowController extends Controller
 
     public function getclientslideshowDetails()
     {
-        $data = Slideshow::all();
+        $data = Slideshow::where('is_active',1)->get();
         return response()->json([
             'status' => 'success',
             'data' => new SlideshowCollectionClient($data)
