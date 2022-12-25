@@ -117,58 +117,52 @@ class StatisticalController extends Controller
                 // ->get();
     }
 
-    public function revenueStatisticsDay(){
+    public function revenueStatistics(){
         $result = [];
         try{
             // daily
-            for($i = 0; $i <= 6; $i++){
+            for($i = 0; $i < 7; $i++){
                 $day = date('d-m-Y', time()-$i*24*60*60);
-                $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereDay('created_at', date('d', time()-$i*24*60*60))->get();
-                if(!empty($data)){
-                    $total = [];
-                    $total['day'] = $day;
-                    $total['total_revenue'] = 0;
-                    foreach($data as $key => $value){
+                $dataDay = Order::where('status', ORDER_STATUS_COMPLETED)->whereDay('created_at', date('d', time()-$i*24*60*60))->get();
+                if(!empty($dataDay)){
+                    $total_revenue_day = 0;
+                    foreach($dataDay as $key => $value){
                         if(!empty($value)){
-                            $total['total_revenue'] += $value->total;
+                            $total_revenue_day += $value->total;
                         }
                     }
                 }
-                $result['daily'][$i] = $total;
+                $result['daily'][$day] = $total_revenue_day;
             }
 
             //monthly
-            for($j = 0; $j <= 5; $j++){
+            for($j = 0; $j < 6; $j++){
                 $month = date('m-Y', time()-$j*30*24*60*60);
-                $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereMonth('created_at', date('m', time()-$j*30*24*60*60))->get();
-                if(!empty($data)){
-                    $total = [];
-                    $total['month'] = $month;
-                    $total['total_revenue'] = 0;
-                    foreach($data as $key => $value){
+                $dataMonth = Order::where('status', ORDER_STATUS_COMPLETED)->whereMonth('created_at', date('m', time()-$j*30*24*60*60))->get();
+                if(!empty($dataMonth)){
+                    $total_revenue_month = 0;
+                    foreach($dataMonth as $key => $value){
                         if(!empty($value)){
-                            $total['total_revenue'] += $value->total;
+                            $total_revenue_month += $value->total;
                         }
                     }
                 }
-                $result['monthly'][$j] = $total;
+                $result['monthly'][$month] = $total_revenue_month;
             }
 
             //yearly
-            for($k = 0; $k <= 4; $k++){
+            for($k = 0; $k <= 5; $k++){
                 $year = date('Y', time()-$k*12*30*24*60*60);
-                $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereYear('created_at', date('Y', time()-$k*12*30*24*60*60))->get();
-                if(!empty($data)){
-                    $total = [];
-                    $total['year'] = $year;
-                    $total['total_revenue'] = 0;
-                    foreach($data as $key => $value){
+                $dataYear = Order::where('status', ORDER_STATUS_COMPLETED)->whereYear('created_at', date('Y', time()-$k*12*30*24*60*60))->get();
+                if(!empty($dataYear)){
+                    $total_revenue_year = 0;
+                    foreach($dataYear as $key => $value){
                         if(!empty($value)){
-                            $total['total_revenue'] += $value->total;
+                            $total_revenue_year += $value->total;
                         }
                     }
                 }
-                $result['yearly'][$k] = $total;
+                $result['yearly'][$year] = $total_revenue_year;
             }
         }
         catch(HttpException $e){
@@ -186,7 +180,7 @@ class StatisticalController extends Controller
         ]);
     }
 
-    public function top10PopularProduct(){
+    public function top5PopularProduct(){
         try{
             $result = [];
             $allProduct = Product::select('id', 'name', 'code')->where('is_active', 1)->get();
@@ -197,7 +191,7 @@ class StatisticalController extends Controller
                     'count' => $count,
                 ];
             }
-            $data = collect($result)->sortBy('count')->reverse()->take(10)->toArray();
+            $data = collect($result)->sortBy('count')->reverse()->take(5)->toArray();
         }
         catch(HttpException $e){
             return response()->json([
@@ -216,7 +210,7 @@ class StatisticalController extends Controller
 
     public function newCustomer(){
         try{
-            $data = User::whereDay('created_at', date('d', time()))->orderBy('created_at', 'desc')->take(10)->get();
+            $data = User::orderBy('created_at', 'desc')->take(10)->get();
         }
         catch(HttpException $e){
             return response()->json([
@@ -233,7 +227,7 @@ class StatisticalController extends Controller
 
     public function newOrder(){
         try{
-            $data = Order::whereDay('created_at', date('d', time()))->orderBy('created_at', 'desc')->take(10)->get();
+            $data = Order::orderBy('created_at', 'desc')->take(10)->get();
         }
         catch(HttpException $e){
             return response()->json([
@@ -308,6 +302,109 @@ class StatisticalController extends Controller
                     'value' => $statusReturned,
                 ],
             ]
+        ]);
+    }
+
+    public function orderStatistics(){
+        $result = [];
+        try{
+            // daily
+            for($i = 0; $i < 7; $i++){
+                $day = date('d-m-Y', time()-$i*24*60*60);
+                $dataDay = Order::where('status', ORDER_STATUS_COMPLETED)->whereDay('created_at', date('d', time()-$i*24*60*60))->count();
+                $result['daily'][$day] = $dataDay;
+            }
+
+            //monthly
+            for($j = 0; $j < 6; $j++){
+                $month = date('m-Y', time()-$j*30*24*60*60);
+                $dataMonth = Order::where('status', ORDER_STATUS_COMPLETED)->whereMonth('created_at', date('m', time()-$j*30*24*60*60))->count();
+                $result['monthly'][$month] = $dataMonth;
+            }
+
+            //yearly
+            for($k = 0; $k <= 5; $k++){
+                $year = date('Y', time()-$k*12*30*24*60*60);
+                $dataYear = Order::where('status', ORDER_STATUS_COMPLETED)->whereYear('created_at', date('Y', time()-$k*12*30*24*60*60))->count();
+                $result['yearly'][$year] = $dataYear;
+            }
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'data' => $result ?? null,
+        ]);
+    }
+
+    public function revenueStatisticsToDay(){
+        $result = [];
+        try{
+            $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereDate('created_at', '=', time())->get()->toArray();
+            $data = Order::where('status', ORDER_STATUS_COMPLETED)->whereDay('created_at', date('d', time()))->get();
+            if(empty($data)){
+                $result['total_revenue_today'] = 0;
+                $result['total_revenue_today_formatted'] = number_format(0).'đ';
+            }
+            $total_revenue_today = 0;
+            foreach($data as $key => $value){
+                if(!empty($value)){
+                    $total_revenue_today += $value->total;
+                }
+            }
+            $result['today'] = date('d-m-Y', time());
+            $result['total_revenue_today'] = $total_revenue_today;
+            $result['total_revenue_today_formatted'] = number_format($total_revenue_today).'đ';
+
+            $orderYesterday = Order::where('status', ORDER_STATUS_COMPLETED)->whereDay('created_at', date('d', time()-24*60*60))->get();
+            if(empty($orderYesterday)){
+                $result['total_revenue_yesterday'] = 0;
+                $result['total_revenue_yesterday_formatted'] = number_format(0).'đ';
+            }
+            $total_revenue_yesterday = 0;
+            foreach($orderYesterday as $key => $value){
+                if(!empty($value)){
+                    $total_revenue_yesterday += $value->total;
+                }
+            }
+            $result['total_revenue_yesterday'] = $total_revenue_yesterday;
+            $result['total_revenue_yesterday_formatted'] = number_format($total_revenue_yesterday).'đ';
+
+            $allCompletedOrder = Order::where('status', ORDER_STATUS_COMPLETED)->get();
+            if(empty($allCompletedOrder)){
+                $result['total_revenue'] = 0;
+                $result['total_revenue_formatted'] = number_format(0).'đ';
+            }
+            $total_revenue = 0;
+            foreach($allCompletedOrder as $key => $value){
+                if(!empty($value)){
+                    $total_revenue += $value->total;
+                }
+            }
+            $result['total_revenue'] = $total_revenue;
+            $result['total_revenue_formatted'] = number_format($total_revenue).'đ';
+
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'data' => $data ?? [],
+            'data' => $result,
         ]);
     }
 }

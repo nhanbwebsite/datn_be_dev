@@ -19,16 +19,11 @@ class NewCustomerStatistic extends ResourceCollection
             // $request not empty
             foreach($this->collection as $value){
                 $result['data'][] = [
-                    'id'            => $value->id,
                     'name'          => $value->name,
                     'phone'         => $value->phone,
-                    'province_id'   => $value->province_id,
                     'province'      => $value->province->name,
-                    'is_active'     => $value->is_active,
                     'created_at'    => $value->created_at->format('d-m-Y H:i:s'),
-                    'updated_at'    => $value->updated_at->format('d-m-Y H:i:s'),
-                    'created_by'    => $value->createdBy($value->created_by)->name ?? null,
-                    'updated_by'    => $value->updatedBy($value->updated_by)->name ?? null,
+                    'is_active' => $value->is_active,
                 ];
             }
             return $result;
