@@ -321,4 +321,19 @@ class SlideshowController extends Controller
 
         return response()->json(new SlideshowCollectionClient($data), 200);
     }
+
+    public function updateSlideMain(Request $request){
+        $data_active = Slideshow::find($request->slide_id_active);
+        $data_un_active = Slideshow::whereNull('category_id')->update([
+            'is_active' => 0
+        ]);
+
+        $data_active->is_active = 1;
+        $data_active->save();
+        return response()->json(
+            [
+                'message' => 'Cập trạng thái hiển thị slideshow thành công'
+            ]
+        );
+    }
 }

@@ -15,3 +15,4 @@ Route::get('/showSlideBycate', [SlideshowController::class, 'showSlideBycate']);
 Route::post('/active_slide_cate', [SlideshowController::class, 'showSlideBycateUpdate']);
 Route::get('/listSlideshowByCate', [SlideshowController::class, 'listSlideshowByCate']);
 Route::get('/listSlideshowMain', [SlideshowController::class, 'listSlideshowMain']);
+Route::post('/updateSlideMain', [SlideshowController::class, 'updateSlideMain']);
