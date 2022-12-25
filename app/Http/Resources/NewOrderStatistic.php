@@ -19,18 +19,11 @@ class NewOrderStatistic extends ResourceCollection
             // $request not empty
             foreach($this->collection as $value){
                 $result['data'][] = [
-                    'id'            => $value->id,
                     'code'          => $value->code,
-                    'user_id'       => $value->user_id,
-                    'user_name'     => $value->user_name,
                     'phone'         => $value->phone,
-                    'status'        => $value->status,
-                    'status_code'   => $value->getStatus->code,
-                    'status_name'   => $value->getStatus->name,
+                    'total_formatted' => number_format($value->total).'đ',
                     'created_at'    => $value->created_at->format('d-m-Y H:i:s'),
-                    'updated_at'    => $value->updated_at->format('d-m-Y H:i:s'),
-                    'created_by'    => $value->createdBy($value->created_by)->name ?? null,
-                    'updated_by'    => $value->updatedBy($value->updated_by)->name ?? null,
+                    'status_name'   => $value->getStatus->name,
                 ];
             }
             return $result;
