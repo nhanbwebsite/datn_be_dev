@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\OrderStatus;
 use App\Models\User;
 use App\Models\Post;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -271,13 +272,41 @@ class StatisticalController extends Controller
         return response()->json([
             'data' => [
                 'total_order' => $totalOrder,
-                'status_new' => $statusNew,
-                'status_approved' => $statusApproved,
-                'status_shipping' => $statusShipping,
-                'status_shipped' => $statusShipped,
-                'status_completed' => $statusCompleted,
-                'status_canceled' => $statusCanceled,
-                'status_returned' => $statusReturned,
+                'status_new' => [
+                    'id' => ORDER_STATUS_NEW,
+                    'name' => OrderStatus::find(ORDER_STATUS_NEW)->name ?? null,
+                    'value' => $statusNew,
+                ],
+                'status_approved' => [
+                    'id' => ORDER_STATUS_APPROVED,
+                    'name' => OrderStatus::find(ORDER_STATUS_APPROVED)->name ?? null,
+                    'value' => $statusApproved,
+                ],
+                'status_shipping' => [
+                    'id' => ORDER_STATUS_SHIPPING,
+                    'name' => OrderStatus::find(ORDER_STATUS_SHIPPING)->name ?? null,
+                    'value' => $statusShipping,
+                ],
+                'status_shipped' => [
+                    'id' => ORDER_STATUS_SHIPPED,
+                    'name' => OrderStatus::find(ORDER_STATUS_SHIPPED)->name ?? null,
+                    'value' => $statusShipped,
+                ],
+                'status_completed' => [
+                    'id' => ORDER_STATUS_COMPLETED,
+                    'name' => OrderStatus::find(ORDER_STATUS_COMPLETED)->name ?? null,
+                    'value' => $statusCompleted,
+                ],
+                'status_canceled' => [
+                    'id' => ORDER_STATUS_CANCELED,
+                    'name' => OrderStatus::find(ORDER_STATUS_CANCELED)->name ?? null,
+                    'value' => $statusCanceled,
+                ],
+                'status_returned' => [
+                    'id' => ORDER_STATUS_RETURNED,
+                    'name' => OrderStatus::find(ORDER_STATUS_RETURNED)->name ?? null,
+                    'value' => $statusReturned,
+                ],
             ]
         ]);
     }

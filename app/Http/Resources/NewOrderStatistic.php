@@ -24,8 +24,6 @@ class NewOrderStatistic extends ResourceCollection
                     'user_id'       => $value->user_id,
                     'user_name'     => $value->user_name,
                     'phone'         => $value->phone,
-                    'total'         => $value->total,
-                    'total_formatted' => number_format($value->total).'đ',
                     'status'        => $value->status,
                     'status_code'   => $value->getStatus->code,
                     'status_name'   => $value->getStatus->name,

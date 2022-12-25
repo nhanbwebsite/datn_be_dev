@@ -37,29 +37,18 @@ class OrderController extends Controller
         $input = $request->all();
         $input['limit'] = $request->limit ?? 10;
         try{
-            $data = Order::with(['details', 'createdBy'])
-            ->where(function ($query) use ($input) {
+            $data = Order::where(function ($query) use ($input) {
                 if(!empty($input['code'])){
-                    $query->where('code', $input['code']);
+                    $query->where('code', 'like', '%'.$input['code'].'%');
+                }
+                if(!empty($input['user_name'])){
+                    $query->where('user_name', 'like', '%'.$input['user_name'].'%');
+                }
+                if(!empty($input['phone'])){
+                    $query->where('phone', 'like', '%'.$input['phone'].'%');
                 }
                 if(!empty($input['status'])){
                     $query->where('status', $input['status']);
-                }
-                if(!empty($input['product_id'])){
-                    $query->whereHas('details', function($q) use($input) {
-                        $q->where('product_id', $input['product_id']);
-                    });
-                }
-                if(!empty($input['user_id'])){
-                    $query->whereHas('createdBy', function($q) use($input) {
-                        $q->where('user_id', $input['user_id']);
-                    });
-                }
-                if(!empty($input['from'])){
-                    $query->whereDate('created_at', '>=', date('Y-m-d H:i:s', strtotime($input['from'])));
-                    if(!empty($input['to'])){
-                        $query->whereDate('created_at', '<=', date('Y-m-d H:i:s', strtotime($input['to'])));
-                    }
                 }
             })->orderBy('orders.created_at', 'desc')->paginate($input['limit']);
         }
