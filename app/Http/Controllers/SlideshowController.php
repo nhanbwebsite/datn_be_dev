@@ -218,6 +218,8 @@ class SlideshowController extends Controller
                 ], 400);
             }
             $data_detail = Slideshow_detail::where('slideshow_id',$data->id)->delete();
+            $data->is_active = 0;
+            $data->save();
             $data->deleted_by = auth('sanctum')->user()->id;
             $data->delete();
 
