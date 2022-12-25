@@ -231,17 +231,17 @@ class OrderController extends Controller
                 ], 404);
             }
 
-            if($input['status'] == ORDER_STATUS_APPROVED){
-                if($update->status == ORDER_STATUS_APPROVED){
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Đơn hàng đã được duyệt !'
-                    ], 400);
-                }
-                $input['warehouse_id'] = $user->store->warehouse->id ?? $request->warehouse_id ?? null;
-                $approveValidator->validate($input);
-                $update->warehouse_id = $input['warehouse_id'];
-            }
+            // if($input['status'] == ORDER_STATUS_APPROVED){
+            //     if($update->status == ORDER_STATUS_APPROVED){
+            //         return response()->json([
+            //             'status' => 'error',
+            //             'message' => 'Đơn hàng đã được duyệt !'
+            //         ], 400);
+            //     }
+            //     $input['warehouse_id'] = $user->store->warehouse->id ?? $request->warehouse_id ?? null;
+            //     $approveValidator->validate($input);
+            //     $update->warehouse_id = $input['warehouse_id'];
+            // }
 
             if($input['status'] == ORDER_STATUS_CANCELED){
                 if(!in_array($update->status, ORDER_STATUS_CAN_CANCEL)){
