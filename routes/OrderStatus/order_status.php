@@ -10,4 +10,6 @@ Route::controller(OrderStatusController::class)->middleware(['auth:sanctum'])->p
     Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-order-status']);
 });
 
+Route::get('/client/order-status', [OrderStatusController::class, 'clientGetOrderStatus']);
+Route::get('/get-order-status-process/{code}', [OrderStatusController::class, 'getStatusProcessByOrder'])->middleware(['auth:sanctum']);
 ?>
