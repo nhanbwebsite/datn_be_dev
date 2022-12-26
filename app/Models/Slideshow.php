@@ -29,4 +29,9 @@ class Slideshow extends Model
     public function category(){
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
+
+    public static function getDetailById($id){
+        $data = Slideshow_detail::where('slideshow_id', $id)->get();
+         return $data;
+    }
 }

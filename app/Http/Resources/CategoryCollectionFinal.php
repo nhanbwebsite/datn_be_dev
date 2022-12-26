@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Slideshow;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class CategoryCollectionFinal extends ResourceCollection
@@ -26,12 +27,17 @@ class CategoryCollectionFinal extends ResourceCollection
                         $slideshow[$k]['category_id'] = $value->id;
                         $slideshow[$k]['title'] = $item->title;
                         $slideshow[$k]['slug'] = $item->slug;
+                        $slideshow[$k]['details'] = Slideshow::getDetailById($item->id);
                         $slideshow[$k]['is_active'] = $item->is_active;
                         $slideshow[$k]['created_at'] = $item->created_at->format('Y-m-d H:i:s');
                         $slideshow[$k]['updated_at'] = $item->updated_at->format('Y-m-d H:i:s');
                         $slideshow[$k]['created_by'] = $item->createdBy->name ?? null;
                         $slideshow[$k]['updated_by'] = $item->updatedBy->name ?? null;
+
                     }
+
+
+
                     $result['data'][] = [
                         'id'            => $value->id,
                         'name'          => $value->name,
@@ -46,7 +52,6 @@ class CategoryCollectionFinal extends ResourceCollection
                     ];
 
                 }
-
             }
 
             $result['paginator'] = [
