@@ -158,6 +158,9 @@ class ProductVariant extends Controller
                 'line' => $e->getLine(),
             ],$e->getStatusCode()); //
         }
+        return response()->json([
+            'message' => 'Cập nhật thành công'
+        ], 422);
     }
 
     /**
