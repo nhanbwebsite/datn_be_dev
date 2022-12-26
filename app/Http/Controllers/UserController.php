@@ -227,6 +227,12 @@ class UserController extends Controller
                         'message' => 'Không tìm thấy người dùng !',
                     ], 404);
                 }
+                if($data->role->level > $user->role->level){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Bạn không thể xóa tài khoản có phân quyền cao hơn !',
+                    ], 400);
+                }
                 $data->deleted_by = $user->id;
                 $data->save();
 
