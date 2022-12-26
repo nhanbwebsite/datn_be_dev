@@ -94,7 +94,7 @@ class Product extends Model
 
     public static function variantDetailsByProvariant($proVariantId){
         $data = DB::table('productVariantDetails')
-        ->where('productVariantDetails.pro_variant_id',$proVariantId)
+        ->where('productVariantDetails.color_id',$proVariantId)
         ->get();
         return $data;
     }
