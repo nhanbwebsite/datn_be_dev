@@ -30,21 +30,17 @@ class BrandCollection extends ResourceCollection
                     'updated_by'    => $value->updatedBy->name ?? null,
                 ];
             }
-                if($request->paginate){
-                    $result['paginator'] = [
-                        'currentPage' => $this->currentPage(),
-                        'totalPages' => $this->lastPage(),
-                        'perPage' => $this->perPage(),
-                        'count' => $this->count(),
-                        'total' => $this->total(),
-                        'nextPageUrl' => $this->nextPageUrl(),
-                        'prevPageUrl' => $this->previousPageUrl(),
-                    ];
-                }
-
-
-
+            $result['paginator'] = [
+                'currentPage' => $this->currentPage(),
+                'totalPages' => $this->lastPage(),
+                'perPage' => $this->perPage(),
+                'count' => $this->count(),
+                'total' => $this->total(),
+                'nextPageUrl' => $this->nextPageUrl(),
+                'prevPageUrl' => $this->previousPageUrl(),
+            ];
             return $result;
+
         }
 
         // $request is empty
