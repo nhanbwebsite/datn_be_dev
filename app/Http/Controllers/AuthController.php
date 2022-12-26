@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AuthController extends Controller
@@ -61,6 +62,14 @@ class AuthController extends Controller
             //         'message' => 'Người dùng đã bị khóa hoặc chưa kích hoạt !',
             //     ], 401);
             // }
+            $userData->tokens()->delete();
+
+            $oldSession = UserSession::where('user_id', $userData->id)->orderBy('created_at', 'desc')->first();
+            if(!empty($oldSession)){
+                $oldSession->deleted_by = $userData->id;
+                $oldSession->save();
+                $oldSession->delete();
+            }
 
             $data = RolePermission::where([
                 ['role_id', $userData->role_id],
@@ -71,12 +80,6 @@ class AuthController extends Controller
                 $permission_code[] = strtolower($item->permission->code);
             }
             $token = $userData->createToken('authToken', $permission_code ?? null)->plainTextToken;
-
-            $oldSession = UserSession::where('user_id', $userData->id);
-            $oldSession->update([
-                'deleted_by' => $userData->id,
-            ]);
-            $oldSession->delete();
 
             $userSessionNew = UserSession::create([
                 'user_id' => $userData->id,
