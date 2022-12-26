@@ -15,6 +15,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Models\ProductVariantDetail;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantDetailById;
+use App\Models\ProductImportSlipDetail;
 use App\Http\Resources\ProductsHaveComemntCollection;
 class ProductController extends Controller
 {
@@ -40,6 +41,7 @@ class ProductController extends Controller
        foreach($dataProducts as $key => $value){
 
                 $value ->create_by_name = product::getNameCreated($value->created_by)->created_by_name;
+                $value ->update_by_name = product::getNameCreated($value->updated_by)->created_by_name;
                 $value->collection_images = explode(',',$value->collection_images);
                 $value-> cartegory_id = product::category($value->id)->cartegory_id;
                 $value->variantsDetailsByProduct = Product::variantDetailsProductByProId($value->id);
@@ -441,6 +443,15 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
             $dataPro = Product::find($id);
+            if($dataPro){
+                $dataCheck = ProductImportSlipDetail::where('product_id',$dataPro->id)->count();
+                if($dataCheck > 0){
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Sản phẩm này đã tồn tại trong kho, không thể xóa !'
+                    ], 401);
+                }
+            }
 
             if(empty($dataPro)){
                 return response()->json([
