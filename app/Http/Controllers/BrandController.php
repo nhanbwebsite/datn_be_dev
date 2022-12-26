@@ -232,6 +232,7 @@ class BrandController extends Controller
 
             if(!empty($data)){
                 $dataCheck = SubCategory::where('brand_id',$data->id)->count();
+
                 if($dataCheck > 0){
                     return response()->json([
                         'message' => 'Thương hiệu này đã được sử dụng,  không thể xóa !'
