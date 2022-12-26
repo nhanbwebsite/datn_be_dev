@@ -29,9 +29,10 @@ class CommentController extends Controller
                 if(!empty($input['user_id'])){
                     $query->where('user_id', $input['user_id']);
                 }
-                if(!empty($input['post_id'])){
-                    $query->where('post_id', $input['post_id']);
+                if(!empty($input['product_id'])){
+                    $query->where('product_id', $input['product_id']);
                 }
+
             })->orderBy('created_at', 'desc')->paginate(!empty($input['limit']) ? $input['limit'] : 10);
             $resource = new CommentCollection($data);
         }
