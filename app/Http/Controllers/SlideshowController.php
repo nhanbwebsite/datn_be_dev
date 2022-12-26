@@ -103,7 +103,7 @@ class SlideshowController extends Controller
             ], $e->getStatusCode()); //
         }
         return response()->json([
-            'status' => 'Created successfully',
+            'status' => 'Đã tạo Thành công',
             'data =>' => $create
         ]);
     }
@@ -177,7 +177,7 @@ class SlideshowController extends Controller
             if (empty($data)) {
                 return response()->json([
                     'message' => 'Slideshow không tồn tại'
-                ], 400);
+                ], 404);
             }
             $data->title = $request->title;
             $data->title = Str::slug($request->title);
@@ -296,7 +296,7 @@ class SlideshowController extends Controller
             if (empty($update_active)) {
                 return response()->json([
                     'message' =>  'Không tìm thấy slideshow !'
-                ], 400);
+                ], 404);
             }
 
             return response()->json([
@@ -378,7 +378,7 @@ class SlideshowController extends Controller
             [
                 'message' => 'Không tìm thấy !'
             ],
-            400
+            404
         );
     }
 }
