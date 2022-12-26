@@ -13,6 +13,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Http\Resources\subcateGoryCollection;
+use App\Models\Product;
+
 class SubcategoryController extends Controller
 {
     /**
@@ -227,7 +229,14 @@ class SubcategoryController extends Controller
         try {
 
             $data = SubCategory::find($id);
+            $dataCheck = Product::where('subcategory_id',$data->id)->count();
+
             if(!empty($data)){
+                if(  $dataCheck > 0){
+                    return response()->json([
+                        'message' => 'Danh mục này đã tồn tại sản phẩm, không thể xóa !',
+                     ],200);
+                }
                 $data->deleted_by = auth('sanctum')->user()->id;
                 $data->save();
                 $data->delete();
