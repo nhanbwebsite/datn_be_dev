@@ -282,7 +282,7 @@ class SlideshowController extends Controller
 
         // dd($request->all());
         $input = $request->all();
-        if (!empty($input)) {
+        if (!empty($input['category_id'])) {
             $data = Slideshow::where('category_id', $input['category_id'])->update([
                 'is_active' => 0
             ]);
@@ -306,8 +306,8 @@ class SlideshowController extends Controller
         }
         // dd($input);
 
-        if (isset($delete_details)) {
-            $data_delete = Slideshow_detail::find($delete_details);
+        if (!empty($input['delete_detail_id'])) {
+            $data_delete = Slideshow_detail::find($input['delete_detail_id']);
             $data_delete->delete();
         }
     }
@@ -338,5 +338,18 @@ class SlideshowController extends Controller
                 'message' => 'Cập trạng thái hiển thị slideshow thành công'
             ]
         );
+    }
+
+    public function deleteSlideDetails(Request $request){
+        $input = $request->all();
+        if (!empty($input['delete_detail_id'])) {
+            $data_delete = Slideshow_detail::find($input['delete_detail_id']);
+            $data_delete->delete();
+            return response()->json(
+                [
+                    'message' => 'Xóa thành công !'
+                ]
+            );
+        }
     }
 }
