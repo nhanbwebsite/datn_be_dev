@@ -259,13 +259,17 @@ class FileController extends Controller
                     $errors[] = '['.$item.'] đang được sử dụng, không thể xóa !';
                 }
                 else{
-                    $check = Storage::disk('public')->exists(PATH_UPLOAD.$item);
-                    $file = File::where('name', $item)->first();
-                    if(!empty($file) && $check == true){
+                    $filename = explode('view/', $item);
+                    $check = Storage::disk('public')->exists(PATH_UPLOAD.$filename[1]);
+                    $file = File::where('name', $filename[1])->first();
+                    if(!empty($file) && $check){
                         $file->deleted_by = $user->id;
                         $file->save();
-                        Storage::disk('public')->delete(PATH_UPLOAD.$item);
+                        Storage::disk('public')->delete(PATH_UPLOAD.$filename[1]);
                         $file->delete();
+                    }
+                    else{
+                        $errors[] = '['.$item.'] không tồn tại !';
                     }
                 }
             }
