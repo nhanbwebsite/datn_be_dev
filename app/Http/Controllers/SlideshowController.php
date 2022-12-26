@@ -343,7 +343,7 @@ class SlideshowController extends Controller
             );
         }
 
-        $data_update = Slideshow_detail::find($request->slide_id);
+        $data_update = Slideshow_detail::find($request->slide_details_id);
         if($data_update){
             $data_update->slideshow_id = $request->slideshow_id;
             $data_update->image = $request->image;
