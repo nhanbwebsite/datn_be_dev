@@ -70,7 +70,7 @@ class Product extends Model
 
     public static function productVariants($id){
         // return $this->hasMany(ProductVariantDetail::class, 'product_id', 'id');
-        $variantByProducts = DB::table(('productVariant'))->select('variants.id','variants.variant_name')
+        $variantByProducts = DB::table(('productVariant'))->select('variants.id','variants.variant_name', 'productVariant.id as productVariantID')
         ->join('products', 'productVariant.product_id', '=', 'products.id')
         ->join('variants', 'productVariant.variant_id', '=', 'variants.id')
         ->where('productVariant.is_active',1)
@@ -94,7 +94,7 @@ class Product extends Model
 
     public static function variantDetailsByProvariant($proVariantId){
         $data = DB::table('productVariantDetails')
-        ->where('productVariantDetails.color_id',$proVariantId)
+        ->where('productVariantDetails.pro_variant_id',$proVariantId)
         ->get();
         return $data;
     }
