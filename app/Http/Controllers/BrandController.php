@@ -20,7 +20,7 @@ class BrandController extends Controller
     $input = $request->all();
     $input['limit'] = $request->limit;
     try{
-        $data = FooterContent::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input) {
+        $data = Brands::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input) {
             if(!empty($input['title'])){
                 $query->where('title', 'like', '%'.$input['title'].'%');
             }
