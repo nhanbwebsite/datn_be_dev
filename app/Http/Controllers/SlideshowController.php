@@ -123,7 +123,7 @@ class SlideshowController extends Controller
             } else {
                 $query->where('slideshow.category_id', null);
             }
-        })->where('is_active',1)->first();
+        })->where('is_active', 1)->first();
         // $update = Slideshow::select('')
         // dd($id->id);
         $data = Slideshow::find($id->id);
@@ -217,7 +217,7 @@ class SlideshowController extends Controller
                     'message' => 'Slideshow không tồn tại'
                 ], 400);
             }
-            $data_detail = Slideshow_detail::where('slideshow_id',$data->id)->delete();
+            $data_detail = Slideshow_detail::where('slideshow_id', $data->id)->delete();
             $data->is_active = 0;
             $data->save();
             $data->deleted_by = auth('sanctum')->user()->id;
@@ -243,7 +243,7 @@ class SlideshowController extends Controller
 
     public function getclientslideshowDetails()
     {
-        $data = Slideshow::where('is_active',1)->get();
+        $data = Slideshow::where('is_active', 1)->get();
 
         return response()->json([
             'status' => 'success',
@@ -319,13 +319,15 @@ class SlideshowController extends Controller
     }
 
 
-    public function listSlideshowMain(){
+    public function listSlideshowMain()
+    {
         $data = Slideshow::whereNull('category_id')->paginate(9);
 
         return response()->json(new SlideshowCollectionClient($data), 200);
     }
 
-    public function updateSlideMain(Request $request){
+    public function updateSlideMain(Request $request)
+    {
         $data_active = Slideshow::find($request->slide_id_active);
         $data_un_active = Slideshow::whereNull('category_id')->update([
             'is_active' => 0
@@ -340,15 +342,24 @@ class SlideshowController extends Controller
         );
     }
 
-    public function deleteSlideDetails(Request $request){
+    public function deleteSlideDetails(Request $request)
+    {
         $input = $request->all();
         if (!empty($input['delete_detail_id'])) {
             $data_delete = Slideshow_detail::find($input['delete_detail_id']);
-            $data_delete->delete();
+            if ($data_delete) {
+                $data_delete->delete();
+                return response()->json(
+                    [
+                        'message' => 'Xóa thành công !'
+                    ]
+                );
+            }
+
             return response()->json(
                 [
-                    'message' => 'Xóa thành công !'
-                ]
+                    'message' => 'Không tìm thấy !'
+                ], 400
             );
         }
     }
