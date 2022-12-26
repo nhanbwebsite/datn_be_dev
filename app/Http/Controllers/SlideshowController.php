@@ -317,6 +317,12 @@ class SlideshowController extends Controller
         $data = Slideshow::whereNotNull('category_id')->paginate(9);
         return response()->json(new SlideshowCollection($data), 200);
     }
+    // one
+    public function listSlideshowByCateByID($id)
+    {
+        $data = Slideshow::whereNotNull('category_id')->where('id',$id)->first();
+        return response()->json(new SlideshowResource($data), 200);
+    }
 
 
     public function listSlideshowMain()
