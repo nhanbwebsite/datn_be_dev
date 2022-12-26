@@ -6,6 +6,9 @@ use App\Http\Resources\FileCollection;
 use App\Http\Resources\FileResource;
 use App\Http\Validators\File\FileUploadValidator;
 use App\Models\File;
+use App\Models\Logo;
+use App\Models\Product;
+use App\Models\Slideshow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -21,7 +24,7 @@ class FileController extends Controller
     public function index()
     {
         try{
-            $data = File::whereNull('deleted_at')->orderBy('created_at')->paginate(20);
+            $data = File::whereNull('deleted_at')->orderBy('created_at', 'desc')->paginate(20);
         }
         catch(HttpException $e){
             return response()->json([
@@ -230,5 +233,65 @@ class FileController extends Controller
             ], $e->getStatusCode());
         }
         return !empty($file) ? response($file)->header('Content-type', 'image/'.strtolower($data->extension)) : null;
+    }
+
+    public function deleteFiles(Request $request){
+        $user = $request->user();
+        $names = $request->names;
+        try{
+            DB::beginTransaction();
+
+            if(!is_array($names)){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Tên ảnh không đúng !',
+                ], 422);
+            }
+
+            $errors = [];
+            foreach($names as $key => $item){
+                $productHasImage = Product::where('url_image', 'like', '%'.$item.'%')->count();
+                $slideHasImage = Slideshow::where('image', 'like', '%'.$item.'%')->count();
+                $logoHasImage = Logo::where('image', 'like', '%'.$item.'%')->count();
+
+                if($productHasImage > 0 || $slideHasImage > 0 || $logoHasImage > 0){
+                    $errors[] = '['.$item.'] đang được sử dụng, không thể xóa !';
+                }
+                else{
+                    $check = Storage::disk('public')->exists(PATH_UPLOAD.$item);
+                    $file = File::where('name', $item)->first();
+                    if(!empty($file) && $check == true){
+                        $file->deleted_by = $user->id;
+                        $file->save();
+                        Storage::disk('public')->delete(PATH_UPLOAD.$item);
+                        $file->delete();
+                    }
+                }
+            }
+
+            if(count($errors) > 0){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $errors,
+                ], 400);
+            }
+
+            DB::commit();
+        }
+        catch(HttpException $e){
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đã xóa !',
+        ]);
     }
 }

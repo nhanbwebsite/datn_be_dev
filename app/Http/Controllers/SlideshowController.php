@@ -288,7 +288,7 @@ class SlideshowController extends Controller
             ]);
             //  dd($data);
             $update_active = Slideshow::find($input['slide_id']);
-            $update_active->is_active = 1;
+            $update_active->is_active = $request->is_active;
             $update_active->save();
             // $update = Slideshow::select('')
             // dd($id->id);
@@ -340,7 +340,7 @@ class SlideshowController extends Controller
                 'is_active' => 0
             ]);
 
-            $data_active->is_active = 1;
+            $data_active->is_active = $request->is_active;
             $data_active->save();
             return response()->json(
                 [
