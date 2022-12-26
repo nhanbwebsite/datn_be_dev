@@ -16,6 +16,7 @@ class FooterContentCollection extends ResourceCollection
     {
         if(!$this->collection->isEmpty()){
             foreach($this->collection as $value){
+                // dd($value->category);
                 $result['data'][] = [
                     'id'            => $value->id,
                     'category_id'   => $value->category_id,

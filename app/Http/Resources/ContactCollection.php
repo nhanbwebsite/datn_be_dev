@@ -19,7 +19,7 @@ class ContactCollection extends ResourceCollection
                 $result['data'][] = [
                     'id'            => $value->id,
                     'footer_category_id' => $value->category_id,
-                    'name_category' => $value->footerCategory->name,
+                    'name_category' => $value->footerCategory->name??null,
                     'name'          => $value->name,
                     'phone'          => $value->phone,
                     'time'          => $value->time,

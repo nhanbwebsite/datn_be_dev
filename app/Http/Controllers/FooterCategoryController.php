@@ -8,6 +8,7 @@ use App\Http\Resources\FooterCategoryResource;
 use App\Http\Resources\LoadFooterCategoryClientCollection;
 use App\Http\Resources\LoadFooterContentResource;
 use App\Models\FooterCategory;
+use App\Models\FooterContent;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -186,36 +187,42 @@ class FooterCategoryController extends Controller
     {
         $user = $request->user();
         try {
-            DB::beginTransaction();
+            //DB::beginTransaction();
 
             $data = FooterCategory::find($id);
-            if(empty($data)){
+            if(!empty($data)){
+                $dataCheck = FooterContent::where('category_id',$data->id)->count();
+
+                if($dataCheck > 0 ){
                 return response()->json([
-                    'status' => 'error',
-                    'message' => 'Danh mục không tồn tại !',
-                ], 404);
+                    'message' => 'Danh mục này đã được sử dụng !',
+                ], 200);
 
             }
             $data->deleted_by = $user->id;
             $data->save();
-            $data->delete();
+            $delete = $data->delete();
+            if($delete) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Đã xóa thành công danh mục ' . $data->name
+                ]);
+            }
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Lỗi, vui lòng thử lại !'
+            ],400);
+        }
 
-            DB::commit();
-        } catch(HttpException $e){
+            //DB::commit();
+        }  catch(Exception $e){
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => [
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ],
-            ], $e->getStatusCode());
+                'message' => $e->getMessage()
+            ]);
         }
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Đã xóa thành công danh mục ' . $data->name
-        ]);
+
     }
 
     public function loadByCate($id)
