@@ -250,6 +250,7 @@ class FileController extends Controller
             }
 
             $errors = [];
+            $notFound = [];
             foreach($names as $key => $item){
                 $productHasImage = Product::where('url_image', 'like', '%'.$item.'%')->count();
                 $slideHasImage = Slideshow_detail::where('image', 'like', '%'.$item.'%')->count();
@@ -269,7 +270,7 @@ class FileController extends Controller
                         $file->delete();
                     }
                     else{
-                        $errors[] = '['.$item.'] không tồn tại !';
+                        $notFound[] = '['.$item.'] không tồn tại !';
                     }
                 }
             }
@@ -279,6 +280,12 @@ class FileController extends Controller
                     'status' => 'error',
                     'message' => $errors,
                 ], 400);
+            }
+            if(count($notFound) > 0){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $notFound,
+                ], 404);
             }
 
             DB::commit();
