@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\SubCategory;
+use App\Http\Resources\CategoryCollectionFinal;
 class CategoryController extends Controller
 {
     /**
@@ -211,7 +212,13 @@ class CategoryController extends Controller
         try {
 
             $data = Category::find($id);
-
+            $dataCheck = SubCategory::where('category_id',$data->id)->count();
+            // dd($dataCheck);
+            if(!empty( $dataCheck)){
+                return response()->json([
+                    'message' => 'Đã tồn tại danh mục con, không thể xóa danh mục này !'
+                ]);
+            }
             if(!empty($data)){
                 $data->deleted_by = auth('sanctum')->user()->id;
                 $data->save();
@@ -319,6 +326,22 @@ class CategoryController extends Controller
         }
 
         return response()->json(new CategoryCollection($data));
+    }
+
+
+
+    public function SlideShowByCate(Request $request){
+        $input = $request->all();
+        $data = Category::where('is_post',0)->where(function($query) use ($input){
+                if(!empty($input['name'])){
+                    $query->where('name', 'like', '%'.$input['name'].'%');
+                }
+                if(!empty($input['slug'])){
+                    $query->where('slug', $input['slug']);
+                }
+            })->orderBy('created_at', 'desc')->paginate($input['limit'] ?? 9);
+
+        return response()->json(new CategoryCollectionFinal($data));
     }
 
 }

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ColorCollection;
+use App\Models\ProductVariantDetailById;
 class ColorsController extends Controller
 {
     /**
@@ -108,6 +109,7 @@ class ColorsController extends Controller
     {
         try{
             $data = Color::find($id);
+
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
@@ -200,10 +202,14 @@ class ColorsController extends Controller
         try {
             DB::beginTransaction();
             $data = Color::find($id);
-
+            $datacheck = ProductVariantDetailById::where('color_id',$data->id)->get();
+            if(!empty($datacheck)){
+                return response()->json([
+                    'message' => 'Đã tồn tại sản phẩm sử dụng màu này, không thể xóa!'
+                ], 400);
+            }
             if(empty($data)){
                 return response()->json([
-                    'status' => 'error',
                     'message' => 'Không tìm thấy màu !!'
                 ], 404);
             }

@@ -40,4 +40,9 @@ class Category extends Model
     public function updatedBy(){
         return $this->belongsTo(User::class, 'updated_by', 'id');
     }
+
+    public function slideshowBycate(){
+        return $this->hasMany(Slideshow::class, 'category_id', 'id');
+    }
+
 }
