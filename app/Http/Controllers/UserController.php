@@ -92,7 +92,7 @@ class UserController extends Controller
                 'province_id' => $request->province_id,
                 'phone' => $request->phone,
                 'password' => Hash::make($request->password),
-                'is_active' => $request->is_active ?? 0,
+                'is_active' => $request->is_active ?? 1,
                 'created_by' => $request->user()->id,
                 'updated_by' => $request->user()->id,
             ]);
