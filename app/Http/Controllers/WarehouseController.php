@@ -231,4 +231,11 @@ class WarehouseController extends Controller
             'message' => 'Đã xóa kho ['.$data->name.'] !',
         ]);
     }
+
+    public function getAllNopaginate(){
+        $data = Warehouse::all();
+        return response()->json([
+            'data' =>  $data
+        ]);
+    }
 }

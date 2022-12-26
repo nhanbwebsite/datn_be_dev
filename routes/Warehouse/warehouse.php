@@ -11,4 +11,5 @@ Route::controller(WarehouseController::class)->middleware(['auth:sanctum'])->pre
 });
 Route::get('/warehouses', [WarehouseController::class,'index']);
 Route::get('warehouses/{id}', [WarehouseController::class,'show']);
+Route::get('/getAllNoPaginate', [WarehouseController::class,'getAllNopaginate']);
 ?>
