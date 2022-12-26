@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ClientOrderStatusCollection;
 use App\Http\Resources\OrderStatusCollection;
 use App\Http\Resources\OrderStatusResource;
 use App\Http\Validators\OrderStatus\OrderStatusUpsertValidator;
+use App\Models\Order;
 use App\Models\OrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -209,5 +211,56 @@ class OrderStatusController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa ['.$data->name.']',
         ]);
+    }
+
+    public function clientGetOrderStatus(){
+        try{
+            $data = OrderStatus::where('is_active', 1)->get();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new ClientOrderStatusCollection($data));
+    }
+
+    public function getStatusProcessByOrder($code){
+        try{
+            $order = Order::where('code', $code)->first();
+            $process = ORDER_STATUS_PROCESS;
+            foreach(ORDER_STATUS_PROCESS as $k => $status){
+                if($status == $order->status){
+                    for($i = 0; $i <= $k; $i++){
+                        unset($process[$i]);
+                    }
+                }
+            }
+            $result = [];
+            foreach($process as $item){
+                $stt = OrderStatus::where('id', $item)->where('is_active', 1)->first();
+                $result[] = $stt;
+            }
+
+            $result[] = OrderStatus::where('id', ORDER_STATUS_COMPLETED)->where('is_active', 1)->first();
+            $result[] = OrderStatus::where('id', ORDER_STATUS_CANCELED)->where('is_active', 1)->first();
+            $result[] = OrderStatus::where('id', ORDER_STATUS_RETURNED)->where('is_active', 1)->first();
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new ClientOrderStatusCollection($result));
     }
 }
