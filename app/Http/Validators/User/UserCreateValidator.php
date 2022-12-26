@@ -8,7 +8,7 @@ class UserCreateValidator extends ValidatorBase{
     protected function rules(){
         return [
             'name' => 'required|string|max:255',
-            'address' => 'nullable|string|max:255',
+            'address' => 'required|string|max:255',
             'role_id'   => 'nullable|numeric|exists:roles,id',
             'store_id'   => 'nullable|numeric|exists:stores,id',
             'ward_id' => 'required|exists:wards,id',
@@ -25,6 +25,7 @@ class UserCreateValidator extends ValidatorBase{
             'name.required' => ':attribute không được để trống !',
             'name.string' => ':attribute phải là chuỗi !',
             'name.max' => ':attribute tối đa 255 ký tự !',
+            'address.required' => ':attribute không được để trống !',
             'address.string' => ':attribute phải là chuỗi !',
             'address.max' => ':attribute tối đa 255 ký tự!',
             'role_id.numeric' => ':attribute chưa đúng !',
