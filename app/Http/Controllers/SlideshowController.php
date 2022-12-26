@@ -328,18 +328,36 @@ class SlideshowController extends Controller
 
     public function updateSlideMain(Request $request)
     {
-        $data_active = Slideshow::find($request->slide_id_active);
-        $data_un_active = Slideshow::whereNull('category_id')->update([
-            'is_active' => 0
-        ]);
+        if($request->slide_id_active){
+            $data_active = Slideshow::find($request->slide_id_active);
+            $data_un_active = Slideshow::whereNull('category_id')->update([
+                'is_active' => 0
+            ]);
 
-        $data_active->is_active = 1;
-        $data_active->save();
-        return response()->json(
-            [
-                'message' => 'Cập trạng thái hiển thị slideshow thành công'
-            ]
-        );
+            $data_active->is_active = 1;
+            $data_active->save();
+            return response()->json(
+                [
+                    'message' => 'Cập nhật trạng thái hiển thị slideshow thành công'
+                ]
+            );
+        }
+
+        $data_update = Slideshow_detail::find($request->slide_id);
+        if($data_update){
+            $data_update->slideshow_id = $request->slideshow_id;
+            $data_update->image = $request->image;
+            $data_update->url = $request->url;
+            $data_update->is_active = $request->is_active;
+            $data_update->save();
+            return response()->json(
+                [
+                    'message' => 'Cập nhật thành công !'
+                ] , 200
+            );
+        }
+
+
     }
 
     public function deleteSlideDetails($id)
