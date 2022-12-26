@@ -155,6 +155,7 @@ class AuthController extends Controller
                 'phone' => $input['phone'],
                 'request_code_at' => date('Y-m-d H:i:s', time()+60),
                 'password' => Hash::make($input['password']),
+                'is_active' => 1,
             ]);
 
             $new_sms->is_used = 1;
