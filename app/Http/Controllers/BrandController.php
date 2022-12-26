@@ -17,29 +17,33 @@ class BrandController extends Controller
      */
     public function index(Request $request)
     {
-        try{
-            $input = $request->all();
-            $data = Brands::where('is_post',0)
-            ->where('deleted_at',null)
-            ->where(function ($query) use ($input) {
-                if(!empty($input['name'])){
-                    $query->where('brand_name', 'like', '%'.$input['name'].'%');
-                }
-                if(!empty($input['slug'])){
-                    $query->where('slug', 'like', '%'.$input['slug'].'%');
-                }
-            })
-            ->paginate(9);
-            return response()->json(new BrandCollection($data));
-
-        } catch(Exception $e){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => $e->getMessage()
-                ]);
-        }
+    $input = $request->all();
+    $input['limit'] = $request->limit;
+    try{
+        $data = FooterContent::where('is_active', $input['is_active'] ?? 1)->where(function ($query) use ($input) {
+            if(!empty($input['title'])){
+                $query->where('title', 'like', '%'.$input['title'].'%');
+            }
+            if(!empty($input['user_id'])){
+                $query->where('user_id', $input['user_id']);
+            }
+            if(!empty($input['is_active'])){
+                $query->where('is_active', $input['is_active']);
+            }
+        })->orderBy('created_at', 'asc')->paginate($input['limit'] ?? 10);
     }
-
+    catch(HttpException $e){
+        return response()->json([
+            'status' => 'error',
+            'message' => [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ],
+        ], $e->getStatusCode());
+    }
+    return response()->json(new BrandCollection($data));
+}
     /**
      * Store a newly created resource in storage.
      *
@@ -284,4 +288,28 @@ class BrandController extends Controller
                 ]);
         }
     }
-}
+    public function brandnotPaginate()
+    {
+        try {
+            $data = Brands::all();
+            return response()->json([
+                'message' => 'SubCategories',
+                'data' => $data
+            ],200);
+
+        } catch (Exception $e) {
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ],400);
+
+        }
+        return response()->json([
+            'data' =>   $data
+        ]);
+
+    }
+    }
+
+
