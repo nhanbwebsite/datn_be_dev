@@ -767,8 +767,17 @@ class ProductController extends Controller
         ],200);
     }
 
-    public function productsHaveCommentAll(){
-        $data = Product::paginate(9);
+    public function productsHaveCommentAll(Request $request){
+        $input = $request->all();
+        $data = Product::where(function ($query) use ($input) {
+            if(!empty($input['name'])){
+                $query->where('name', 'like', '%'.$input['name'].'%');
+            }
+            if(!empty($input['slug'])){
+                $query->where('slug', 'like', '%'.$input['slug'].'%');
+            }
+
+       })->paginate(9);
         $data = new ProductsHaveComemntCollection($data);
         return response()->json(
              $data,200);
