@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ProductVariant as ProductVariantModel;
 use App\Models\ProductVariantDetailById;
+use App\Models\ProductVariantDetail;
 class ProductVariant extends Controller
 {
     /**
@@ -171,7 +172,12 @@ class ProductVariant extends Controller
         try {
             DB::beginTransaction();
             $data = ProductVariantModel::find($id);
-
+            $dataCheck = ProductVariantDetail::where('variant_id', $data->id)->count();
+           if($dataCheck){
+            return response()->json([
+                'message' => 'Biến thể này đang được sử dụng, không thể xóa !'
+            ], 400);
+           }
             if(empty($data)){
                 return response()->json([
                     'status' => 'error',
