@@ -6,6 +6,7 @@ use App\Models\Brands;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use App\Models\SubCategory;
 use App\Http\Resources\BrandResource;
 class BrandController extends Controller
 {
@@ -230,6 +231,12 @@ class BrandController extends Controller
             $data = Brands::find($id);
 
             if(!empty($data)){
+                $dataCheck = SubCategory::where('brand_id',$data->id)->count();
+                if($dataCheck > 0){
+                    return response()->json([
+                        'message' => 'Thương hiệu này đã được sử dụng,  không thể xóa !'
+                    ],200);
+                }
             $data->deleted_by = auth('sanctum')->user()->id;
             $data->save();
             $delete = $data->delete();
