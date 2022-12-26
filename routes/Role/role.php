@@ -10,4 +10,5 @@ Route::controller(RoleController::class)->middleware(['auth:sanctum'])->prefix('
     Route::delete('/{id}', 'destroy')->middleware(['checkAction:all,delete-role']);
 });
 
+Route::get('get-roles-by-lvl', [RoleController::class, 'roleByLevel'])->middleware(['auth:sanctum', 'checkAction:all,view-role']);
 ?>

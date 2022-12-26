@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\RoleByLevelCollection;
 use App\Http\Resources\RoleCollection;
 use App\Http\Resources\RoleResource;
 use App\Http\Validators\Role\RoleCreateValidator;
@@ -208,5 +209,25 @@ class RoleController extends Controller
             'status' => 'success',
             'message' => 'Đã xóa ['.$data->name.']',
         ]);
+    }
+
+    public function roleByLevel(Request $request){
+        $user = $request->user();
+        try{
+
+            $data = Role::where('level', '<', $user->role->level)->get();
+
+        }
+        catch(HttpException $e){
+            return response()->json([
+                'status' => 'error',
+                'message' => [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ],
+            ], $e->getStatusCode());
+        }
+        return response()->json(new RoleByLevelCollection($data));
     }
 }
