@@ -17,3 +17,4 @@ Route::prefix('admin')->group(function(){
 });
 
 Route::get('/client/categories',[CategoryController::class,'getClientCategory']);
+Route::get('/listSlideShowByCate',[CategoryController::class,'SlideShowByCate']);
