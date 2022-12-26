@@ -340,7 +340,7 @@ class SlideshowController extends Controller
                 'is_active' => 0
             ]);
 
-            $data_active->is_active = 1;
+            $data_active->is_active = $request->is_active;
             $data_active->save();
             return response()->json(
                 [
