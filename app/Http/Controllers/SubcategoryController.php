@@ -414,7 +414,7 @@ class SubcategoryController extends Controller
             if(!empty($input['slug'])){
                 $query->where('slug', 'like', '%'.$input['slug'].'%');
             }
-       })->paginate($input['limit'] ?? 9);
+       })->orderBy('created_at','desc')->paginate($input['limit'] ?? 9);
 
         return response()->json(new subcateGoryCollection($data),200);
 
@@ -431,7 +431,7 @@ class SubcategoryController extends Controller
             if(!empty($input['slug'])){
                 $query->where('slug', 'like', '%'.$input['slug'].'%');
             }
-       })->paginate($input['limit'] ?? 9);
+       })->orderBy('created_at','desc')->paginate($input['limit'] ?? 9);
        return response()->json(new subcateGoryCollection($data),200);
 
     }

@@ -278,7 +278,7 @@ class CategoryController extends Controller
                     $query->where('slug', $input['slug']);
                 }
             })
-            ->where('is_post',0)
+            ->where('is_post',0)->orderBy('created_at','desc')
             ->paginate(9);
             foreach( $data as $value){
                 // push object subscategories
