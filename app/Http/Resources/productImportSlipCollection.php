@@ -23,7 +23,8 @@ class  productImportSlipCollection extends ResourceCollection
                     $value2->product_info->name;
                     $value2->product_info->variant;
                     $value2->color;
-                    $value2->variant->variant_product;
+                    // dd($value2->pro_variant_id);
+                    $value2->pro_variant_id;
 
                 }
 
