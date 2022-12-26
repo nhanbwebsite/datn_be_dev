@@ -236,7 +236,7 @@ class OrderStatusController extends Controller
             $process = ORDER_STATUS_PROCESS;
             foreach(ORDER_STATUS_PROCESS as $k => $status){
                 if($status == $order->status){
-                    for($i = 0; $i <= $k; $i++){
+                    for($i = 0; $i < $k; $i++){
                         unset($process[$i]);
                     }
                 }
