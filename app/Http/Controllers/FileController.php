@@ -9,6 +9,7 @@ use App\Models\File;
 use App\Models\Logo;
 use App\Models\Product;
 use App\Models\Slideshow;
+use App\Models\Slideshow_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -251,7 +252,7 @@ class FileController extends Controller
             $errors = [];
             foreach($names as $key => $item){
                 $productHasImage = Product::where('url_image', 'like', '%'.$item.'%')->count();
-                $slideHasImage = Slideshow::where('image', 'like', '%'.$item.'%')->count();
+                $slideHasImage = Slideshow_detail::where('image', 'like', '%'.$item.'%')->count();
                 $logoHasImage = Logo::where('image', 'like', '%'.$item.'%')->count();
 
                 if($productHasImage > 0 || $slideHasImage > 0 || $logoHasImage > 0){
