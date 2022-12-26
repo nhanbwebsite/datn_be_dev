@@ -158,6 +158,9 @@ class Product extends Model
         ->where('products.name','like','%'.$keywords.'%')
         ->orWhere('products.meta_title','like','%'.$keywords.'%')
         ->get();
+        foreach($data as $value){
+            $value->price = number_format($value->price);
+        }
         return $data;
     }
 
