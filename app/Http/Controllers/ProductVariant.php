@@ -199,4 +199,16 @@ class ProductVariant extends Controller
             'message' => 'Đã xóa ['.$data->variant_name.'] !',
         ]);
     }
+
+    public function getAllPaginate()
+    {
+        // không phân trang
+        $data = ProductVariantModel::where('is_active',1)->where('deleted_at',null)->paginate(9);
+        // dd($data);
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ],200);
+    }
+
 }
