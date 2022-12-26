@@ -219,6 +219,7 @@ class Product extends Model
         $data = DB::table('categories')
         ->select('categories.id as category_id','categories.name')
         ->where('is_post',0)
+        ->where('deleted_at',null)
         ->get();
         return $data;
     }
