@@ -342,25 +342,25 @@ class SlideshowController extends Controller
         );
     }
 
-    public function deleteSlideDetails(Request $request)
+    public function deleteSlideDetails($id)
     {
-        $input = $request->all();
-        if (!empty($input['delete_detail_id'])) {
-            $data_delete = Slideshow_detail::find($input['delete_detail_id']);
-            if ($data_delete) {
-                $data_delete->delete();
-                return response()->json(
-                    [
-                        'message' => 'Xóa thành công !'
-                    ]
-                );
-            }
 
+        $data_delete = Slideshow_detail::find($id);
+        if ($data_delete) {
+            $data_delete->delete();
             return response()->json(
                 [
-                    'message' => 'Không tìm thấy !'
-                ], 400
+                    'message' => 'Xóa thành công !'
+                ],
+                200
             );
         }
+
+        return response()->json(
+            [
+                'message' => 'Không tìm thấy !'
+            ],
+            400
+        );
     }
 }
