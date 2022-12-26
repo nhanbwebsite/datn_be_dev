@@ -16,4 +16,4 @@ Route::post('/active_slide_cate', [SlideshowController::class, 'showSlideBycateU
 Route::get('/listSlideshowByCate', [SlideshowController::class, 'listSlideshowByCate']);
 Route::get('/listSlideshowMain', [SlideshowController::class, 'listSlideshowMain']);
 Route::post('/updateSlideMain', [SlideshowController::class, 'updateSlideMain']);
-Route::delete('/deleteSlideDetails', [SlideshowController::class, 'deleteSlideDetails']);
+Route::delete('/deleteSlideDetails/{id}', [SlideshowController::class, 'deleteSlideDetails']);
