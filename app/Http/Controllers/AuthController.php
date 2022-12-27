@@ -43,11 +43,12 @@ class AuthController extends Controller
             if(!$user){
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Số điện thoại không đúng !',
+                    'message' => 'Số điện thoại hoặc mật khẩu không đúng !',
                 ], 401);
             }
-
-            $userData = User::where('phone', $input['phone'])->first();
+            Auth::logoutOtherDevices($input['password']);
+            // $userData = User::where('phone', $input['phone'])->first();
+            $userData = User::find(Auth::id());
             if(env('SMS_ENABLE') == 1){
                 if(!empty($userData->request_code_at) && (date('Y-m-d H:i:s', time()-60) > $userData->request_code_at)){
                     return response()->json([
@@ -56,15 +57,14 @@ class AuthController extends Controller
                     ], 400);
                 }
             }
-            // if($userData->is_active == 0){
-            //     return response()->json([
-            //         'status' => 'error',
-            //         'message' => 'Người dùng đã bị khóa hoặc chưa kích hoạt !',
-            //     ], 401);
-            // }
-            $userData->tokens()->delete();
-
+            if($userData->is_active == 0){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Người dùng đã bị khóa hoặc chưa kích hoạt !',
+                ], 401);
+            }
             $oldSession = UserSession::where('user_id', $userData->id)->orderBy('created_at', 'desc')->first();
+            // dd($oldSession->ip_address, $request->ip(), $request->userAgent());
             if(!empty($oldSession)){
                 $oldSession->deleted_by = $userData->id;
                 $oldSession->save();
