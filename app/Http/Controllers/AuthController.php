@@ -69,8 +69,7 @@ class AuthController extends Controller
                 $oldSession->deleted_by = $userData->id;
                 $oldSession->save();
                 $oldSession->delete();
-                $personalAccessTokenID = explode("|", $oldSession->token)[0];
-                PersonalAccessToken::find($personalAccessTokenID)->delete();
+                PersonalAccessToken::where('tokenable_id', $userData->id)->delete();
             }
 
             $data = RolePermission::where([
