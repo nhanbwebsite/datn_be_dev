@@ -65,11 +65,11 @@ class AuthController extends Controller
             }
             $oldSession = UserSession::where('user_id', $userData->id)->orderBy('created_at', 'desc')->first();
             // dd($oldSession->ip_address, $request->ip(), $request->userAgent());
-            $personalAccessTokenID = explode("|", $oldSession->token)[0];
             if(!empty($oldSession) && ($oldSession->ip_address != $request->ip() && $oldSession->user_agent != $request->userAgent())){
                 $oldSession->deleted_by = $userData->id;
                 $oldSession->save();
                 $oldSession->delete();
+                $personalAccessTokenID = explode("|", $oldSession->token)[0];
                 PersonalAccessToken::find($personalAccessTokenID)->delete();
             }
 
