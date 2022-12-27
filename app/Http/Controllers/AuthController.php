@@ -46,7 +46,7 @@ class AuthController extends Controller
                     'message' => 'Số điện thoại hoặc mật khẩu không đúng !',
                 ], 401);
             }
-            Auth::logoutOtherDevices($input['password']);
+            // Auth::logoutOtherDevices($input['password']);
             // $userData = User::where('phone', $input['phone'])->first();
             $userData = User::find(Auth::id());
             if(env('SMS_ENABLE') == 1){
@@ -65,10 +65,12 @@ class AuthController extends Controller
             }
             $oldSession = UserSession::where('user_id', $userData->id)->orderBy('created_at', 'desc')->first();
             // dd($oldSession->ip_address, $request->ip(), $request->userAgent());
-            if(!empty($oldSession)){
+            $personalAccessTokenID = explode("|", $oldSession->token)[0];
+            if(!empty($oldSession) && ($oldSession->ip_address != $request->ip() && $oldSession->user_agent != $request->userAgent())){
                 $oldSession->deleted_by = $userData->id;
                 $oldSession->save();
                 $oldSession->delete();
+                PersonalAccessToken::find($personalAccessTokenID)->delete();
             }
 
             $data = RolePermission::where([
